@@ -1,5 +1,5 @@
 const art={
- settings:'<path d="M19 3h10l2 7 6 3 7-1 4 9-5 5v7l-7 6-6-2-6 3-4 6-9-4v-7l-5-5-7-1 1-10 7-2 4-6Z" fill="#b7a0e9" stroke="#7965aa" stroke-width="2"/><circle cx="24" cy="24" r="9" fill="#fff3cc" stroke="#7965aa" stroke-width="2"/>',
+ settings:'<path d="M20 3h8l2 6 5 3 6-2 4 7-5 4v6l5 4-4 7-6-2-5 3-2 6h-8l-2-6-5-3-6 2-4-7 5-4v-6l-5-4 4-7 6 2 5-3 2-6Z" fill="#b9a4e8" stroke="#755da6" stroke-width="2" stroke-linejoin="round"/><circle cx="24" cy="24" r="8" fill="#fff4d3" stroke="#755da6" stroke-width="2"/>',
  energy:'<path d="M27 3L8 28h13l-3 17 22-28H27Z" fill="#ffd45e" stroke="#bd8b29"/><path d="M24 11L15 24h8" fill="none" stroke="#fff2ba" stroke-width="3"/>',
  feed:'<path d="M25 13C12 2 4 18 10 34q8 15 15 7 8 8 15-7c7-17-3-29-15-21" fill="#f36b70" stroke="#c84155"/><path d="M24 14q-1-10 10-11" fill="none" stroke="#726644" stroke-width="3"/><path d="M25 10q1-10 13-6-1 9-13 6" fill="#71bc67"/><path d="M14 18q-5 5-2 11" stroke="#ffd4bd" stroke-width="4" fill="none"/>',
  pet:'<path d="M24 42C-8 23 9-3 24 13 39-3 56 23 24 42" fill="#f580b1" stroke="#c6538c"/><path d="M12 14q-5 2-4 8" fill="none" stroke="#ffe3ef" stroke-width="4"/>',
