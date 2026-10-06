@@ -20,9 +20,9 @@ export function tick(p,now=Date.now()){
  // Hour-sized steps retain the consequences of long offline absences.
  while(remaining>0&&!n.dead){
   const h=Math.min(1,remaining);remaining-=h;cursor+=h*3600000;
-  n.wasteClock+=h;const interval=n.sleeping?8:1.5;if(n.wasteClock>=interval){const produced=Math.floor(n.wasteClock/interval);n.waste=Math.min(5,n.waste+produced);n.floorDirt=Math.min(5,n.floorDirt+produced);n.stats.hygiene=clamp(n.stats.hygiene-produced*8);n.wasteClock%=interval;}
-  n.stats.food=clamp(n.stats.food-h*(n.sleeping?3:18));n.stats.hygiene=clamp(n.stats.hygiene-h*((n.sleeping?1:6)+(n.waste+(n.floorDirt??0))*.4));n.stats.joy=clamp(n.stats.joy-h*(n.sleeping?.5:18));
-  n.stats.energy=clamp(n.stats.energy+h*(n.sleeping?24:-16));
+  n.wasteClock+=h;const interval=n.sleeping?8:.75;if(n.wasteClock>=interval){const produced=Math.floor(n.wasteClock/interval);n.waste=Math.min(5,n.waste+produced);n.floorDirt=Math.min(5,n.floorDirt+produced);n.stats.hygiene=clamp(n.stats.hygiene-produced*8);n.wasteClock%=interval;}
+  n.stats.food=clamp(n.stats.food-h*(n.sleeping?3:80));n.stats.hygiene=clamp(n.stats.hygiene-h*((n.sleeping?1:6)+(n.waste+(n.floorDirt??0))*.4));n.stats.joy=clamp(n.stats.joy-h*(n.sleeping?.5:22));
+  n.stats.energy=clamp(n.stats.energy+h*(n.sleeping?24:-22));
   const neglected=n.stats.food<=15||n.stats.energy<=10||n.stats.hygiene<=10||n.waste>=4;
   n.neglectHours=neglected?n.neglectHours+h:0;
   n.stats.health=clamp(n.stats.health+h*(neglected?-3:(n.sleeping?2:.5)));
@@ -37,9 +37,9 @@ export function tick(p,now=Date.now()){
 }
 export function care(p,action){const n=structuredClone(p);if(n.dead)return n;const s=n.stats;
  if(action==='sleep'){n.sleeping=!n.sleeping;return n;}
- if(action==='clean'){n.waste=0;n.floorDirt=0;return n;}if(action==='pickup'){n.waste=Math.max(0,(n.waste??0)-1);return n;}
+ if(action==='clean'){n.coins+=n.waste??0;n.waste=0;n.floorDirt=0;return n;}if(action==='pickup'){if((n.waste??0)>0){n.waste--;n.coins++;}return n;}
  if(n.sleeping)return n;
- if(action==='feed'&&n.coins>=5){n.coins-=5;s.food=clamp(s.food+25);s.joy=clamp(s.joy+3);n.xp+=2;}
+ if(action==='feed'&&n.coins>=5){n.coins-=5;s.food=clamp(s.food+60);s.joy=clamp(s.joy+3);n.xp+=2;}
  if(action==='bath'){s.hygiene=100;s.joy=clamp(s.joy+4);n.xp+=2;}
  if(action==='pet'){s.joy=clamp(s.joy+5);}
  if(action==='medicine'&&n.coins>=12&&s.health<90){n.coins-=12;s.health=clamp(s.health+20);}
