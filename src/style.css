@@ -79,3 +79,11 @@ nav button{padding-left:10px;padding-right:10px}nav button span{white-space:nowr
 .shell-board button{display:flex;align-items:center;justify-content:center;padding:0}.shell-board button svg{display:block;flex:none;margin:0;width:64px;height:64px}.memory-board{display:grid;grid-template-columns:repeat(var(--columns,4),minmax(0,1fr))}
 .garden-sky>span{left:50%;right:auto;transform:translateX(-50%)}
 .shop-card>b{display:flex;align-items:center;justify-content:center;gap:5px;min-height:28px}.shop-card>b svg{width:22px;height:22px}.shop-card{display:flex;flex-direction:column;align-items:stretch}.shop-card button{margin-top:auto}
+/* Ground contact follows the SVG feet, rather than a distant blurred shadow. */
+.world .pet-stage.grounded{--pet-size:165px}.world.bedroom .grounded{--pet-size:145px}.garden .garden-pet.grounded{--pet-size:95px}.world .grounded:not(.in-bed):after{bottom:calc(var(--pet-size)*.075);left:29%;width:42%;height:8px;background:#62472c30;filter:blur(1px)}.world .grounded svg.creature{filter:none}.world .grounded.roaming .creature{animation:grounded-walk .9s ease-in-out infinite;transform-origin:50% 93%}@keyframes grounded-walk{0%,100%{transform:rotate(-1deg)}50%{transform:rotate(1deg)}}
+@media(prefers-reduced-motion:reduce){.world .grounded.roaming .creature{animation:none}}
+.reduce-motion .world .grounded.roaming .creature{animation:none}
+.world.bedroom .bedside-lamp,.world.bedroom:not(.night) .bedside-lamp{bottom:183px}
+.pet-blanket{position:absolute;left:44%;bottom:172px;width:104px;height:60px;transform:translateX(-50%) rotate(10deg);z-index:6;pointer-events:none}.pet-blanket svg{width:100%;height:100%;display:block}.night .pet-blanket{filter:brightness(.68)}
+.world .grounded.in-bed .creature{animation:none;transform:none}
+.world.bedroom .bedside-lamp,.world.bedroom:not(.night) .bedside-lamp{bottom:178px}.pet-blanket{bottom:157px}
