@@ -1,0 +1,62 @@
+name: Gerar APK PetVerso
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: apk-petverso-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: npx cap add android
+      - run: node .github/scripts/prepare-android.mjs
+      - name: Compilar APK de teste
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          sed -i 's/versionName "1.0"/versionName "0.3.0"/' app/build.gradle
+          sed -i 's/versionCode 1/versionCode 3/' app/build.gradle
+          ./gradlew assembleDebug --no-daemon --stacktrace
+      - name: Preparar download
+        run: |
+          mkdir -p apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk apk/petverso-v03.apk
+          sha256sum apk/petverso-v03.apk > apk/SHA256SUMS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: petverso-apk-teste
+          path: apk/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Resumo
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<'SUMMARY'
+          ## PetVerso — APK de teste
+          Baixe **petverso-apk-teste**, extraia e instale **petverso-v03.apk**.
+          Android 7 ou superior. Jogo offline, sem conta e sem chave de API.
+          Assinatura de desenvolvimento: uma atualização pode exigir desinstalar a versão anterior.
+          SUMMARY

@@ -1,0 +1,67 @@
+name: Gerar app iOS
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      signed_iphone:
+        description: Gerar IPA Ad Hoc para iPhones cadastrados (requer os Secrets IOS_*)
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: ios-petverso-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 30
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - name: Compilar o jogo
+        run: npm run build
+      - run: npx cap add ios
+      - name: Compilar app iOS
+        run: bash .github/scripts/build-ios.sh
+        env:
+          APP_SLUG: petverso
+          IOS_SIGNED: ${{ github.event_name == 'workflow_dispatch' && inputs.signed_iphone }}
+          IOS_CERTIFICATE_P12_BASE64: ${{ secrets.IOS_CERTIFICATE_P12_BASE64 }}
+          IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          IOS_TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: petverso-ios
+          path: artifacts/
+          retention-days: 14
+          if-no-files-found: error
+      - name: Resumo
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<'SUMMARY'
+          ## Build iOS
+          O ZIP contém o app para simulador do Xcode; ele não instala em iPhone físico.
+          Ao executar manualmente com assinatura ativada e Secrets Apple configurados,
+          o artefato também contém o IPA Ad Hoc para os iPhones registrados no perfil.
+          Consulte os requisitos de assinatura no README.
+          SUMMARY
+      - name: Limpar material de assinatura
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/ios-profile-uuid.txt" ]; then
+            profile_uuid="$(cat "$RUNNER_TEMP/ios-profile-uuid.txt")"
+            rm -f "$HOME/Library/MobileDevice/Provisioning Profiles/$profile_uuid.mobileprovision"
+          fi
+          security delete-keychain "$RUNNER_TEMP/ios-build.keychain-db" 2>/dev/null || true
+          rm -f "$RUNNER_TEMP/ios-certificate.p12" "$RUNNER_TEMP/ios-profile.mobileprovision" "$RUNNER_TEMP/ios-profile.plist"

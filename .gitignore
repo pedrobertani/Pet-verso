@@ -1,0 +1,14 @@
+node_modules/
+dist/
+android/
+ios/
+*.apk
+*.aab
+*.jks
+*.keystore
+*.ipa
+*.p12
+*.mobileprovision
+test-results/
+playwright-report/
+artifacts/
