@@ -25,4 +25,4 @@ ball:'<defs><clipPath id="toy-ball-clip"><circle cx="24" cy="24" r="19"/></clipP
  hide:'<path d="M6 15l18-8 18 8v27H6Z" fill="#f7c477" stroke="#bf8c42"/><path d="M6 15h36M24 15v27" stroke="#bf8c42"/><path d="M18 23q6-8 12 0-6 11-12 0" fill="#e68aa7"/>',
  runner:'<path d="M8 15h12l5 14 15 4q8 2 4 10H5V29Z" fill="#8ccfdd" stroke="#508fab"/><path d="M5 39h39M21 23l7-2M23 28l8-2" stroke="#fff7e1" stroke-width="4"/>'
 });
-export function colorfulIcon(name){const a=art[name==='star'?'brain':name==='food'?'feed':name];return a?`<svg class="icon colorful-icon" viewBox="0 0 48 48" aria-hidden="true"><g stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${a}</g></svg>`:null;}
+export function colorfulIcon(name){const a=art[name==='memory-ball'?'ball':name==='star'?'brain':name==='food'?'feed':name];return a?`<svg class="icon colorful-icon" viewBox="0 0 48 48" aria-hidden="true"><g stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${a}</g></svg>`:null;}
