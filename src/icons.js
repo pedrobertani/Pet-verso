@@ -1,4 +1,4 @@
-const art={
+const art={box:'<path d="M5 15L24 6l19 9v27H5Z" fill="#efbd79" stroke="#b98347"/><path d="M5 15h38M24 15v27" stroke="#b98347"/><path d="M19 16h10v11l-5-3-5 3Z" fill="#ffe4b0"/>',sun:'<circle cx="24" cy="24" r="11" fill="#ffdc78"/><path d="M24 3v6M24 39v6M3 24h6M39 24h6M9 9l4 4M35 35l4 4M9 39l4-4M35 13l4-4" stroke="#ffeaa2" stroke-width="3"/>',
  settings:'<path d="M20 3h8l2 6 5 3 6-2 4 7-5 4v6l5 4-4 7-6-2-5 3-2 6h-8l-2-6-5-3-6 2-4-7 5-4v-6l-5-4 4-7 6 2 5-3 2-6Z" fill="#b9a4e8" stroke="#755da6" stroke-width="2" stroke-linejoin="round"/><circle cx="24" cy="24" r="8" fill="#fff4d3" stroke="#755da6" stroke-width="2"/>',
  energy:'<path d="M27 3L8 28h13l-3 17 22-28H27Z" fill="#ffd45e" stroke="#bd8b29"/><path d="M24 11L15 24h8" fill="none" stroke="#fff2ba" stroke-width="3"/>',
  feed:'<path d="M24 15C14 8 5 14 6 25C7 36 13 44 20 41Q24 39 28 41C35 44 41 36 42 25C43 14 34 8 24 15Z" fill="#ef656a"/><path d="M24 15Q24 9 20 5" fill="none" stroke="#916956" stroke-width="4"/><path d="M26 11C26 4 34 2 41 4C38 10 32 13 26 11Z" fill="#74b56a"/>',
