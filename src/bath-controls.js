@@ -1,0 +1,27 @@
+export const showerArt=`<svg viewBox="0 0 80 180" aria-hidden="true"><path d="M56 8v21q0 9-13 9" fill="none" stroke="#369cba" stroke-width="13" stroke-linecap="round"/><path d="M54 8v20" stroke="#a2edf4" stroke-width="4" stroke-linecap="round"/><path d="M14 37q22-28 44 0v9H14Z" fill="#58c8de" stroke="#3189ad" stroke-width="2"/><path d="M17 47h38" stroke="#e4fdff" stroke-width="4" stroke-linecap="round"/><g class="shower-stream" fill="none" stroke="#7ae2f2" stroke-width="3.5" stroke-linecap="round"><path d="M20 50L9 169M28 50l-4 126M36 50v128M44 50l5 126M52 50l12 119"/></g></svg>`;
+export function bindBath({root,audio,step,sleeping,onStep}){
+ const room=root.querySelector('.bathroom'),target=root.querySelector('#touch-pet'),soap=root.querySelector('#bath-soap'),shower=root.querySelector('#bath-shower');if(!room||!target)return ()=>{};
+ let active=null,frame=0,timeout=0,selected=false,wetTime=0,soapDistance=0,last=null,moved=false,finished=false;
+ const tools=[soap,shower];for(const tool of tools)tool.disabled=sleeping||step===3||(tool===soap&&step!==1);
+ function petBox(){const b=target.getBoundingClientRect();return {left:b.left+b.width*.32,right:b.left+b.width*.7,top:b.top+b.height*.1,bottom:b.top+b.height*.55};}
+ function inside(x,y){const b=petBox();return x>=b.left&&x<=b.right&&y>=b.top&&y<=b.bottom;}
+ function intersectsWater(){const b=shower.getBoundingClientRect(),p=petBox();return b.left+b.width*.65>p.left&&b.left+b.width*.2<p.right&&b.top+45<p.bottom&&b.top+162>p.top;}
+ function water(on){shower.classList.toggle('running',on);if(on)audio.startWater();else audio.stopWater();}
+ function complete(next){if(finished)return;finished=true;water(false);cancelAnimationFrame(frame);clearTimeout(timeout);audio.sound(next===3?'win':'soap');onStep(next);}
+ function beginWater(){if(step!==0&&step!==2)return;water(true);let previous=performance.now();const loop=now=>{if(intersectsWater())wetTime+=Math.min(50,now-previous);previous=now;if(wetTime>=450){shower.classList.add('ready');if(!active)return complete(step===0?1:3);}frame=requestAnimationFrame(loop);};frame=requestAnimationFrame(loop);}
+ function place(tool,x,y){const b=room.getBoundingClientRect();const w=tool.offsetWidth,h=tool.offsetHeight;tool.style.left=Math.max(0,Math.min(b.width-w,x-b.left-w/2))+'px';tool.style.top=Math.max(0,Math.min(b.height-h-20,y-b.top-(tool===shower?30:h/2)))+'px';tool.style.transform='none';}
+ function bubble(x,y){const b=target.getBoundingClientRect(),dot=document.createElement('i');dot.className='soap-bubble';dot.style.left=(x-b.left)+'px';dot.style.top=(y-b.top)+'px';target.append(dot);if(target.querySelectorAll('.soap-bubble').length>16)target.querySelector('.soap-bubble').remove();}
+ function rub(x,y,distance){if(step!==1||!selected||!inside(x,y))return;soapDistance+=Math.min(distance,25);bubble(x,y);if(soapDistance>=45)soap.classList.add('ready');}
+ function down(e,tool){if(tool.disabled||active)return;e.preventDefault();audio.unlock();active=tool;moved=false;last={x:e.clientX,y:e.clientY};tool.setPointerCapture(e.pointerId);tool.classList.add('dragging');if(tool===shower){wetTime=0;beginWater();}else{selected=true;soap.classList.add('selected');audio.sound('soap');}}
+ function move(e,tool){if(active!==tool)return;const distance=Math.hypot(e.clientX-last.x,e.clientY-last.y);if(distance>2)moved=true;last={x:e.clientX,y:e.clientY};place(tool,e.clientX,e.clientY);if(tool===soap)rub(e.clientX,e.clientY,distance);}
+ function up(e,tool,cancelled=false){if(active!==tool)return;active=null;tool.classList.remove('dragging');if(tool.hasPointerCapture?.(e.pointerId))tool.releasePointerCapture(e.pointerId);if(cancelled){cancelAnimationFrame(frame);water(false);return;}if(tool===soap){if(soapDistance>=45)complete(2);}else if(wetTime>=450)complete(step===0?1:3);else if(!moved){const p=petBox();place(shower,(p.left+p.right)/2,p.top-25);timeout=setTimeout(()=>{cancelAnimationFrame(frame);water(false);},1800);}else{cancelAnimationFrame(frame);water(false);}}
+ for(const tool of tools){tool.onpointerdown=e=>down(e,tool);tool.onpointermove=e=>move(e,tool);tool.onpointerup=e=>up(e,tool);tool.onpointercancel=e=>up(e,tool,true);tool.onclick=e=>{if(e.detail!==0)return;if(tool===soap){selected=true;soap.classList.add('selected');return;}if(step===0||step===2){const p=petBox();place(shower,(p.left+p.right)/2,p.top-25);beginWater();timeout=setTimeout(()=>{cancelAnimationFrame(frame);water(false);},1800);}};}
+ // A selected soap can also be rubbed directly on the pet; keyboard users press Enter.
+ let petDrag=false,previous=null;
+ target.onpointerdown=e=>{if(step!==1||!selected)return;petDrag=true;previous={x:e.clientX,y:e.clientY};target.setPointerCapture(e.pointerId);};
+ target.onpointermove=e=>{if(!petDrag)return;const distance=Math.hypot(e.clientX-previous.x,e.clientY-previous.y);previous={x:e.clientX,y:e.clientY};place(soap,e.clientX,e.clientY);rub(e.clientX,e.clientY,distance);};
+ target.onpointerup=()=>{petDrag=false;if(soapDistance>=45)complete(2);};target.onpointercancel=()=>{petDrag=false;};
+ target.onkeydown=e=>{if((e.key==='Enter'||e.key===' ')&&step===1&&!sleeping){e.preventDefault();complete(2);}};
+ const visibility=()=>{if(document.hidden){active=null;cancelAnimationFrame(frame);clearTimeout(timeout);water(false);}};document.addEventListener('visibilitychange',visibility);
+ return ()=>{cancelAnimationFrame(frame);clearTimeout(timeout);audio.stopWater();document.removeEventListener('visibilitychange',visibility);};
+}
