@@ -1,0 +1,58 @@
+name: Gerar AAB para Play Store
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      signed_release:
+        description: Assinar com a chave de upload para envio ao Play Console
+        type: boolean
+        default: false
+      version_code:
+        description: Código da versão (maior que todos os já enviados à loja)
+        type: string
+        required: true
+        default: '1'
+permissions:
+  contents: read
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      APP_SLUG: petverso
+      VERSION_CODE: ${{ inputs.version_code || github.run_number }}
+      SIGNED_RELEASE: ${{ inputs.signed_release || false }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
+      - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - run: npm ci
+      - run: npm test
+      - name: Compilar sem chave pessoal de IA
+        run: npm run build
+      - run: npx cap add android
+      - name: Gerar bundle e assinatura opcional
+        run: bash .github/scripts/build-play.sh
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ inputs.signed_release && secrets.ANDROID_KEYSTORE_BASE64 || '' }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ inputs.signed_release && secrets.ANDROID_KEYSTORE_PASSWORD || '' }}
+          ANDROID_KEY_ALIAS: ${{ inputs.signed_release && secrets.ANDROID_KEY_ALIAS || '' }}
+          ANDROID_KEY_PASSWORD: ${{ inputs.signed_release && secrets.ANDROID_KEY_PASSWORD || '' }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: petverso-play-store
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 14
