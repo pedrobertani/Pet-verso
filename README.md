@@ -1,22 +1,22 @@
-# PetVerso — protótipo v0.1
+# PetVerso — protótipo v0.2
 
-Bichinho virtual offline em português, um companheiro por vez. Adoção escolhida ou ovo surpresa com chances iguais para as 40 espécies. Seis atributos: saciedade, felicidade, energia, higiene, saúde e inteligência. Guarda progresso no dispositivo; inteligência não cai com o tempo.
+Bichinho virtual offline em português, um companheiro por vez. Adoção escolhida ou ovo surpresa com chances iguais para as 17 espécies. Seis atributos: saciedade, felicidade, energia, higiene, saúde e inteligência. Guarda progresso no dispositivo; inteligência não cai com o tempo.
 
-## Catálogo definido nesta base
+## Catálogo visual
 
-- **Pets:** Gato, Cachorro, Coelho, Hamster, Porquinho-da-índia, Calopsita, Poodle, Gatinho preto.
-- **Exóticos:** Axolote, Camaleão, Furão, Iguana, Ouriço, Gecko, Chinchila, Tartaruga.
-- **Selva:** Leão, Macaco, Elefante, Tigre, Panda, Girafa, Zebra, Onça.
-- **Dinos:** Tiranossauro, Tricerátops, Braquiossauro, Estegossauro, Velociraptor, Anquilossauro, Parassaurolofo, Diplodoco.
-- **Sombrios simpáticos:** Fantasminha, Morceguinho, Monstrinho de sombra, Abóbora viva, Dragão noturno, Gatinho espectral, Múmia pequena, Lobinho lunar.
+Dezessete pets com desenhos vetoriais próprios: Gato, Cachorro, Axolote, Camaleão, Leão, Panda, Tiranossauro, Tricerátops, Fantasminha e Morceguinho, além de Coelho, Tartaruga, Elefante, Braquiossauro, Estegossauro, Urso marrom e Urso polar. Sorteio uniforme por espécie. Gatos e cachorros têm três cores escolhidas depois da espécie; ovo surpresa sorteia também a cor. Nome e cor persistem no save. Saves das espécies antigas continuam válidos, com aviso de arte legada. Arte 2D com sombras, sem modelos 3D. Pet passeia na sala, recebe carinho por arraste e dorme na cama no quarto.
 
-As espécies estão cadastradas e disponíveis; a arte inicial usa desenhos vetoriais compartilhados por família, com variações de cor e detalhe. Não são as artes finais específicas de cada animal. Animações iniciais: respirar, piscar, carinho, comer, banho e sono. A corrida usa representação simplificada. Evolução por experiência: jovem aos 40 pontos, adulto aos 120; arte de cada fase ainda pendente.
+Necessidades usam ícones e barras: verde ≥75, amarelo ≥50, laranja ≥25 e vermelho abaixo de 25. O toque mostra o nome e o valor; leitores de tela recebem ambos. Textos de ajuda ficam recolhidos. A inteligência também usa a mesma escala, mas não perde pontos com o tempo.
+
+Banheiro separado com banheira: molhar, ensaboar, enxaguar e secar por arraste ou botão acessível. Higiene só recupera ao terminar. Necessidades se acumulam na sala; recolher ou limpar é grátis e independente do banho. A carteira atualiza imediatamente ao receber prêmio de minijogo, com proteção contra conclusão duplicada.
+
+Evolução por experiência: jovem aos 40 pontos, adulto aos 120; arte de cada fase ainda pendente. A corrida usa representação simplificada.
 
 ## Cuidados, doença e morte
 
-Alimentar custa 5 moedas; remédio custa 12 e só pode ser usado abaixo de 90 de saúde. Banho, carinho e dormir são grátis. Sono recupera energia em tempo real, inclusive offline, e reduz consumo de comida. O horário é flexível.
+Alimentar custa 5 moedas; remédio custa 12 e só pode ser usado abaixo de 90 de saúde. Banho, carinho, limpeza e dormir são grátis. Sono recupera energia em tempo real, inclusive offline, e reduz consumo de comida. O horário é flexível.
 
-Saciedade ≤15, energia ≤10 ou higiene ≤10 são necessidades críticas. Doze horas contínuas nesse estado, ou saúde ≤25, causam doença. A doença termina quando saúde ≥70 e saciedade, energia e higiene ≥30. **72 horas consecutivas doente sem recuperação causam morte permanente**. Mostra lápide R.I.P., bloqueia cuidados e jogos; sem ressurreição. Nova adoção reinicia pet, moedas e móveis. O tempo offline conta integralmente. Aviso visível antes da adoção e contagem de horas restantes durante a doença. Notificações nativas ainda não implementadas.
+Saciedade ≤15, energia ≤10 ou higiene ≤10, ou quatro necessidades acumuladas, são necessidades críticas. Doze horas contínuas nesse estado, ou saúde ≤25, causam doença. A doença termina quando saúde ≥70 e saciedade, energia e higiene ≥30. **72 horas consecutivas doente sem recuperação causam morte permanente**. Mostra lápide R.I.P., bloqueia cuidados e jogos; sem ressurreição. Nova adoção reinicia pet, moedas e móveis. O tempo offline conta integralmente. Aviso visível antes da adoção e contagem de horas restantes durante a doença. Notificações nativas ainda não implementadas.
 
 ## Brincadeiras e economia
 
@@ -34,4 +34,6 @@ iOS assinado requer IOS_CERTIFICATE_P12_BASE64, IOS_CERTIFICATE_PASSWORD, IOS_PR
 
 ## Limitações desta primeira base
 
-Artes e animações específicas de cada espécie/fase ainda precisam ser produzidas. Preferências por família são apresentadas, mas ainda não alteram benefícios dos cuidados. Personalidade é sorteada inicialmente. Sem contas, sincronização, múltiplos pets simultâneos ou notificações. Não testado em aparelho físico.
+Arte por fase e substituição das artes legadas ainda precisam ser produzidas. Preferências por família são apresentadas, mas ainda não alteram benefícios dos cuidados. Personalidade é sorteada inicialmente. Sem contas, sincronização, múltiplos pets simultâneos ou notificações. Não testado em aparelho físico.
+
+Cocô reduz higiene em oito pontos e deixa manchas; sujeira e cocô acumulados aumentam a perda contínua. Recolher tira só o cocô; limpar remove as manchas e o cocô, sem recuperar a higiene do pet. Abaixo de 60 de higiene, aparecem manchas no pet, removidas com banho completo.
