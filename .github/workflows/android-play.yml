@@ -43,6 +43,7 @@ jobs:
       - name: Compilar sem chave pessoal de IA
         run: npm run build
       - run: npx cap add android
+      - run: node .github/scripts/prepare-android.mjs
       - name: Gerar bundle e assinatura opcional
         run: bash .github/scripts/build-play.sh
         env:
