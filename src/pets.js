@@ -1,3 +1,4 @@
+import {standardPet} from './pet-standard.js';
 import {specialPet} from './pet-art.js';
 // Distinct silhouettes and anatomy for the ten selectable companions.
 const styles={
@@ -22,6 +23,7 @@ Object.assign(styles,{
  'selva-polar':{color:'#edf4ff',back:'<circle cx="57" cy="54" r="21" fill="#dbe5f3"/><circle cx="143" cy="54" r="21" fill="#dbe5f3"/><circle cx="57" cy="54" r="11" fill="#c5d3e4"/><circle cx="143" cy="54" r="11" fill="#c5d3e4"/>',marks:'<ellipse cx="100" cy="119" rx="25" ry="20" fill="#dce8f7"/><ellipse cx="100" cy="113" rx="9" ry="6" fill="#344659"/>'}
 });
 export function petDrawing(s,mode='idle'){
+ const standard=standardPet(s,mode);if(standard)return standard;
  const custom=specialPet(s,mode);if(custom)return custom;
  const base=styles[s.id],palette=s.palette;const t=base?{...base,color:palette?.color||base.color,back:palette?base.back?.replaceAll(base.color,palette.color).replaceAll('#895438',palette.detail):base.back,marks:palette?base.marks?.replaceAll('#bf753d',palette.detail):base.marks,tail:palette?base.tail?.replaceAll('#e99a59',palette.color).replaceAll('#b77b55',palette.detail):base.tail}:null;if(!t)return `<svg class="creature ${mode} legacy" viewBox="0 0 200 200" role="img" aria-label="Pet antigo"><ellipse cx="100" cy="110" rx="58" ry="68" fill="${s.color}"/><text x="100" y="125" text-anchor="middle" font-size="45" fill="#fff">♥</text></svg>`;
  const id=s.id,gradientId=id+'-'+(palette?.id||'base'),fill=`url(#coat-${gradientId})`,eyes=['sleep','sleepy'].includes(mode)?'<path d="M66 93q10 9 20 0M114 93q10 9 20 0" fill="none" stroke="#384456" stroke-width="4"/>':'<ellipse cx="76" cy="94" rx="9" ry="12" fill="#334254"/><ellipse cx="124" cy="94" rx="9" ry="12" fill="#334254"/><ellipse cx="79" cy="89" rx="3" ry="4" fill="white"/><ellipse cx="127" cy="89" rx="3" ry="4" fill="white"/>';
