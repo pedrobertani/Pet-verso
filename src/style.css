@@ -105,3 +105,15 @@ nav button{padding-left:10px;padding-right:10px}nav button span{white-space:nowr
 .reduce-motion .pet-facing{animation:none!important}
 @media(prefers-reduced-motion:reduce){.pet-facing{animation:none!important}}
 .world.garden .roaming .pet-facing{animation:pet-facing-bedroom 18s steps(1,end) infinite}
+
+.world .airborne.roaming:has(.species-sombrios-dragon) .creature{animation:dragon-hover 2.4s ease-in-out infinite;transform-origin:center}
+.world .airborne.roaming .species-sombrios-dragon .pet-wing{animation:dragon-flap .85s ease-in-out infinite}
+.world .airborne.roaming .species-sombrios-dragon .wing-right{animation-direction:reverse}
+.world .airborne.roaming .species-sombrios-dragon .pet-leg{animation:none}
+.bath-composition .species-sombrios-dragon .pet-wing{animation:none}
+@keyframes dragon-hover{0%,100%{transform:translateY(-12px)}50%{transform:translateY(-22px)}}
+@keyframes dragon-flap{0%,100%{transform:rotate(-9deg) scaleX(.95)}50%{transform:rotate(9deg) scaleX(1)}}
+.reduce-motion .world .species-sombrios-dragon{animation:none!important}
+@media(prefers-reduced-motion:reduce){.world .species-sombrios-dragon{animation:none!important}}
+.world .airborne.roaming .species-sombrios-dragon .wing-right{animation-name:dragon-flap-right;animation-direction:normal}
+@keyframes dragon-flap-right{0%,100%{transform:rotate(9deg) scaleX(.95)}50%{transform:rotate(-9deg) scaleX(1)}}
