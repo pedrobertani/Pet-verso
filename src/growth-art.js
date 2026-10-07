@@ -1,7 +1,7 @@
 // Species-specific proportions. Adult artwork remains the approved drawing.
 export const growthProfiles={
- 'dinos-pterosaur':{head:[1,.94],wing:[.58,.78],tail:[.5,.75]},
- 'selva-owl':{head:[1.05,1],wing:[.6,.8],tail:[.65,.8]},
+ 'dinos-pterosaur':{head:[1,.94],wing:[.86,.9],tail:[.5,.75]},
+ 'selva-owl':{head:[1.05,1],wing:[.86,.9],tail:[.65,.8]},
  'exoticos-frog':{head:[1.05,1],body:[.7,.86]},
  'pets-0':{head:[1,.96],tail:[.55,.65]},
  'pets-1':{head:[1,.92],tail:[.65,.65]},
@@ -23,8 +23,8 @@ export const growthProfiles={
  'dinos-2':{head:[.88,.58],body:[.86,.88],tail:[.62,.7]},
  'dinos-3':{head:[.97,.93],plates:[.8,.53],tail:[.62,.7]},
  'sombrios-0':{body:[.84,.7],arm:[.7,.7]},
- 'sombrios-1':{wing:[.62,.7],head:[.9,.85]},
- 'sombrios-dragon':{wing:[.55,.65],tail:[.52,.65],head:[.92,.82]},
+ 'sombrios-1':{wing:[.9,.9],head:[.9,.85]},
+ 'sombrios-dragon':{wing:[.9,.9],tail:[.52,.65],head:[.92,.82]},
 };
 function transformGroup(svg,cls,transform){
  const pattern=new RegExp('<g class="'+cls+'(?: [^"]*)?">','g');let match;

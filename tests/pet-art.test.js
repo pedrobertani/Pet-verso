@@ -7,4 +7,6 @@ test('quadrúpedes acordados têm quatro patas e uma única face; cuidados prese
 
 test('ursos mantêm a pose original, mesmo ao passear',()=>{for(const id of ['selva-4','selva-brown','selva-polar','exoticos-penguin']){const pet=activeSpecies.find(s=>s.id===id);assert.ok(!quadrupedIds.includes(id));assert.ok(!petDrawing({...pet,walking:true},'happy').includes('quadruped-pose'));}});
 
-test('raposa e pinguim não têm boca humana em nenhuma pose',()=>{for(const id of ['selva-fox','exoticos-penguin'])for(const carePose of [false,true])for(const mode of ['happy','sleep','sad','sick'])assert.ok(!petDrawing({...activeSpecies.find(s=>s.id===id),carePose},mode).includes('class="mouth '),id+mode);});
+test('raposa tem só um traço e pinguim mantém o bico',()=>{for(const carePose of [false,true])for(const mode of ['happy','sleep','sad','sick']){assert.ok(!petDrawing({...activeSpecies.find(s=>s.id==='selva-fox'),carePose},mode).includes('class="mouth open"'));assert.ok(!petDrawing({...activeSpecies.find(s=>s.id==='exoticos-penguin'),carePose},mode).includes('class="mouth '));}});
+
+test('bebês têm chupeta no lugar da boca; jovens e adultos não têm chupeta',()=>{for(const s of activeSpecies)for(const carePose of [true,false])for(const growthLevel of [0,1,2]){const svg=petDrawing({...s,carePose,growthLevel},'happy');assert.equal(svg.includes('class="pet-pacifier"'),growthLevel===0,s.id);if(growthLevel===0)assert.ok(!svg.includes('class="mouth open"'),s.id);}});
