@@ -1,3 +1,4 @@
+import {parkToys} from './park-toys.js';
 import {advanceGrowth,countGrowthCare,growthProgress} from './growth.js';
 export const families = [
  {id:'pets',name:'Pets',icon:'🐾',color:'#eab483',names:['Gato','Cachorro','Coelho','Hamster','Porquinho-da-índia','Calopsita','Poodle','Gatinho preto'],food:'ração',toy:'bola'},
@@ -62,4 +63,5 @@ shop.push(...[
 {id:'tub-basic',name:'Banheira lilás',price:0,slot:'tub',room:'bathroom'},
 {id:'tub-mint',name:'Banheira menta',price:200,slot:'tub',room:'bathroom'},
 {id:'tub-rose',name:'Banheira rosinha',price:200,slot:'tub',room:'bathroom'}]);
-export function buy(p,id){const item=shop.find(x=>x.id===id);const n=structuredClone(p);if(n.dead)return n;n.inventory??=[];n.equipped??={};if(!item)return n;if(n.inventory.includes(id)){n.equipped[item.slot]=id;return n;}if(n.coins<item.price)return n;n.coins-=item.price;n.inventory.push(id);n.equipped[item.slot]=id;return n;}
+shop.push(...parkToys);
+export function buy(p,id){const item=shop.find(x=>x.id===id);const n=structuredClone(p);if(n.dead)return n;n.inventory??=[];n.equipped??={};if(!item||(item.species&&item.species!==n.species))return n;if(n.inventory.includes(id)){n.equipped[item.slot]=id;return n;}if(n.coins<item.price)return n;n.coins-=item.price;n.inventory.push(id);n.equipped[item.slot]=id;return n;}

@@ -17,7 +17,7 @@ const tree=(x,y,size=1,kind='round')=>`<g transform="translate(${x} ${y}) scale(
 const pond=(x,y,c='#7bd1da')=>ellipse(x,y,66,21,'#b6dacf')+ellipse(x,y-3,58,16,c)+`<path d="M${x-30} ${y-7}h24m10 6h20" stroke="#e0fcff" stroke-width="3" stroke-linecap="round"/>`;
 const bamboo=(x,y)=>`<g stroke-linecap="round"><path d="M${x} ${y}v-120m16 120v-140m-31 140v-95" stroke="#528b58" stroke-width="8"/><path d="M${x-4} ${y-30}h8m-8-30h8m8 10h8m-8-30h8" stroke="#b3db88" stroke-width="3"/><path d="M${x} ${y-90}q-40-35-30-5q7 12 30 5m16-30q35-28 25-2q-8 10-25 2" fill="#79b96c" stroke="none"/></g>`;
 const cloud=(x,y)=>`<g fill="#fff" opacity=".75">${ellipse(x,y,32,10,'#fff')}${ellipse(x-10,y-8,15,14,'#fff')}${ellipse(x+10,y-12,18,17,'#fff')}</g>`;
-export function environmentArt(id,{night=false,playground=false}={}){
+export function environmentArt(id,{night=false,playground=false,tall=false}={}){
  const e=environments.find(e=>e.id===id)||environments[0];id=e.id;
  const palettes={home:['#a9e6f2','#a5d67b','#c0dd8d'],savanna:['#ffe0a3','#d9c97a','#efd393'],bamboo:['#bae6d8','#91c286','#b9dba0'],forest:['#b9dfec','#84b496','#a9cf9a'],tropical:['#a9e6d8','#78b99b','#a6d4a3'],ice:['#bfe9f5','#c1dbe8','#f0f8fc'],prehistoric:['#b7e1e9','#80b899','#b6d491'],haunted:['#746aab','#696690','#8a7da9'],volcanic:['#f5b4a6','#9b83ad','#c6a3bd'],aquarium:['#a4e6ee','#7bc6d7','#f0d9b1']};
  const [sky,hills,floor]=palettes[id];let back='',front='';
@@ -49,6 +49,6 @@ export function environmentArt(id,{night=false,playground=false}={}){
  };
  back=(supports[id]||'')+back;
  if(playground&&['savanna','bamboo','forest','tropical','ice','prehistoric','haunted','volcanic'].includes(id)){back=`<g transform="translate(600 0) scale(-1 1)">${back}</g>`;front=`<g transform="translate(600 0) scale(-1 1)">${front}</g>`;}
- const sun=id==='haunted'?'<path d="M301 39a25 25 0 1 0 21 40a24 24 0 0 1-21-40" fill="#ffe5a9"/>':id==='aquarium'?'':`<circle cx="300" cy="53" r="21" fill="#ffe7a1"/>`;
- return `<svg class="park-environment theme-${id}" viewBox="0 0 600 400" role="img" aria-label="${e.name}" xmlns="http://www.w3.org/2000/svg"><rect width="600" height="400" fill="${sky}"/>${sun}${id==='haunted'||id==='aquarium'?'':cloud(138,60)+cloud(455,76)}<path d="M0 236Q85 160 177 220T359 201T600 235V400H0Z" fill="${hills}"/><path d="M0 249Q180 236 300 251T600 249V400H0Z" fill="${floor}"/>${back}<path d="M0 322Q200 306 375 327T600 320" fill="none" stroke="#ffffff" stroke-opacity=".13" stroke-width="5"/>${front}${night?'<rect width="600" height="400" fill="#192646" opacity=".45"/>':''}</svg>`;
+ const sun=(night&&id!=='aquarium')||id==='haunted'?'<path d="M301 39a25 25 0 1 0 21 40a24 24 0 0 1-21-40" fill="#ffe5a9"/>':id==='aquarium'?'':`<circle cx="300" cy="53" r="21" fill="#ffe7a1"/>`;
+ return `<svg class="park-environment theme-${id}" viewBox="0 0 600 ${tall?600:400}" preserveAspectRatio="none" role="img" aria-label="${e.name}" xmlns="http://www.w3.org/2000/svg"><rect width="600" height="400" fill="${sky}"/>${sun}${id==='haunted'||id==='aquarium'?'':cloud(138,60)+cloud(455,76)}<path d="M0 236Q85 160 177 220T359 201T600 235V400H0Z" fill="${hills}"/><path d="M0 249Q180 236 300 251T600 249V400H0Z" fill="${floor}"/>${tall?`<rect y="399" width="600" height="201" fill="${floor}"/>`:""}${back}<path d="M0 322Q200 306 375 327T600 320" fill="none" stroke="#ffffff" stroke-opacity=".13" stroke-width="5"/>${front}${night?`<rect width="600" height="${tall?600:400}" fill="#192646" opacity=".45"/>`:''}</svg>`;
 }
