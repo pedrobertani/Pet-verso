@@ -1,3 +1,4 @@
+import {captureSceneMotion,restoreSceneMotion} from './scene-motion.js';
 import {foodIcon} from './pet-diets.js';
 import {bindPetThoughts} from './pet-thoughts.js';
 import {parkActionState,startParkAction,animateParkAction} from './park-actions.js';
@@ -47,7 +48,7 @@ function face(kind){const mouth={happy:'M7 13q5 8 10 0z',bored:'M8 16h8',sad:'M7
 function drawing(s,mode='idle',walking=false){s={...s,growthLevel:pet&&s.id===pet.species?growthProgress(pet).level:0,walking,carePose:!walking,palette:s.palette||((pet&&s.id===pet.species)?palettes[s.id]?.find(c=>c.id===pet.color):null),dirty:pet&&s.id===pet.species&&pet.stats.hygiene<60};return petDrawing(s,mode==='idle'&&pet&&s.id===pet.species?mood():mode);}
 function resetBath(){bathStep=0;bathProgress=0;waterOn=false;soapSelected=false;strokeDistance=0;}
 function render(){
- const visitKey=`${page}:${scene}:${pet?.born}:${pet?.species}`;if(visitKey!==callVisitKey){callVisitKey=visitKey;callNoticeShown=false;skillNoticeShown=false;}
+ const visitKey=`${page}:${scene}:${pet?.born}:${pet?.species}`;const sceneMotion=visitKey===callVisitKey&&pet&&!pet.sleeping&&!pet.dead&&scene!=='bathroom'?captureSceneMotion(root):null;if(visitKey!==callVisitKey){callVisitKey=visitKey;callNoticeShown=false;skillNoticeShown=false;}
  sceneCleanup();sceneCleanup=()=>{};audio.setEnvironment(scene);
  const s=pet?species.find(x=>x.id===pet.species):null;
  root.innerHTML=`<header><a class="brand" href="#">${icon('pet')} PetVerso<span>um pequeno mundo, uma grande amizade</span></a><div class="header-tools">${pet?`<div class="wallet">${icon('coin')} ${pet.coins}</div>`:''}<button id="open-settings" aria-label="Configurações">${icon('settings')}</button></div></header><main>${!pet?adoption():pet.dead?memorial():page==='shop'?store():page==='games'?games():home(s)}</main>${pet&&!pet.dead?`<nav>${[['home','⌂','Meu pet'],['games','▶','Brincar'],['shop','✧','Lojinha']].map(([p,i,n])=>`<button data-page="${p}" class="${page===p?'active':''}">${icon(p)}<span>${n}</span></button>`).join('')}</nav>`:''}<div role="status" class="toast ${message?'show':''}">${esc(message)}</div>`;
@@ -61,7 +62,7 @@ function render(){
  root.querySelector('#confirm-adopt')?.addEventListener('click',()=>finishAdoption(pendingSpecies,palettes[pendingSpecies][pendingColor].id,root.querySelector('#adopt-name').value));
  root.querySelector('#cancel-adopt')?.addEventListener('click',()=>{pendingSpecies=null;render();});
  root.querySelector('#open-growth')?.addEventListener('click',()=>{pet=tick(pet);save();openGrowth(pet);});
- bindScene();root.querySelectorAll('[data-care]').forEach(b=>b.onclick=()=>action(b.dataset.care));
+ restoreSceneMotion(root,sceneMotion);bindScene();root.querySelectorAll('[data-care]').forEach(b=>b.onclick=()=>action(b.dataset.care));
  root.querySelectorAll('[data-game]').forEach(b=>b.onclick=()=>start(b.dataset.game));
  root.querySelectorAll('[data-shop-room]').forEach(b=>b.onclick=()=>{shopRoom=b.dataset.shopRoom;render();});
  root.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{pet=buy(tick(pet),b.dataset.buy);audio.sound('buy');save();render();});
