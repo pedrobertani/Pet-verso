@@ -1,3 +1,4 @@
+import {pterosaur,owl,frog} from './new-pet-art.js';
 import {growthArt} from './growth-art.js';
 import {mouth} from './pet-art.js';
 const g=(cls,svg)=>`<g class="${cls}">${svg}</g>`;
@@ -16,10 +17,9 @@ function lion(s,m,c,f){const age=s.growthLevel??2;let mane='';for(let i=0;i<(age
 function mouse(s,m,c,f){
  const d=s.palette?.detail||'#acb8c7';
  if(!s.walking)return mouseSeated(s,m,c,f);
- return g('pet-tail tail-left',stroke('M66 173Q28 192 12 169','#dda2b4',2.5))+
- g('pet-leg leg-1',path('M76 171l-5 14 14 2 4-14Z',d)+oval(80,187,9,3,'#e7b4c3'))+
- '<g class="mouse-rise">'+g('pet-body',path('M60 160q4-23 32-23 32 0 43 22l-7 19H77q-18-1-17-18Z',f))+
- g('pet-leg leg-0',path('M72 173l-5 12 14 3 8-13Z',c)+oval(77,188,9,3,'#e7b4c3'))+
+ return g('pet-leg leg-0',path('M72 173l-5 12 14 3 8-13Z',c)+oval(77,188,9,3,'#e7b4c3'))+g('pet-leg leg-1',path('M76 171l-5 14 14 2 4-14Z',d)+oval(80,187,9,3,'#e7b4c3'))+'<g class="mouse-rise">'+g('pet-tail tail-left',stroke('M66 173Q28 192 12 169','#dda2b4',2.5))+
+ g('pet-body',path('M60 160q4-23 32-23 32 0 43 22l-7 19H77q-18-1-17-18Z',f))+
+ 
  '<g class="mouse-front">'+g('pet-leg leg-0',path('M122 168l4 16 8 2-2-18Z',d)+oval(133,186,8,3,'#e7b4c3'))+g('pet-leg leg-1',path('M115 171l4 15 9 2-3-17Z',c)+oval(126,188,8,3,'#e7b4c3'))+'</g>'+
  '<g class="mouse-level"><g class="pet-head">'+oval(125,138,13,14,d)+oval(125,138,8.5,9,'#e2b5c9')+oval(144,137,11,12,d)+oval(144,137,7,8,'#e2b5c9')+path('M116 154q0-21 22-19 17 1 23 18l13 12-28 12q-28 1-30-23Z',f)+g('eyes',eye(139,151,m,4.5)+eye(153,152,m,3.5))+oval(173,165,3,2.5,'#d18ca1')+g('mouth closed',stroke('M169 169l-7 1','#806d78',1))+stroke('M164 163l19-5M165 168l20 3M158 168l-16 5','#8794a4',1)+'</g></g></g>';
 }
@@ -101,7 +101,7 @@ function quadruped(s,m,c,f){
  const torso=turtlePet?oval(93,139,51,34,'#669463')+path('M54 135q12-34 41-29 33-1 44 31l-9 21H62Z','#7aa56a')+stroke('M61 127l22 16h27l20-16M83 143l-7 17M110 143l7 17M83 143l12-34','#b4ce8b',3):path(`M43 ${low?132:119}q6-25 42-24h30q30 1 34 29l-5 31H58q-17-9-15-${low?23:36}Z`,body)+oval(94,147,31,10,panda?'#354153':id==='selva-fox'?'#fff1da':body);
  return g('pet-tail tail-left',tail)+leg(67,y,far,1,16,h-2)+leg(130,y,far,0,16,h-2)+g('pet-body',torso+(id==='pets-2'?oval(69,140,24,23,c):''))+leg(48,y,paws,0,21,h)+leg(117,y,paws,1,21,h)+g('pet-head',head);
 }
-const drawings={'pets-0':cat,'pets-1':null,'pets-2':rabbit,'pets-mouse':mouse,'exoticos-0':axolotl,'exoticos-1':chameleon,'exoticos-7':turtle,'selva-0':lion,'selva-2':elephant,'selva-4':bear,'selva-brown':bear,'selva-polar':bear,'dinos-0':rex,'dinos-1':triceratops,'dinos-2':brachio,'dinos-3':stego,'sombrios-0':ghost,'sombrios-1':bat,'selva-capybara':capybara,'selva-fox':fox,'exoticos-penguin':penguin,'sombrios-dragon':dragon};
-const colors={'pets-1':'#d2a079','pets-0':'#f1ad68','pets-2':'#edd2b6','pets-mouse':'#e4eaf2','exoticos-0':'#f4b9d4','exoticos-1':'#92c97d','exoticos-7':'#a0c48c','selva-0':'#edba66','selva-2':'#a9c2e4','selva-4':'#fff4e2','selva-brown':'#b58a63','selva-polar':'#eaf1fa','dinos-0':'#97c981','dinos-1':'#9fc5c5','dinos-2':'#a9c5e8','dinos-3':'#efbf7b','sombrios-0':'#ddd0f1','sombrios-1':'#ae97d2','selva-capybara':'#d7a36e','selva-fox':'#ef9b57','exoticos-penguin':'#7d90b9','sombrios-dragon':'#b6a0de'};
+const drawings={'dinos-pterosaur':pterosaur,'selva-owl':owl,'exoticos-frog':frog,'pets-0':cat,'pets-1':null,'pets-2':rabbit,'pets-mouse':mouse,'exoticos-0':axolotl,'exoticos-1':chameleon,'exoticos-7':turtle,'selva-0':lion,'selva-2':elephant,'selva-4':bear,'selva-brown':bear,'selva-polar':bear,'dinos-0':rex,'dinos-1':triceratops,'dinos-2':brachio,'dinos-3':stego,'sombrios-0':ghost,'sombrios-1':bat,'selva-capybara':capybara,'selva-fox':fox,'exoticos-penguin':penguin,'sombrios-dragon':dragon};
+const colors={'dinos-pterosaur':'#d9a078','selva-owl':'#c8a17a','exoticos-frog':'#8bc68b','pets-1':'#d2a079','pets-0':'#f1ad68','pets-2':'#edd2b6','pets-mouse':'#e4eaf2','exoticos-0':'#f4b9d4','exoticos-1':'#92c97d','exoticos-7':'#a0c48c','selva-0':'#edba66','selva-2':'#a9c2e4','selva-4':'#fff4e2','selva-brown':'#b58a63','selva-polar':'#eaf1fa','dinos-0':'#97c981','dinos-1':'#9fc5c5','dinos-2':'#a9c5e8','dinos-3':'#efbf7b','sombrios-0':'#ddd0f1','sombrios-1':'#ae97d2','selva-capybara':'#d7a36e','selva-fox':'#ef9b57','exoticos-penguin':'#7d90b9','sombrios-dragon':'#b6a0de'};
 let next=0;
 export function standardPet(s,m='idle'){const quad=quadrupedIds.includes(s.id),moving=quad&&!s.carePose&&!['sleep','sleepy'].includes(m);const natural=['pets-0','dinos-1','dinos-2','dinos-3','selva-capybara','selva-fox','pets-mouse'].includes(s.id);const draw=moving?(natural?drawings[s.id]:quadruped):drawings[s.id];if(!draw)return null;if(moving)s={...s,walking:true};let c=s.palette?.color||colors[s.id];if(s.id==='exoticos-penguin')c=(s.growthLevel??2)===0?'#b5bfcc':s.growthLevel===1?'#96aac4':c;const id='standard-coat-'+(++next),fill=`url(#${id})`;return growthArt(`<svg xmlns="http://www.w3.org/2000/svg" class="creature standard-pet ${moving?'walking-pose quadruped-pose':''} ${m} species-${s.id}" viewBox="${s.id==='sombrios-dragon'?'-10 -5 220 210':'0 0 200 200'}" role="img" aria-label="${s.name}"><defs><linearGradient id="${id}" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="${c}"/><stop offset=".58" stop-color="${c}"/><stop offset="1" stop-color="${c}"/></linearGradient></defs>${draw(s,m,c,fill)}${s.dirty?g('pet-dirt',oval(86,146,11,6,'#87623d','opacity=".5"')+oval(135,116,8,5,'#87623d','opacity=".4"')):''}${m==='sick'?stroke('M123 109l14 14','#e78780',4):''}${['sleep','sleepy'].includes(m)?'<g class="sleep-z" fill="#75618b"><text x="154" y="38" font-size="15">z</text><text x="172" y="21" font-size="20">Z</text></g>':''}</svg>`,s.id,s.growthLevel??2);}

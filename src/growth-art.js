@@ -1,5 +1,8 @@
 // Species-specific proportions. Adult artwork remains the approved drawing.
 export const growthProfiles={
+ 'dinos-pterosaur':{head:[1,.94],wing:[.58,.78],tail:[.5,.75]},
+ 'selva-owl':{head:[1.05,1],wing:[.6,.8],tail:[.65,.8]},
+ 'exoticos-frog':{head:[1.05,1],body:[.7,.86]},
  'pets-0':{head:[1,.96],tail:[.55,.65]},
  'pets-1':{head:[1,.92],tail:[.65,.65]},
  'pets-2':{head:[.86,.72],tail:[.75,.75]},

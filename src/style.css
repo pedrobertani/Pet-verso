@@ -159,3 +159,21 @@ nav button{padding-left:10px;padding-right:10px}nav button span{white-space:nowr
 .world .species-pets-mouse .mouse-rise,.world .species-pets-mouse .mouse-level,.world .species-pets-mouse .mouse-front{animation:none!important}
 
 .skill-badge.skill-locked,.skill-badge.skill-cooldown{background:#e0dee5;border-color:#c4c0cc;box-shadow:0 3px 0 #aca7b5;cursor:default}.skill-locked>svg,.skill-cooldown>svg{filter:grayscale(1);opacity:.55}.skill-lock{position:absolute;right:-3px;bottom:-2px;font-size:14px;line-height:1}.skill-seconds{position:absolute;inset:0;display:grid;place-items:center;font-weight:900;color:#453d5c;background:#e0dee5b8;border-radius:inherit}
+
+.performing-trick .creature,.performing-trick .creature *{animation:none!important}
+.trick-effect{position:absolute;pointer-events:none;z-index:6}.trick-effect svg{width:100%;height:100%;overflow:visible}
+.trick-flame{width:50%;height:30%;left:66%;top:39%;animation:trick-effect-pulse 2.4s both}
+.trick-splash{width:50%;height:60%;left:55%;top:-10%;animation:trick-effect-pulse 2.6s both}
+.trick-roar{width:65%;height:65%;left:50%;top:20%;animation:trick-effect-pulse 2.2s both}
+@keyframes trick-effect-pulse{0%,15%,100%{opacity:0;transform:scale(.5)}35%,75%{opacity:1;transform:scale(1)}}
+
+.performing-trick .pet-facing{position:relative}
+.reduce-motion .trick-effect{animation:none}
+@media(prefers-reduced-motion:reduce){.trick-effect{animation:none}}
+
+.world .airborne.roaming:has(.species-dinos-pterosaur,.species-selva-owl) .creature{animation:dragon-hover 2.4s ease-in-out infinite}.world .airborne.roaming .species-dinos-pterosaur .pet-wing,.world .airborne.roaming .species-selva-owl .pet-wing{animation:pet-wing-soft .75s ease-in-out infinite}.world .airborne.roaming .species-dinos-pterosaur .pet-leg,.world .airborne.roaming .species-selva-owl .pet-leg{animation:none}
+.park-performing .creature,.park-performing .creature *{animation:none!important}.park-performing.airborne .pet-wing{animation:pet-wing-soft .55s ease-in-out infinite!important}.park-action-effect{position:absolute;z-index:10;pointer-events:none}.park-splash{width:60px;height:36px;transform:translate(-50%,-80%)}.park-splash svg{width:100%;height:100%}.park-action-bubble{width:8px;height:8px;border:2px solid #d9ffff;border-radius:50%;background:#9be5f166;transform:translate(-50%,-50%)}.park-hoop-foreground{position:absolute;z-index:12;pointer-events:none}.park-hoop-foreground svg{width:100%;display:block}
+
+.park-action-ball{z-index:11;transform:translate(-50%,-50%);pointer-events:none}.park-action-ball svg{width:100%;height:100%}
+
+.pet-thought{position:absolute;z-index:14;width:60px;height:56px;transform:translateX(-50%);border:3px solid #c4b4da;border-radius:48% 48% 44% 44%;background:#fffaf0;box-shadow:0 3px 0 #aa91c333;display:grid;place-items:center;pointer-events:none}.pet-thought>.icon{width:38px;height:38px}.pet-thought i{position:absolute;right:12px;bottom:-12px;width:11px;height:11px;border:2px solid #c4b4da;border-radius:50%;background:#fffaf0}.pet-thought i+i{right:18px;bottom:-20px;width:6px;height:6px}.world[data-thinking="true"] .pet-stage,.world[data-thinking="true"] .pet-facing,.world[data-thinking="true"] .creature *{animation-play-state:paused!important}.world[data-thinking="true"] .airborne .pet-wing{animation-play-state:running!important}[data-theme="dark"] .pet-thought{background:#eee3ff}

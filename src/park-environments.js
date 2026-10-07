@@ -1,25 +1,27 @@
 // Native vector environments. The lower third remains free for pet/toy placement.
 export const environments = [
+ {id:'wetland',name:'Lago dos sapinhos',pets:['exoticos-frog'],description:'Sapo'},
+ {id:'rainforest',name:'Floresta das corujinhas',pets:['selva-owl'],description:'Corujinha'},
  {id:'home',name:'Quintal de casa',pets:['pets-0','pets-1','pets-2','pets-mouse'],description:'Gato, cachorro, coelho e ratinho'},
  {id:'savanna',name:'Savana e lago',pets:['selva-0','selva-2'],description:'Leão e elefante'},
  {id:'bamboo',name:'Bosque de bambus',pets:['selva-4'],description:'Panda'},
  {id:'forest',name:'Bosque e lago',pets:['selva-brown','selva-capybara','selva-fox'],description:'Urso marrom, capivara e raposa'},
  {id:'tropical',name:'Jardim tropical',pets:['exoticos-1','exoticos-7'],description:'Camaleão e tartaruga'},
  {id:'ice',name:'Refúgio de gelo',pets:['selva-polar','exoticos-penguin'],description:'Urso polar e pinguim'},
- {id:'prehistoric',name:'Vale dos dinossauros',pets:['dinos-0','dinos-1','dinos-2','dinos-3'],description:'Todos os dinossauros'},
+ {id:'prehistoric',name:'Vale dos dinossauros',pets:['dinos-0','dinos-1','dinos-2','dinos-3','dinos-pterosaur'],description:'Todos os dinossauros'},
  {id:'haunted',name:'Castelinho encantado',pets:['sombrios-0','sombrios-1'],description:'Fantasminha e morcego'},
  {id:'volcanic',name:'Vale do dragão',pets:['sombrios-dragon'],description:'Dragãozinho'},
  {id:'aquarium',name:'Aquário do axolote',pets:['exoticos-0'],description:'Axolote'}
 ];
-export function environmentFor(species){return environments.find(e=>e.pets.includes(species))||environments[0];}
+export function environmentFor(species){return environments.find(e=>e.pets.includes(species))||environments.find(e=>e.id==='home');}
 const ellipse=(x,y,rx,ry,c)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${c}"/>`;
 const tree=(x,y,size=1,kind='round')=>`<g transform="translate(${x} ${y}) scale(${size})"><path d="M-8 0V-65H8V0Z" fill="#9d704b"/>${kind==='pine'?'<path d="M0-145L-48-65H-30L-59-25H59L30-65H48Z" fill="#528b7b"/>':ellipse(-27,-92,39,36,'#6eae72')+ellipse(27,-92,39,36,'#7cbd78')+ellipse(0,-126,40,36,'#89c77f')}</g>`;
 const pond=(x,y,c='#7bd1da')=>ellipse(x,y,66,21,'#b6dacf')+ellipse(x,y-3,58,16,c)+`<path d="M${x-30} ${y-7}h24m10 6h20" stroke="#e0fcff" stroke-width="3" stroke-linecap="round"/>`;
 const bamboo=(x,y)=>`<g stroke-linecap="round"><path d="M${x} ${y}v-120m16 120v-140m-31 140v-95" stroke="#528b58" stroke-width="8"/><path d="M${x-4} ${y-30}h8m-8-30h8m8 10h8m-8-30h8" stroke="#b3db88" stroke-width="3"/><path d="M${x} ${y-90}q-40-35-30-5q7 12 30 5m16-30q35-28 25-2q-8 10-25 2" fill="#79b96c" stroke="none"/></g>`;
 const cloud=(x,y)=>`<g fill="#fff" opacity=".75">${ellipse(x,y,32,10,'#fff')}${ellipse(x-10,y-8,15,14,'#fff')}${ellipse(x+10,y-12,18,17,'#fff')}</g>`;
 export function environmentArt(id,{night=false,playground=false,tall=false}={}){
- const e=environments.find(e=>e.id===id)||environments[0];id=e.id;
- const palettes={home:['#a9e6f2','#a5d67b','#c0dd8d'],savanna:['#ffe0a3','#d9c97a','#efd393'],bamboo:['#bae6d8','#91c286','#b9dba0'],forest:['#b9dfec','#84b496','#a9cf9a'],tropical:['#a9e6d8','#78b99b','#a6d4a3'],ice:['#bfe9f5','#c1dbe8','#f0f8fc'],prehistoric:['#b7e1e9','#80b899','#b6d491'],haunted:['#746aab','#696690','#8a7da9'],volcanic:['#f5b4a6','#9b83ad','#c6a3bd'],aquarium:['#a4e6ee','#7bc6d7','#f0d9b1']};
+ const e=environments.find(e=>e.id===id)||environments.find(e=>e.id==='home');id=e.id;
+ const palettes={wetland:['#b5e9e6','#83bba1','#b9d9aa'],rainforest:['#b4e9df','#6ca78b','#a1ca92'],home:['#a9e6f2','#a5d67b','#c0dd8d'],savanna:['#ffe0a3','#d9c97a','#efd393'],bamboo:['#bae6d8','#91c286','#b9dba0'],forest:['#b9dfec','#84b496','#a9cf9a'],tropical:['#a9e6d8','#78b99b','#a6d4a3'],ice:['#bfe9f5','#c1dbe8','#f0f8fc'],prehistoric:['#b7e1e9','#80b899','#b6d491'],haunted:['#746aab','#696690','#8a7da9'],volcanic:['#f5b4a6','#9b83ad','#c6a3bd'],aquarium:['#a4e6ee','#7bc6d7','#f0d9b1']};
  const [sky,hills,floor]=palettes[id];let back='',front='';
  if(id==='home'){
  back=`<g stroke="#dba470" stroke-width="3"><path d="M28 242V144L94 101l66 43v98Z" fill="#fff0d8"/><path d="M18 146l76-53 76 53" fill="none" stroke="#cc8c73" stroke-width="10" stroke-linejoin="round"/><rect x="75" y="189" width="38" height="53" rx="16" fill="#adcbdd"/><rect x="44" y="153" width="28" height="28" rx="5" fill="#a1deed"/></g>${tree(520,243,.85)}<path d="M0 247H600" stroke="#eac390" stroke-width="7"/>`;
@@ -39,6 +41,8 @@ export function environmentArt(id,{night=false,playground=false,tall=false}={}){
  back=`<g fill="#5aad99"><path d="M37 271q28-33 8-71t17-52q-4 45 17 75t-9 48Z"/><path d="M520 270q-18-50 4-79t-3-45q47 31 23 71t7 53Z"/></g><g fill="#fff" opacity=".45"><circle cx="79" cy="103" r="8"/><circle cx="86" cy="78" r="5"/><circle cx="501" cy="100" r="7"/><circle cx="518" cy="65" r="4"/></g><path d="M119 261q-18-34 2-31q12 3 11 24q2-42 16-37q11 5-4 47" fill="none" stroke="#dc9dac" stroke-width="8" stroke-linecap="round"/>${ellipse(481,268,28,10,'#baafbf')}`;
  front='<path d="M8 18V382h584V18" fill="none" stroke="#dbfaff" stroke-width="9" opacity=".75"/><path d="M23 30v120m10-118v60" stroke="white" stroke-width="4" opacity=".5"/>';
  }
+ if(id==='wetland')back=tree(58,251,.72)+tree(534,249,.85)+pond(153,266)+`<g stroke-linecap="round"><path d="M36 267v-43m12 44v-35M226 270v-37" stroke="#619978" stroke-width="5"/><path d="M36 237v-14m12 19v-11M226 243v-12" stroke="#b79465" stroke-width="7"/></g>`;
+ if(id==='rainforest')back=tree(43,255,1.3)+tree(115,249,1.05)+tree(526,250,1.4)+tree(587,250,1.05)+tree(190,249,.8)+`<path d="M43 111q42 30 72-9M526 87q-18 26-8 67" fill="none" stroke="#78b37b" stroke-width="4"/>${pond(150,268)}${ellipse(58,259,55,9,'#79ae85')}${ellipse(538,256,61,10,'#79ae85')}`;
  // Contact patches sit behind decorations, joining their bases to the terrain.
  const supports={
  tropical:ellipse(66,248,63,10,'#78ae89')+ellipse(530,248,64,10,'#78ae89'),

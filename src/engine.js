@@ -1,3 +1,4 @@
+import {dietForSpecies} from './pet-diets.js';
 import {parkToys} from './park-toys.js';
 import {advanceGrowth,countGrowthCare,growthProgress} from './growth.js';
 export const families = [
@@ -11,8 +12,10 @@ export const species=families.flatMap(f=>f.names.map((name,i)=>({id:`${f.id}-${i
 species.push(...[{id:'selva-brown',name:'Urso marrom',color:'#a77552'},{id:'selva-polar',name:'Urso polar',color:'#f2f7ff'}].map(s=>({...s,family:'selva',variant:0,food:'frutas',toy:'bola'})));
 species.push({id:'pets-mouse',name:'Ratinho',family:'pets',color:'#e9edf2',variant:0,food:'ração',toy:'bola'});
 species.push(...[{id:'selva-capybara',name:'Capivara',family:'selva',color:'#d7a36e',food:'frutas',toy:'bola'},{id:'selva-fox',name:'Raposa',family:'selva',color:'#ef9b57',food:'frutas',toy:'esconde-esconde'},{id:'exoticos-penguin',name:'Pinguim',family:'exoticos',color:'#7d90b9',food:'ração',toy:'corrida'},{id:'sombrios-dragon',name:'Dragãozinho',family:'sombrios',color:'#b6a0de',food:'biscoito',toy:'corrida'}].map(s=>({...s,variant:0})));
+species.push(...[{id:'dinos-pterosaur',name:'Pterossauro',family:'dinos',color:'#d9a078',food:'ração',toy:'arco'},{id:'exoticos-frog',name:'Sapo',family:'exoticos',color:'#8bc68b',food:'ração',toy:'lago'},{id:'selva-owl',name:'Corujinha',family:'selva',color:'#c8a17a',food:'frutas',toy:'arco'}].map(s=>({...s,variant:0})));
+for(const s of species)s.diet=dietForSpecies(s.id);
 export const palettes={'pets-mouse':[{id:'white',name:'Branco',color:'#f0f2f6',detail:'#d6dce5'},{id:'gray',name:'Cinza',color:'#9eabba',detail:'#7b8da4'}],'pets-0':[{id:'orange',name:'Laranja',color:'#f4b173',detail:'#bf753d'},{id:'gray',name:'Cinza',color:'#a7b4c5',detail:'#5d7088'},{id:'black',name:'Preto',color:'#586171',detail:'#333d50'}],'pets-1':[{id:'caramel',name:'Caramelo',color:'#d2a079',detail:'#895438'},{id:'brown',name:'Marrom',color:'#9e7056',detail:'#60412e'},{id:'blackwhite',name:'Preto e branco',color:'#eef2f5',detail:'#364354'}]};
-export const activeSpecies=species.filter(s=>['pets-0','pets-1','exoticos-0','exoticos-1','selva-0','selva-4','dinos-0','dinos-1','sombrios-0','sombrios-1','pets-2','exoticos-7','selva-2','dinos-2','dinos-3','selva-brown','selva-polar','pets-mouse','selva-capybara','selva-fox','exoticos-penguin','sombrios-dragon'].includes(s.id));
+export const activeSpecies=species.filter(s=>['dinos-pterosaur','exoticos-frog','selva-owl','pets-0','pets-1','exoticos-0','exoticos-1','selva-0','selva-4','dinos-0','dinos-1','sombrios-0','sombrios-1','pets-2','exoticos-7','selva-2','dinos-2','dinos-3','selva-brown','selva-polar','pets-mouse','selva-capybara','selva-fox','exoticos-penguin','sombrios-dragon'].includes(s.id));
 export const attrs={food:'Saciedade',joy:'Felicidade',energy:'Energia',hygiene:'Higiene',health:'Saúde',intelligence:'Inteligência'};
 export const fresh=(id,name,now=Date.now())=>({revision:1,species:id,name:name.trim().slice(0,24)||species.find(s=>s.id===id)?.name||'Meu pet',born:now,last:now,sleeping:false,coins:40,stats:{food:85,joy:80,energy:90,hygiene:90,health:100,intelligence:0},xp:0,growth:{version:1,level:0,baths:0,meals:0,games:0},personality:['Curioso','Brincalhão','Tranquilo'][Math.floor(Math.random()*3)],games:0,ill:false,illnessHours:0,neglectHours:0,dead:false,deadAt:null,inventory:[],equipped:{},waste:0,wasteClock:0,floorDirt:0,lastEarning:0,totalPoints:0,records:{}});
 const clamp=x=>Math.max(0,Math.min(100,x));
@@ -44,7 +47,7 @@ export function care(p,action){const n=structuredClone(p);if(n.dead)return n;con
  if(n.sleeping)return n;
  if(action==='feed'&&n.coins>=5){const needed=s.food<=60;n.coins-=5;s.food=clamp(s.food+60);s.joy=clamp(s.joy+3);if(needed){n.xp+=2;countGrowthCare(n,'meals');}}
  if(action==='bath'){const needed=s.hygiene<=75;s.hygiene=100;s.joy=clamp(s.joy+4);if(needed){n.xp+=2;countGrowthCare(n,'baths');}}
- if(action==='pet'){s.joy=clamp(s.joy+5);}
+ if(action==='pet'){s.joy=clamp(s.joy+5);n.social={...n.social,affection:n.last};}
  if(action==='medicine'&&n.coins>=12&&s.health<90){n.coins-=12;s.health=clamp(s.health+20);}
  return n;
 }
