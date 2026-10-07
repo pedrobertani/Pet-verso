@@ -28,6 +28,32 @@ function fox(s,m,c,f){return g('pet-tail tail-right',path('M130 170Q186 174 183 
 function penguin(s,m,c,f){return g('pet-wing wing-left',path('M59 119Q31 130 24 163q21 3 40-17Z','#7185af'))+g('pet-wing wing-right',path('M141 119q28 11 35 44-21 3-40-17Z','#7185af'))+g('pet-body',oval(100,126,46,58,f)+oval(100,138,35,44,'#fff0d4'))+g('pet-leg leg-0',path('M65 175q15-2 20 5l8 9-16-2-15 3-14-5Z','#f5c66d'))+g('pet-leg leg-1',path('M135 175q-15-2-20 5l-8 9 16-2 15 3 14-5Z','#f5c66d'))+g('pet-head',oval(100,79,44,41,f)+oval(80,88,23,31,'#fff0d4')+oval(120,88,23,31,'#fff0d4')+g('eyes',eye(79,85,m,8)+eye(121,85,m,8))+path('M89 102q11-10 22 0l-11 11Z','#f3c368')+mouth(m,100,114,17,{tongue:true}));}
 function dragon(s,m,c,f){return g('pet-tail tail-left',path('M80 151Q34 167 25 142q-8-17-5-31 8 32 47 24Z','#9680c5')+path('M21 113l-8-14 14 6 7 14Z','#d3b8ed'))+g('pet-wing wing-left',path('M79 127L66 78Q47 47 13 50Q8 52 9 58L8 105Q23 84 36 116Q51 98 60 133Q69 122 79 136Z','#c6afe8','stroke="#8d72b7" stroke-width="2" stroke-linejoin="round"')+stroke('M78 130L65 78Q46 52 13 54M65 78L8 105M65 78L36 116M65 78L60 133','#9275b9',2.5)+stroke('M62 75Q42 58 18 58','#ead8f7',2))+g('pet-wing wing-right',path('M125 127L138 78Q157 47 191 50Q196 52 195 58L196 105Q181 84 168 116Q153 98 144 133Q135 122 125 136Z','#c6afe8','stroke="#8d72b7" stroke-width="2" stroke-linejoin="round"')+stroke('M126 130L139 78Q158 52 191 54M139 78L196 105M139 78L168 116M139 78L144 133','#9275b9',2.5)+stroke('M142 75Q162 58 186 58','#ead8f7',2))+g('pet-body',oval(103,143,29,34,c)+oval(106,146,19,26,'#e2edbf')+stroke('M92 137h27M90 149h30M95 161h21','#b8cb93',2))+g('pet-leg leg-0',oval(86,174,13,8,'#9680c5'))+g('pet-leg leg-1',oval(122,174,13,8,'#9680c5'))+g('pet-head',path('M75 66q-14-17-7-29l18 22M124 58l14-21q10 14-3 30','#f7dfae')+path('M64 82q0-31 36-32 39 0 44 35l-2 21q-6 24-38 22-38-1-40-29Z',f)+path('M104 87q15-10 40-4 21 4 21 19 0 19-29 23h-27q-15-3-17-14Z',c)+g('eyes',eye(86,84,m,7)+eye(119,82,m,6))+oval(153,96,2.5,2,'#80689f')+mouth(m,131,108,20,{tongue:true})+oval(88,56,5,3,'#9680c5'))+g('pet-arm',stroke('M76 131l9 11M132 131l-8 11',c,8));}
 export const quadrupedIds=['pets-0','pets-1','pets-2','exoticos-0','exoticos-1','exoticos-7','selva-0','selva-2','dinos-1','dinos-2','dinos-3','selva-capybara','selva-fox'];
+function smallQuadruped(id,m,c,f,head){
+ const limb=(n,d,foot,x,y)=>g(`pet-leg leg-${n}`,path(d,foot)+oval(x,y,id==='pets-2'?13:8,4,foot));
+ let back='',body='',front='',tail='',shift='',size=.86;
+ if(id==='pets-2'){
+  size=.9;shift='translate(-16 8)';tail=oval(62,157,10,10,'#fff4e4');
+  back=limb(1,'M83 159q-9 7-7 22h13l5-19Z','#c5ab91',85,184)+limb(0,'M120 151l4 30h9l-4-26Z','#c5ab91',132,183);
+  body=oval(95,152,32,26,f)+oval(78,158,19,23,c)+oval(106,160,16,17,'#fff5e9');
+  front=limb(0,'M79 162q-14 2-14 19l17 3 10-14Z',c,73,184)+limb(1,'M116 151l-1 31 12 1-2-30Z',c,121,184);
+ }else if(id==='exoticos-0'){
+  size=.82;shift='translate(-9 24)';tail=path('M80 157Q49 147 26 161q-8 7-15 5 15 17 39 10l30-3Z','#e99cbd')+stroke('M23 168q27-9 49-3','#f8d2e2',2);
+  back=limb(1,'M83 162l-12 9 8 7 8-5 6-9Z','#d991b2',77,178)+limb(0,'M120 158l16 13-5 8-8-6-13-9Z','#d991b2',133,179);
+  body=oval(99,161,30,16,f)+oval(100,168,22,7,'#f8d2e2');
+  front=limb(0,'M82 166l-16 14 6 5 17-10Z',c,67,186)+limb(1,'M120 166l15 14-5 5-16-10Z',c,135,186);
+ }else if(id==='exoticos-1'){
+  size=.84;shift='translate(-12 14)';tail=stroke('M75 157Q45 177 37 153q-7-21 10-27 16-5 18 9 1 12-9 11','#62a36c',10);
+  back=limb(1,'M86 155l-10 16 8 7 9-5-1-16Z','#6da65b',83,179)+limb(0,'M119 154l15 18-6 5-10-12Z','#6da65b',133,178);
+  body=oval(98,154,28,19,f)+oval(105,163,17,8,'#bfdea0')+path('M78 145l5-10 7 7 7-10 8 10 6-5 6 9Z','#6cae71');
+  front=limb(0,'M83 158l-12 20 8 6 9-4-3-5 8-15Z',c,78,185)+limb(1,'M117 155l10 20-3 8 11 1 5-10-13-17Z',c,131,186);
+ }else{
+  size=.9;shift='translate(-10 18)';tail=path('M68 166l-17 7 21 2Z','#659661');
+  back=limb(1,'M80 164l-15 12 7 5 17-10Z','#669463',70,182)+limb(0,'M116 165l14 9-2 7-17-9Z','#669463',131,181);
+  body=oval(99,158,37,25,'#669463')+path('M64 157q9-30 34-27 29-1 38 28l-8 13H73Z','#7aa56a')+stroke('M72 144l17 13h22l15-13M89 157l-6 16M111 157l5 16M89 157l9-26','#b4ce8b',3);
+  front=limb(0,'M80 171l-16 9 7 5 16-7Z',c,67,186)+limb(1,'M117 171l16 8-3 6-18-8Z',c,132,186);
+ }
+ return `<g class="small-species" transform="translate(${100*(1-size)} ${188*(1-size)}) scale(${size})">`+g('pet-tail tail-left',tail)+back+g('pet-body',body)+front+`<g class="pet-head"><g transform="${shift}">${head}</g></g></g>`;
+}
 function quadruped(s,m,c,f){
  const id=s.id,d=s.palette?.detail||({'pets-1':'#895438','pets-mouse':'#acb8c7','selva-4':'#354153','selva-brown':'#896148','selva-polar':'#b1c4dc'}[id])||c;
  const bearPet=['selva-4','selva-brown','selva-polar'].includes(id),panda=id==='selva-4',turtlePet=id==='exoticos-7',low=['pets-2','pets-mouse','exoticos-0','exoticos-1','exoticos-7'].includes(id);
@@ -54,6 +80,7 @@ function quadruped(s,m,c,f){
  else if(id==='exoticos-1'){head=path('M114 90l16-26 13 24 14-13 10 24','#6cae71')+oval(140,117,33,27,f)+oval(123,107,13,16,'#c2e4a5')+oval(157,107,13,16,'#c2e4a5')+face(140,108,m,{gap:17,r:5.5,w:20});}
  else if(turtlePet){head=oval(157,135,28,25,f)+oval(163,148,20,10,'#c7e0a7')+face(158,130,m,{gap:12,r:5,w:15});}
  else if(id==='selva-2'){head=oval(137,93,35,39,f)+oval(114,92,23,32,'#93afd2')+oval(116,92,15,24,'#d6b9db')+face(144,86,m,{gap:15,r:6,w:15})+g('pet-trunk',path('M166 96q14-1 13 15l-2 27q0 16 11 8 7-5 10 2 4 11-12 17-25 4-23-29l-1-26q-1-10 4-14Z','#94b2d8')+stroke('M169 118l8 1M168 131l8 1','#7f9fc7',2))+path('M151 108q2 19 14 21l-6-22','#fff1d2');}
+ if(['pets-2','exoticos-0','exoticos-1','exoticos-7'].includes(id))return smallQuadruped(id,m,c,f,head);
  const torso=turtlePet?oval(93,139,51,34,'#669463')+path('M54 135q12-34 41-29 33-1 44 31l-9 21H62Z','#7aa56a')+stroke('M61 127l22 16h27l20-16M83 143l-7 17M110 143l7 17M83 143l12-34','#b4ce8b',3):path(`M43 ${low?132:119}q6-25 42-24h30q30 1 34 29l-5 31H58q-17-9-15-${low?23:36}Z`,body)+oval(94,147,31,10,panda?'#354153':id==='selva-fox'?'#fff1da':body);
  return g('pet-tail tail-left',tail)+leg(67,y,far,1,16,h-2)+leg(130,y,far,0,16,h-2)+g('pet-body',torso+(id==='pets-2'?oval(69,140,24,23,c):''))+leg(48,y,paws,0,21,h)+leg(117,y,paws,1,21,h)+g('pet-head',head);
 }
