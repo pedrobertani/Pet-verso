@@ -81,6 +81,8 @@ function quadruped(s,m,c,f){
  else if(turtlePet){head=oval(157,135,28,25,f)+oval(163,148,20,10,'#c7e0a7')+face(158,130,m,{gap:12,r:5,w:15});}
  else if(id==='selva-2'){head=oval(137,93,35,39,f)+oval(114,92,23,32,'#93afd2')+oval(116,92,15,24,'#d6b9db')+face(144,86,m,{gap:15,r:6,w:15})+g('pet-trunk',path('M166 96q14-1 13 15l-2 27q0 16 11 8 7-5 10 2 4 11-12 17-25 4-23-29l-1-26q-1-10 4-14Z','#94b2d8')+stroke('M169 118l8 1M168 131l8 1','#7f9fc7',2))+path('M151 108q2 19 14 21l-6-22','#fff1d2');}
  if(['pets-2','exoticos-0','exoticos-1','exoticos-7'].includes(id))return smallQuadruped(id,m,c,f,head);
+ if(id==='selva-fox')return g('pet-tail tail-left',tail)+leg(68,151,'#a97751',1,13,35)+leg(128,148,'#a97751',0,13,38)+g('pet-body',path('M51 141q6-24 32-23 22 0 38 12l17-4q5 24-7 35-16 10-45 3-27-1-35-23Z',f)+oval(112,147,18,18,'#fff1da'))+g('pet-leg leg-0',path('M64 152l13 4-8 23 2 5H52q-2-7 4-10Z','#745445')+oval(59,184,10,4,'#745445'))+g('pet-leg leg-1',path('M117 151l13-1-1 29 5 6h-17l-3-7Z','#745445')+oval(124,184,10,4,'#745445'))+g('pet-head',head);
+
  const torso=turtlePet?oval(93,139,51,34,'#669463')+path('M54 135q12-34 41-29 33-1 44 31l-9 21H62Z','#7aa56a')+stroke('M61 127l22 16h27l20-16M83 143l-7 17M110 143l7 17M83 143l12-34','#b4ce8b',3):path(`M43 ${low?132:119}q6-25 42-24h30q30 1 34 29l-5 31H58q-17-9-15-${low?23:36}Z`,body)+oval(94,147,31,10,panda?'#354153':id==='selva-fox'?'#fff1da':body);
  return g('pet-tail tail-left',tail)+leg(67,y,far,1,16,h-2)+leg(130,y,far,0,16,h-2)+g('pet-body',torso+(id==='pets-2'?oval(69,140,24,23,c):''))+leg(48,y,paws,0,21,h)+leg(117,y,paws,1,21,h)+g('pet-head',head);
 }
