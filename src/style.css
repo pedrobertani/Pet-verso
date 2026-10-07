@@ -117,3 +117,23 @@ nav button{padding-left:10px;padding-right:10px}nav button span{white-space:nowr
 @media(prefers-reduced-motion:reduce){.world .species-sombrios-dragon{animation:none!important}}
 .world .airborne.roaming .species-sombrios-dragon .wing-right{animation-name:dragon-flap-right;animation-direction:normal}
 @keyframes dragon-flap-right{0%,100%{transform:rotate(6deg) scaleX(.98)}50%{transform:rotate(-6deg) scaleX(1)}}
+
+/* Ratinho anda rente ao chão; levanta somente durante as pausas do passeio. */
+.world .roaming:has(.species-pets-mouse){animation:mouse-wander 18s ease-in-out infinite}
+.world .roaming:has(.species-pets-mouse) .pet-facing{animation:pet-facing-room 18s steps(1,end) infinite}
+.mouse-rise{transform-origin:78px 185px;animation:mouse-rear-up 18s ease-in-out infinite}
+.mouse-level{transform-origin:138px 155px;animation:mouse-level-head 18s ease-in-out infinite}
+@keyframes mouse-wander{0%,100%{left:40%}20%,35%{left:65%}60%,75%{left:28%}}
+@keyframes mouse-rear-up{0%,18%,35%,58%,75%,100%{transform:rotate(0deg)}23%,30%,63%,70%{transform:rotate(-52deg)}}
+@keyframes mouse-level-head{0%,18%,35%,58%,75%,100%{transform:rotate(0deg)}23%,30%,63%,70%{transform:rotate(52deg)}}
+.world .roaming .species-pets-mouse .pet-head{animation:none}
+.world .roaming .species-pets-mouse .pet-leg{animation:none}
+.world .roaming .species-pets-mouse .mouse-front{transform-origin:122px 168px;animation:mouse-forefeet 18s ease-in-out infinite}
+@keyframes mouse-forefeet{0%,18%,35%,58%,75%,100%{transform:rotate(0deg)}23%,30%,63%,70%{transform:rotate(-35deg)}}
+.reduce-motion .mouse-rise,.reduce-motion .mouse-level,.reduce-motion .mouse-front{animation:none!important}
+@media(prefers-reduced-motion:reduce){.mouse-rise,.mouse-level,.mouse-front{animation:none!important}}
+
+.world .roaming .species-pets-mouse .leg-0{animation:mouse-feet-a 18s linear infinite}
+.world .roaming .species-pets-mouse .leg-1{animation:mouse-feet-b 18s linear infinite}
+@keyframes mouse-feet-a{0%,4%,8%,12%,16%,36%,40%,44%,48%,52%,56%,76%,80%,84%,88%,92%,96%,100%{transform:translateX(-2px)}2%,6%,10%,14%,38%,42%,46%,50%,54%,78%,82%,86%,90%,94%,98%{transform:translateX(2px)}18%,35%,58%,75%{transform:translateX(0)}}
+@keyframes mouse-feet-b{0%,4%,8%,12%,16%,36%,40%,44%,48%,52%,56%,76%,80%,84%,88%,92%,96%,100%{transform:translateX(2px)}2%,6%,10%,14%,38%,42%,46%,50%,54%,78%,82%,86%,90%,94%,98%{transform:translateX(-2px)}18%,35%,58%,75%{transform:translateX(0)}}
