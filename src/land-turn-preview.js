@@ -1,11 +1,11 @@
-// Preview rig only. Uses the selected species' native SVG and growth artwork.
+// Directional anatomy shared by previews and the game.
 import {petDrawing} from './pets.js';
 import {dogTurnPreview} from './dog-turn-preview.js';
 const bipeds=new Set(['selva-4','selva-brown','selva-polar','exoticos-penguin','dinos-0','exoticos-frog']);
-export function landTurnPreview(s,angle=0){
- if(s.id==='pets-1')return dogTurnPreview(s,angle);
+export function landTurnPreview(s,angle=0,mode='happy'){
+ if(s.id==='pets-1')return dogTurnPreview(s,angle,mode);
  const side=Math.cos(angle),depth=Math.sin(angle),amount=Math.abs(side),sign=side<0?-1:1;
- const holder=document.createElement('div');holder.innerHTML=petDrawing({...s,growthLevel:2,walking:!bipeds.has(s.id),carePose:bipeds.has(s.id)},'happy');
+ const holder=document.createElement('div');holder.innerHTML=petDrawing({...s,growthLevel:s.growthLevel??2,walking:!bipeds.has(s.id),carePose:bipeds.has(s.id)},mode);
  const svg=holder.querySelector('svg');svg.style.overflow='visible';document.body.append(holder);holder.style.cssText='position:absolute;visibility:hidden';
  const parts=[...svg.querySelectorAll('.pet-body,.pet-head,.pet-leg,.pet-tail,.pet-plates,.pet-arm')].filter(el=>!el.parentElement.closest('.pet-body,.pet-head,.pet-leg,.pet-tail'));
  const boxes=new Map(parts.map(el=>[el,el.getBBox()]));holder.remove();
@@ -23,8 +23,5 @@ export function landTurnPreview(s,angle=0){
  else transform(el,100+(x-100)*side,y,sign*(.8+.2*amount),1);
  }
  svg.classList.add('land-turn-study');svg.querySelectorAll('*').forEach(el=>el.style.animation='none');
- // Reuse the existing growth system after the directional pose has been built.
- const level=s.growthLevel??2;const size=level===0?.73:level===1?.9:1;
- if(size!==1){const group=document.createElementNS('http://www.w3.org/2000/svg','g');group.setAttribute('transform',`translate(${100*(1-size)} ${188*(1-size)}) scale(${size})`);[...svg.children].filter(el=>el.tagName!=='defs').forEach(el=>group.append(el));svg.append(group);}
  return svg.outerHTML;
 }

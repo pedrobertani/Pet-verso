@@ -194,3 +194,14 @@ nav button{padding-left:10px;padding-right:10px}nav button span{white-space:nowr
 .bath-composition .standard-pet .pet-wing{animation:none}
 .reduce-motion .standard-pet .pet-wing{animation:none!important}
 @media(prefers-reduced-motion:reduce){.standard-pet .pet-wing{animation:none!important}}
+/* Directional anatomy replaces whole-character mirroring only while roaming. */
+.world .directional-pet .pet-facing{transform:none!important;animation:none!important}
+.world .directional-art .directional-part{animation:none!important;transform-box:view-box;transform-origin:0 0}
+.world .directional-art .pet-leg{transform-box:fill-box;transform-origin:50% 10%}
+.world .airborne .directional-art .wing-left{animation:wing-forward-left var(--wing-beat,1.15s) ease-in-out infinite!important}
+.world .airborne .directional-art .wing-right{animation:wing-forward-right var(--wing-beat,1.15s) ease-in-out infinite!important}
+.world .called-idle .directional-art .pet-wing{animation-play-state:running!important}
+.reduce-motion .world .directional-art .pet-wing{animation:none!important}
+@media(prefers-reduced-motion:reduce){.world .directional-art .pet-wing{animation:none!important}}
+.world .directional-pet.call-moving .directional-art .leg-0{animation:pet-step-a 1.2s ease-in-out infinite}
+.world .directional-pet.call-moving .directional-art .leg-1{animation:pet-step-b 1.2s ease-in-out infinite}

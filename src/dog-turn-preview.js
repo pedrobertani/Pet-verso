@@ -1,9 +1,9 @@
-// Prototype: redraw anatomy through a turn; never flatten or mirror the whole pet.
+// Directional anatomy: redraw anatomy through a turn; never flatten or mirror the whole pet.
 import {growthArt} from './growth-art.js';
 import {mouth} from './pet-art.js';
 import {babyPacifier} from './baby-pacifier.js';
 const ellipse=(x,y,rx,ry,fill)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${fill}"/>`;
-export function dogTurnPreview(s,angle=0){
+export function dogTurnPreview(s,angle=0,mode='happy'){
  const side=Math.cos(angle),depth=Math.sin(angle),amount=Math.abs(side),dir=Math.sign(side)||1;
  const coat=s.palette?.color||'#d2a079',detail=s.palette?.detail||'#895438',cream='#fff0da';
  const headX=100+side*39,headY=95,bodyW=29+amount*25;
@@ -23,8 +23,8 @@ export function dogTurnPreview(s,angle=0){
  const face=ellipse(headX,headY,33-amount*2,33,coat)+
  `<g class="eyes">${eye(eyeNear,headY-4,6)}${amount<.95?eye(eyeFar,headY-5,6-amount*3):''}</g>`+
  ellipse(muzzleX,muzzleY,25-amount*3,18,cream)+ellipse(muzzleX+side*7,muzzleY-9,6,5,'#674637')+
- mouth('happy',muzzleX,muzzleY+6,19,{tongue:true});
- let art=tail+rearLegs+body+frontLegs+`<g class="pet-head">${farEar}${face}${nearEar}</g>`;
+ mouth(mode,muzzleX,muzzleY+6,19,{tongue:true});
+ let art=tail+rearLegs+body+frontLegs+`<g class="pet-head">${farEar}${face}${nearEar}</g>`+(s.dirty?'<g class="pet-dirt" fill="#87623d" opacity=".5"><ellipse cx="86" cy="146" rx="11" ry="6"/><ellipse cx="135" cy="116" rx="8" ry="5"/></g>':'');
  if((s.growthLevel??2)===0)art=babyPacifier(art,'pets-1');
- return growthArt(`<svg xmlns="http://www.w3.org/2000/svg" class="creature dog-turn-study" viewBox="0 0 200 200"><defs></defs>${art}</svg>`,'pets-1',s.growthLevel??2);
+ return growthArt(`<svg xmlns="http://www.w3.org/2000/svg" class="creature standard-pet walking-pose species-pets-1 dog-turn-study ${mode}" viewBox="0 0 200 200"><defs></defs>${art}</svg>`,'pets-1',s.growthLevel??2);
 }
