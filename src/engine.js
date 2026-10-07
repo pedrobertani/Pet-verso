@@ -1,3 +1,4 @@
+import {advanceGrowth,countGrowthCare,growthProgress} from './growth.js';
 export const families = [
  {id:'pets',name:'Pets',icon:'🐾',color:'#eab483',names:['Gato','Cachorro','Coelho','Hamster','Porquinho-da-índia','Calopsita','Poodle','Gatinho preto'],food:'ração',toy:'bola'},
  {id:'exoticos',name:'Exóticos',icon:'🦎',color:'#a3cddd',names:['Axolote','Camaleão','Furão','Iguana','Ouriço','Gecko','Chinchila','Tartaruga'],food:'frutas',toy:'memória'},
@@ -12,7 +13,7 @@ species.push(...[{id:'selva-capybara',name:'Capivara',family:'selva',color:'#d7a
 export const palettes={'pets-mouse':[{id:'white',name:'Branco',color:'#f0f2f6',detail:'#d6dce5'},{id:'gray',name:'Cinza',color:'#9eabba',detail:'#7b8da4'}],'pets-0':[{id:'orange',name:'Laranja',color:'#f4b173',detail:'#bf753d'},{id:'gray',name:'Cinza',color:'#a7b4c5',detail:'#5d7088'},{id:'black',name:'Preto',color:'#586171',detail:'#333d50'}],'pets-1':[{id:'caramel',name:'Caramelo',color:'#d2a079',detail:'#895438'},{id:'brown',name:'Marrom',color:'#9e7056',detail:'#60412e'},{id:'blackwhite',name:'Preto e branco',color:'#eef2f5',detail:'#364354'}]};
 export const activeSpecies=species.filter(s=>['pets-0','pets-1','exoticos-0','exoticos-1','selva-0','selva-4','dinos-0','dinos-1','sombrios-0','sombrios-1','pets-2','exoticos-7','selva-2','dinos-2','dinos-3','selva-brown','selva-polar','pets-mouse','selva-capybara','selva-fox','exoticos-penguin','sombrios-dragon'].includes(s.id));
 export const attrs={food:'Saciedade',joy:'Felicidade',energy:'Energia',hygiene:'Higiene',health:'Saúde',intelligence:'Inteligência'};
-export const fresh=(id,name,now=Date.now())=>({revision:1,species:id,name:name.trim().slice(0,24)||species.find(s=>s.id===id)?.name||'Meu pet',born:now,last:now,sleeping:false,coins:40,stats:{food:85,joy:80,energy:90,hygiene:90,health:100,intelligence:0},xp:0,personality:['Curioso','Brincalhão','Tranquilo'][Math.floor(Math.random()*3)],games:0,ill:false,illnessHours:0,neglectHours:0,dead:false,deadAt:null,inventory:[],equipped:{},waste:0,wasteClock:0,floorDirt:0,lastEarning:0,totalPoints:0,records:{}});
+export const fresh=(id,name,now=Date.now())=>({revision:1,species:id,name:name.trim().slice(0,24)||species.find(s=>s.id===id)?.name||'Meu pet',born:now,last:now,sleeping:false,coins:40,stats:{food:85,joy:80,energy:90,hygiene:90,health:100,intelligence:0},xp:0,growth:{version:1,level:0,baths:0,meals:0,games:0},personality:['Curioso','Brincalhão','Tranquilo'][Math.floor(Math.random()*3)],games:0,ill:false,illnessHours:0,neglectHours:0,dead:false,deadAt:null,inventory:[],equipped:{},waste:0,wasteClock:0,floorDirt:0,lastEarning:0,totalPoints:0,records:{}});
 const clamp=x=>Math.max(0,Math.min(100,x));
 export function valid(p){return p?.revision===1&&species.some(s=>s.id===p.species)&&typeof p.name==='string'&&p.name.length>0&&p.name.length<=24&&typeof p.sleeping==='boolean'&&Number.isFinite(p.last)&&Number.isFinite(p.born)&&p.born<=p.last&&Number.isFinite(p.coins)&&p.coins>=0&&Number.isFinite(p.xp)&&p.xp>=0&&Number.isFinite(p.games)&&p.games>=0&&['Curioso','Brincalhão','Tranquilo'].includes(p.personality)&&Object.keys(attrs).every(k=>Number.isFinite(p.stats?.[k])&&p.stats[k]>=0&&p.stats[k]<=100);}
 export function tick(p,now=Date.now()){
@@ -34,20 +35,20 @@ export function tick(p,now=Date.now()){
    else {n.illnessHours+=h;if(n.illnessHours>=72){n.dead=true;n.deadAt=cursor;n.sleeping=false;}}
   }
  }
- n.last=Math.max(now,n.last);return n;
+ n.last=Math.max(now,n.last);return advanceGrowth(n);
 }
 export function care(p,action){const n=structuredClone(p);if(n.dead)return n;const s=n.stats;
  if(action==='sleep'){n.sleeping=!n.sleeping;return n;}
  if(action==='clean'){n.coins+=n.waste??0;n.waste=0;n.floorDirt=0;return n;}if(action==='pickup'){if((n.waste??0)>0){n.waste--;n.coins++;}return n;}
  if(n.sleeping)return n;
- if(action==='feed'&&n.coins>=5){n.coins-=5;s.food=clamp(s.food+60);s.joy=clamp(s.joy+3);n.xp+=2;}
- if(action==='bath'){s.hygiene=100;s.joy=clamp(s.joy+4);n.xp+=2;}
+ if(action==='feed'&&n.coins>=5){const needed=s.food<=60;n.coins-=5;s.food=clamp(s.food+60);s.joy=clamp(s.joy+3);if(needed){n.xp+=2;countGrowthCare(n,'meals');}}
+ if(action==='bath'){const needed=s.hygiene<=75;s.hygiene=100;s.joy=clamp(s.joy+4);if(needed){n.xp+=2;countGrowthCare(n,'baths');}}
  if(action==='pet'){s.joy=clamp(s.joy+5);}
  if(action==='medicine'&&n.coins>=12&&s.health<90){n.coins-=12;s.health=clamp(s.health+20);}
  return n;
 }
-export function reward(p,score,smart,gameId){const n=structuredClone(p);if(n.dead||n.sleeping||n.stats.energy<10)return n;const points=Math.max(0,Math.min(100,Math.floor(score)));const earnedPoints=Math.max(0,Math.floor(Number.isFinite(score)?score:0));n.totalPoints=(n.totalPoints||0)+earnedPoints;n.records??={};if(gameId)n.records[gameId]=Math.max(n.records[gameId]||0,earnedPoints);n.lastEarning=gameId?3+Math.floor(earnedPoints/40):3+Math.floor(points/10);n.coins+=n.lastEarning;n.games++;n.xp+=3+Math.floor(points/20);n.stats.energy=clamp(n.stats.energy-8);n.stats.joy=clamp(n.stats.joy+5+points/20);if(smart)n.stats.intelligence=clamp(n.stats.intelligence+(n.stats.health<40?1:2)+points/25);return n;}
-export function stage(p){return p.xp>=120?'Adulto':p.xp>=40?'Jovem':'Filhote';}
+export function reward(p,score,smart,gameId){const n=structuredClone(p);if(n.dead||n.sleeping||n.stats.energy<10)return n;const points=Math.max(0,Math.min(100,Math.floor(score)));const earnedPoints=Math.max(0,Math.floor(Number.isFinite(score)?score:0));n.totalPoints=(n.totalPoints||0)+earnedPoints;n.records??={};if(gameId)n.records[gameId]=Math.max(n.records[gameId]||0,earnedPoints);n.lastEarning=gameId?3+Math.floor(earnedPoints/40):3+Math.floor(points/10);n.coins+=n.lastEarning;n.growth??={version:1,level:growthProgress(n).level,baths:0,meals:0,games:n.games};n.games++;if(earnedPoints>0)n.growth.games++;n.xp+=3+Math.floor(points/20);n.stats.energy=clamp(n.stats.energy-8);n.stats.joy=clamp(n.stats.joy+5+points/20);if(smart)n.stats.intelligence=clamp(n.stats.intelligence+(n.stats.health<40?1:2)+points/25);return advanceGrowth(n);}
+export function stage(p){return growthProgress(p).name;}
 export function randomSpecies(random=Math.random){return activeSpecies[Math.min(activeSpecies.length-1,Math.max(0,Math.floor(random()*activeSpecies.length)))].id;}
 export const shop=[{id:'bed-cloud',name:'Caminha nuvem',icon:'☁️',price:180,slot:'bed'},{id:'bed-leaf',name:'Cama folha',icon:'🍃',price:240,slot:'bed'},{id:'bed-moon',name:'Cama lunar',icon:'🌙',price:420,slot:'bed'},{id:'rug',name:'Tapete arco-íris',icon:'🌈',price:110,slot:'rug'},{id:'plant',name:'Plantinha',icon:'🪴',price:90,slot:'decor'},{id:'lamp',name:'Abajur estrela',icon:'⭐',price:260,slot:'lamp',room:'bedroom'},{id:'castle',name:'Castelinho',icon:'🏰',price:600,slot:'decor'},{id:'ball',name:'Bola colorida',icon:'⚽',price:120,slot:'toy'},{id:'rocket',name:'Foguete de brincar',icon:'🚀',price:350,slot:'toy'},{id:'sofa',name:'Sofá aconchegante',price:280,slot:'sofa',room:'living'},{id:'shelf',name:'Estante de livros',price:220,slot:'shelf',room:'living'},{id:'table',name:'Mesinha redonda',price:160,slot:'table',room:'living'},{id:'swing',name:'Balanço do quintal',price:360,slot:'garden-swing',room:'garden'},{id:'slide',name:'Escorregador',price:450,slot:'garden-slide',room:'garden'},{id:'trampoline',name:'Cama elástica',price:520,slot:'garden-trampoline',room:'garden'},{id:'bench',name:'Banco do jardim',price:190,slot:'garden-bench',room:'garden'}];
 shop.push(...[
