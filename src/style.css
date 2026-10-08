@@ -251,7 +251,7 @@ nav button{padding-left:10px;padding-right:10px}nav button span{white-space:nowr
 /* Outdoor scenes follow the same sleep lighting used by the indoor rooms. */
 .garden.night .park-background,
 .playground.night .park-background{
- filter:brightness(.88) saturate(.85);
+ filter:brightness(.52) saturate(.7);
 }
 .garden.night .garden-item,
 .playground.night .park-object{
