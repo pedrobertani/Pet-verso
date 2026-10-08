@@ -216,3 +216,30 @@ nav button{padding-left:10px;padding-right:10px}nav button span{white-space:nowr
 .living:has(.room-furniture.table) .world-decor .furniture-art{width:100%;height:100%}
 
 .living .world-toy{left:8%;right:auto}
+
+/* Bedroom: centered bed, clear window and independently lit bedside lamps. */
+.world.bedroom{container-type:inline-size}
+.world.bedroom .scenery-window{left:28%;width:44%;top:18px;height:135px}
+.world.bedroom .sleep-bed,.world.bedroom .sleep-cover,.world.bedroom:not(.night) .sleep-bed{left:20%;width:60%;height:180px;bottom:70px}
+.world.bedroom .in-bed{left:61%;bottom:140px}
+.world.bedroom .bedside-dresser{width:22%;height:auto;aspect-ratio:180/130;bottom:110px}
+.world.bedroom .bedside-lamp,.world.bedroom:not(.night) .bedside-lamp{position:absolute;width:16%;height:auto;aspect-ratio:180/130;bottom:calc(116px + 12.8cqw);padding:0;border:0;border-radius:0;background:none;box-shadow:none;overflow:visible;cursor:pointer;touch-action:manipulation}
+.world.bedroom .bedside-dresser.bedside-left{left:0;right:auto}
+.world.bedroom .bedside-dresser.bedside-right{right:0;left:auto}
+.world.bedroom .bedside-lamp.bedside-left{left:3%;right:auto}
+.world.bedroom .bedside-lamp.bedside-right{right:3%;left:auto}
+.world.bedroom .bedside-lamp:before{display:block;content:'';position:absolute;inset:-25% -60% -40%;background:radial-gradient(ellipse at 50% 40%,#ffe9a477,#ffe9a430 35%,transparent 70%);opacity:0;pointer-events:none;transition:opacity .35s ease}
+.world.bedroom .bedside-lamp svg{position:relative;display:block;transition:filter .35s ease}
+.world.bedroom .bedside-lamp.lit{filter:none}
+.world.bedroom .bedside-lamp.lit:before{opacity:1}
+.world.bedroom .bedside-lamp.lit svg{filter:brightness(1.15) drop-shadow(0 0 5px #ffe19d99)}
+@media(prefers-reduced-motion:reduce){.world.bedroom .bedside-lamp:before,.world.bedroom .bedside-lamp svg{transition:none}}
+.world.bedroom .in-bed{left:calc(50% + 37px)}
+.world.bedroom .pet-blanket{left:calc(50% + 37px);bottom:145px;width:64px;height:30px;z-index:7}
+.world.bedroom .bedside-lamp:before{width:auto;height:auto;transform:none}
+@media(min-width:601px){
+ .world.bedroom .bedside-dresser{width:110px}
+ .world.bedroom .bedside-lamp,.world.bedroom:not(.night) .bedside-lamp{width:80px;bottom:180px}
+ .world.bedroom .bedside-dresser.bedside-left,.world.bedroom .bedside-lamp.bedside-left{left:11%;right:auto;transform:translateX(-50%)}
+ .world.bedroom .bedside-dresser.bedside-right,.world.bedroom .bedside-lamp.bedside-right{left:89%;right:auto;transform:translateX(-50%)}
+}
