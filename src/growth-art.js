@@ -18,10 +18,10 @@ export const growthProfiles={
  'selva-capybara':{head:[.8,.94],body:[.76,.83]},
  'selva-fox':{head:[.78,.92],tail:[.58,.7]},
  'exoticos-penguin':{head:[1.03,1],body:[.82,.88],wing:[.7,.8]},
- 'dinos-0':{head:[.8,.83],tail:[.5,.65]},
- 'dinos-1':{head:[.9,.93],horns:[.25,.3],tail:[.65,.65]},
- 'dinos-2':{head:[.88,.58],body:[.86,.88],tail:[.62,.7]},
- 'dinos-3':{head:[.97,.93],tail:[.62,.7]},
+ 'dinos-0':{head:[.8,.83],tail:[.82,.8]},
+ 'dinos-1':{head:[.9,.93],horns:[.25,.3],tail:[.82,.8]},
+ 'dinos-2':{head:[.88,.9],body:[.86,.88],tail:[.86,.88]},
+ 'dinos-3':{head:[.97,.93],tail:[.82,.8]},
  'sombrios-0':{body:[.84,.7],arm:[.7,.7]},
  'sombrios-1':{wing:[.9,.9],head:[.9,.85]},
  'sombrios-dragon':{wing:[.9,.9],tail:[.52,.65],head:[.92,.82]},
@@ -38,8 +38,13 @@ export function growthArt(svg,id,level=2){
  const profile=growthProfiles[id],young=level===1;
  for(const [part,base] of Object.entries({body:[.82,.8],head:[.95,.94],tail:[.65,.72],leg:[.85,.74],arm:[.82,.8],...profile})){
   const [sx,sy]=base.map(n=>young?1+(n-1)*.45:n);
-  const pivot=id==='pets-mouse'&&part==='tail'?[svg.includes('mouse-rise')?66:120,svg.includes('mouse-rise')?173:163]:part==='wing'?[100,130]:part==='plates'?[100,112]:part==='horns'?[145,105]:part==='trunk'?[100,105]:[100,188];
-  svg=transformGroup(svg,'pet-'+part,`translate(${pivot[0]} ${pivot[1]}) scale(${sx} ${sy}) translate(${-pivot[0]} ${-pivot[1]})`);
+  const pivot=id==='pets-mouse'&&part==='tail'?[svg.includes('mouse-rise')?66:120,svg.includes('mouse-rise')?151:163]:part==='wing'?[100,130]:part==='plates'?[100,112]:part==='horns'?[145,105]:part==='trunk'?[100,105]:[100,188];
+  let partTransform=`translate(${pivot[0]} ${pivot[1]}) scale(${sx} ${sy}) translate(${-pivot[0]} ${-pivot[1]})`;
+  if(part==='tail'&&['pets-1','pets-mouse'].includes(id)){
+   const start=/<g class="pet-tail[^"]*">[\s\S]*?d="M([\d.-]+) ([\d.-]+)/.exec(svg);
+   if(start){const root=start.slice(1).map(Number),bodyScale=(profile.body||[.82,.8]).map(n=>young?1+(n-1)*.45:n),mapped=root.map((n,i)=>[100,188][i]+(n-[100,188][i])*bodyScale[i]);partTransform=`translate(${mapped[0]} ${mapped[1]}) scale(${sx} ${sy}) translate(${-root[0]} ${-root[1]})`;}
+  }
+  svg=transformGroup(svg,'pet-'+part,partTransform);
  }
  const size=young?.9:.73;
  const start=svg.indexOf('</defs>')+7,end=svg.lastIndexOf('</svg>');

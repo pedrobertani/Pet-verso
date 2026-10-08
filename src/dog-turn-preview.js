@@ -11,7 +11,7 @@ export function dogTurnPreview(s,angle=0,mode='happy'){
  const backX=100-side*35,frontX=100+side*32;
  const rearLegs=paw(backX-12*depth,181-16*depth,true)+paw(backX+12*depth,181-16*depth);
  const frontLegs=paw(frontX-12*depth,181,true)+paw(frontX+12*depth,181);
- const tail=`<g class="pet-tail"><path d="M${100-side*bodyW*.8} 131Q${100-side*(bodyW+23)} 135 ${100-side*(bodyW+21)} 106" fill="none" stroke="${detail}" stroke-width="10" stroke-linecap="round"/></g>`;
+ const tail=`<g class="pet-tail"><path d="M${100-side*bodyW*.9} 117Q${100-side*(bodyW+23)} 120 ${100-side*(bodyW+21)} 106" fill="none" stroke="${detail}" stroke-width="10" stroke-linecap="round"/></g>`;
  const body=`<g class="pet-body">${ellipse(100,128,bodyW,34,coat)}${ellipse(100,147,bodyW*.65,10,coat)}</g>`;
  const ear=(x,y,near)=>`<g class="pet-ear">${ellipse(x,y,near?12:10,31,detail)}</g>`;
  const leftEar=ear(headX-(25+5*depth)+side*5,headY+2,true);

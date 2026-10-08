@@ -18,7 +18,7 @@ export function landTurnPreview(s,angle=0,mode='happy'){
 
  else if(el.classList.contains('pet-leg')){const front=quad&&x>=frontAt-20,near=legs.indexOf(el)>=Math.floor(legs.length/2);const spread=s.id==='selva-capybara'?36:bb?Math.min(32,bb.width*.28):28;const nx=quad?100+(front?spread:-spread)*side+(near?10:-10)*depth:100+(x-100)*(.9+.1*amount);const baseline=quad?Math.max(...legBoxes.map(r=>r.y+r.height)):b.y+b.height;const ny=quad?baseline-b.height/2:y;transform(el,nx,ny,quad?sign:1,1);if(quad&&!front&&body&&el.parentElement===body.parentElement)body.parentElement.insertBefore(el,body);}
 
- else if(el.classList.contains('pet-tail'))transform(el,100+(x-center)*side,y,sign*(.5+.5*amount),1);
+ else if(el.classList.contains('pet-tail')){const root=({'pets-mouse':[66,151],'dinos-0':[84,136],'dinos-1':[64,133],'dinos-2':[64,128],'dinos-3':[57,127]})[s.id];if(root){const width=quad?amount*.35+.65:.84+.16*depth;el.setAttribute('transform',`translate(${100+(root[0]-center)*sign*width} ${root[1]}) scale(${sign*(.5+.5*amount)} 1) translate(${-root[0]} ${-root[1]})`);el.style.animation='none';el.style.transformOrigin='0 0';el.style.transformBox='view-box';}else transform(el,100+(x-center)*side,y,sign*(.5+.5*amount),1);}
  else if(el.classList.contains('pet-plates'))transform(el,100+(x-center)*side,y,.65+.35*amount,1);
  else transform(el,100+(x-100)*side,y,sign*(.8+.2*amount),1);
  }
