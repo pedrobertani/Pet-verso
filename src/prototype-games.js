@@ -21,8 +21,8 @@ export function prototypeDifficulty(kind,level=1){
   };
   return {
     size:Math.min(8,6+Math.floor((n-1)/7)),
-    moves:Math.max(13,24-Math.floor((n-1)/3)),
-    target:180+(n-1)*55,
+    moves:Math.max(18,30-Math.floor((n-1)/2)),
+    target:450+(n-1)*120,
     kinds:Math.min(6,5+Math.floor((n-1)/8))
   };
 }
@@ -66,18 +66,19 @@ const blockShapes=[
  [[0,0],[1,0],[0,1]],[[0,0],[1,0],[0,1],[1,1]],[[0,0],[1,0],[2,0],[1,1]],[[0,0],[0,1],[0,2],[1,2]]
 ];
 export function blocksGame(area,api){
-  const size=8;let level=1,score=0,board=[],tray=[],selected=null,stopped=false;
+  const size=8;let level=1,score=0,board=[],tray=[],selected=null,stopped=false,linesDone=0;
   const empty=()=>Array.from({length:size},()=>Array(size).fill(0));
   function seed(count,colors){for(let n=0;n<count;n++){const open=[];for(let r=0;r<size;r++)for(let c=0;c<size;c++)if(!board[r][c])open.push([r,c]);if(!open.length)return;const [r,c]=pick(open);board[r][c]=1+Math.floor(Math.random()*colors);}}
   function available(shape){for(let r=0;r<size;r++)for(let c=0;c<size;c++)if(canPlace(board,shape,r,c))return true;return false;}
   function makeTray(){const d=prototypeDifficulty('blocks',level),pool=blockShapes.filter((_,i)=>i<5||Math.random()<d.largeChance);return Array.from({length:3},(_,id)=>({id,shape:pick(pool),color:1+Math.floor(Math.random()*d.colors)}));}
+  const lineGoal=()=>Math.min(6,2+Math.floor((level-1)/4));
   function clearLines(){let lines=0;for(let r=0;r<size;r++)if(board[r].every(Boolean)){board[r].fill(0);lines++;}for(let c=0;c<size;c++)if(board.every(row=>row[c])){board.forEach(row=>row[c]=0);lines++;}return lines;}
   function anchor(shape,row,col){const width=Math.max(...shape.map(p=>p[0]))+1,height=Math.max(...shape.map(p=>p[1]))+1;return [clamp(row-Math.floor(height/2),0,size-height),clamp(col-Math.floor(width/2),0,size-width)];}
   function preview(row,col){area.querySelectorAll('[data-cell]').forEach(cell=>cell.classList.remove('drop-preview','drop-invalid'));if(!selected)return;const [r,c]=anchor(selected.shape,row,col),ok=canPlace(board,selected.shape,r,c);selected.shape.forEach(([x,y])=>area.querySelector(`[data-cell="${r+y},${c+x}"]`)?.classList.add(ok?'drop-preview':'drop-invalid'));}
-  function place(row,col){if(!selected||stopped)return;const [r,c]=anchor(selected.shape,row,col);if(!canPlace(board,selected.shape,r,c)){api.sound('wrong');preview(row,col);return;}selected.shape.forEach(([x,y])=>board[r+y][c+x]=selected.color);score+=selected.shape.length;tray=tray.filter(piece=>piece.id!==selected.id);selected=null;const lines=clearLines();if(lines){score+=lines*(5+Math.min(level,10));api.sound('match');}else api.sound('tap');api.onScore(score);if(!tray.length){level++;score+=2+Math.min(level,8);api.onScore(score);tray=makeTray();}if(!tray.some(piece=>available(piece.shape))){stopped=true;setTimeout(()=>api.onEnd(score),400);return;}draw();}
-  function next(){const d=prototypeDifficulty('blocks',level);board=empty();seed(d.seeded,d.colors);tray=makeTray();draw();}
+  function place(row,col){if(!selected||stopped)return;const [r,c]=anchor(selected.shape,row,col);if(!canPlace(board,selected.shape,r,c)){api.sound('wrong');preview(row,col);return;}selected.shape.forEach(([x,y])=>board[r+y][c+x]=selected.color);score+=selected.shape.length;tray=tray.filter(piece=>piece.id!==selected.id);selected=null;const lines=clearLines();if(lines){linesDone+=lines;score+=lines*(5+Math.min(level,10));api.sound('match');}else api.sound('tap');api.onScore(score);if(linesDone>=lineGoal()){score+=10+level*2;api.onScore(score);level++;setTimeout(next,550);return;}if(!tray.length)tray=makeTray();if(!tray.some(piece=>available(piece.shape))){stopped=true;setTimeout(()=>api.onEnd(score),400);return;}draw();}
+  function next(){const d=prototypeDifficulty('blocks',level);linesDone=0;board=empty();seed(d.seeded,d.colors);tray=makeTray();draw();}
   function draw(){
-    area.innerHTML=`${gameHeader(score,level,'Complete linhas')}<div class="block-board" style="--block-size:${size}">${board.flatMap((row,r)=>row.map((value,c)=>`<button data-cell="${r},${c}" class="block-color-${value}" aria-label="Linha ${r+1}, coluna ${c+1}"></button>`)).join('')}</div><p class="proto-help">Arraste a peça para o tabuleiro ou toque na peça e no local.</p><div class="block-tray">${tray.map(piece=>{const width=Math.max(...piece.shape.map(p=>p[0]))+1,height=Math.max(...piece.shape.map(p=>p[1]))+1;return `<button data-piece="${piece.id}" class="${selected?.id===piece.id?'selected':''}"><i class="piece-preview" style="--pw:${width};--ph:${height}">${piece.shape.map(([x,y])=>`<span class="block-color-${piece.color}" style="--x:${x};--y:${y}"></span>`).join('')}</i></button>`;}).join('')}</div>`;
+    area.innerHTML=`${gameHeader(score,level,`Linhas ${linesDone}/${lineGoal()}`)}<div class="block-board" style="--block-size:${size}">${board.flatMap((row,r)=>row.map((value,c)=>`<button data-cell="${r},${c}" class="block-color-${value}" aria-label="Linha ${r+1}, coluna ${c+1}"></button>`)).join('')}</div><p class="proto-help">Arraste a peça para o tabuleiro ou toque na peça e no local.</p><div class="block-tray">${tray.map(piece=>{const width=Math.max(...piece.shape.map(p=>p[0]))+1,height=Math.max(...piece.shape.map(p=>p[1]))+1;return `<button data-piece="${piece.id}" class="${selected?.id===piece.id?'selected':''}"><i class="piece-preview" style="--pw:${width};--ph:${height}">${piece.shape.map(([x,y])=>`<span class="block-color-${piece.color}" style="--x:${x};--y:${y}"></span>`).join('')}</i></button>`;}).join('')}</div>`;
     area.querySelectorAll('[data-piece]').forEach(button=>{
       const choose=()=>{selected=tray.find(piece=>piece.id===+button.dataset.piece);area.querySelectorAll('[data-piece]').forEach(x=>x.classList.toggle('selected',x===button));api.sound('tap');};
       button.onclick=choose;button.onpointerdown=event=>{choose();button.setPointerCapture?.(event.pointerId);};
