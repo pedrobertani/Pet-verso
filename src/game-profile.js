@@ -32,9 +32,7 @@ export function gameProfile(s,{flight=false}={}){
    head.setAttribute('transform',`translate(${maskedFaces.has(s.id)?8:0} 0) translate(${pivot} 0) scale(.88 1) translate(${-pivot} 0)`);
   }
  }
- if(s.id==='selva-fox'){
-  const defs=svg.querySelector('defs');const clip=document.createElementNS('http://www.w3.org/2000/svg','clipPath');const id='fox-profile-outline-'+(++profileId);clip.id=id;clip.innerHTML='<rect x="0" y="158" width="220" height="60"/>';defs.append(clip);svg.querySelectorAll('.limb-side-outline').forEach(p=>p.setAttribute('clip-path',`url(#${id})`));
- }
+ if(s.id==='selva-fox'){const clip=document.createElementNS('http://www.w3.org/2000/svg','clipPath');const id='fox-exposed-limbs-'+(++profileId);clip.id=id;clip.innerHTML='<rect x="0" y="153" width="220" height="70"/>';svg.querySelector('defs').append(clip);svg.querySelectorAll('.limb-side-outline').forEach(p=>p.setAttribute('clip-path',`url(#${id})`));}
  svg.querySelectorAll('*').forEach(el=>el.style.animation='none');
  if(['selva-brown','selva-polar'].includes(s.id))svg.querySelector('.eyes')?.setAttribute('transform','translate(-2 0)');
  attachNeck(svg,s);if(flight&&!airborneSpecies.has(s.id))addJetBoard(svg);
