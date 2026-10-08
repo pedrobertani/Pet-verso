@@ -29,16 +29,14 @@ if [[ "${SIGNED_RELEASE:-false}" == true ]]; then
     -Pandroid.injected.signing.key.password="$ANDROID_KEY_PASSWORD" \
     --no-daemon)
   bundle="artifacts/${APP_SLUG}-play.aab"
-  apk_unsigned="android/app/build/outputs/apk/release/app-release-unsigned.apk"
-  apk_aligned="artifacts/${APP_SLUG}-release-aligned.apk"
   apk="artifacts/${APP_SLUG}-release.apk"
   cp android/app/build/outputs/bundle/release/app-release.aab "$bundle"
-  "$ANDROID_HOME/build-tools/36.0.0/zipalign" -p -f 4 "$apk_unsigned" "$apk_aligned"
-  "$ANDROID_HOME/build-tools/36.0.0/apksigner" sign --ks "$keyfile" --ks-pass env:ANDROID_KEYSTORE_PASSWORD --ks-key-alias "$ANDROID_KEY_ALIAS" --key-pass env:ANDROID_KEY_PASSWORD --out "$apk" "$apk_aligned"
+  apk_source=$(find android/app/build/outputs/apk/release -maxdepth 1 -name '*.apk' | head -n 1)
+  [[ -n "$apk_source" ]] || { echo "APK release não encontrado"; find android/app/build/outputs/apk -maxdepth 3 -type f; exit 1; }
+  cp "$apk_source" "$apk"
   "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs "$apk" > "$RUNNER_TEMP/apk-signature.txt"
   jarsigner -verify "$bundle" > "$RUNNER_TEMP/aab-signature.txt"
   grep -q 'jar verified' "$RUNNER_TEMP/aab-signature.txt"
-  rm -f "$apk_aligned"
   echo 'APK assinado para teste e AAB assinado com a chave de upload. Envie o AAB ao Play Console.' > artifacts/LEIA-ME.txt
 else
   (cd android && ./gradlew assembleRelease bundleRelease --no-daemon)
