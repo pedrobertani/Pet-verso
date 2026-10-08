@@ -124,7 +124,7 @@ export function hiddenGame(area,api){
   let level=1,score=0,interval=0,stopped=false;
   function round(){
     clearInterval(interval);const d=prototypeDifficulty('hidden',level);let seconds=d.seconds;
-    const positions=shuffle(Array.from({length:24},(_,index)=>({x:9+(index%6)*16.3,y:14+Math.floor(index/6)*19})));
+    const positions=shuffle(Array.from({length:30},(_,index)=>({x:9+(index%6)*16.3,y:12+Math.floor(index/6)*15.5})));
     const targets=shuffle(hiddenCatalog).slice(0,d.targets).map(([symbol,name],id)=>({id,symbol,name,...positions[id]}));
     const decoys=Array.from({length:d.decoys},(_,index)=>({symbol:pick(['🌸','📚','🪴','🧸','🖼️','🛋️']),...positions[d.targets+index]}));
     const found=new Set();
