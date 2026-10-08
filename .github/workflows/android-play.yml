@@ -14,7 +14,7 @@ on:
         description: Código da versão (maior que todos os já enviados à loja)
         type: string
         required: true
-        default: '22'
+        default: '23'
 permissions:
   contents: read
 jobs:
@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 20
     env:
       APP_SLUG: petverso
-      VERSION_CODE: ${{ inputs.version_code || '22' }}
+      VERSION_CODE: ${{ inputs.version_code || '23' }}
       SIGNED_RELEASE: ${{ github.event_name == 'push' || inputs.signed_release || false }}
     steps:
       - uses: actions/checkout@v4
