@@ -1,7 +1,7 @@
 import {arcadeDifficulty} from './difficulty.js';
 // Arcade sessions have no countdown: points grow until three lives are lost.
 export function arcade(kind,area,{spriteSvg,sound,onEnd,onScore}){
- area.innerHTML=`<div class="arcade-hud"><span id="arcade-score">0 pontos</span><span id="arcade-lives" aria-label="3 vidas">♥ ♥ ♥</span></div><canvas class="arcade-canvas" width="480" height="640" tabindex="0" aria-label="${kind==='runner'?'Toque para pular':'Arraste o dedo para cortar frutas; evite bombas'}"></canvas><p class="arcade-help">${kind==='runner'?'Toque para pular. Evite os obstáculos!':'Corte as frutas com o dedo. Cuidado com as bombas!'}</p>`;
+ area.innerHTML=`<div class="arcade-hud"><span id="arcade-score">0 pontos</span><span id="arcade-lives" aria-label="3 vidas">♥ ♥ ♥</span></div><canvas class="arcade-canvas" width="480" height="640" tabindex="0" aria-label="${kind==='runner'?'Toque para pular':'Arraste o dedo para cortar frutas; evite bombas'}"></canvas>`;
  const canvas=area.querySelector('canvas'),ctx=canvas.getContext('2d'),scoreEl=area.querySelector('#arcade-score'),livesEl=area.querySelector('#arcade-lives');
  const sprite=new Image();sprite.src='data:image/svg+xml,'+encodeURIComponent(spriteSvg.replace(/<svg(?![^>]*xmlns=)/,'<svg xmlns="http://www.w3.org/2000/svg"'));
  let points=0,lives=3,elapsed=0,last=performance.now(),raf,ended=false,hidden=false;

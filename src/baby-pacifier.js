@@ -10,6 +10,7 @@ export function babyPacifier(art,id){
   if(point){x=point[3]==='Q'?Number(point[4]):Number(point[1])+Number(point[4]);y=Number(point[2])+3;}
  }
  if(x===undefined){[x,y]=({'exoticos-penguin':[100,109],'dinos-pterosaur':[131,94],'selva-owl':[100,94],'selva-2':[100,120],'pets-mouse':[166,169]})[id]||[100,120];if(!match){const head=/<g class="pet-head">/.exec(art);if(!head)return art;start=end=head.index+head[0].length;}}
+ if(id==='selva-2'){[x,y]=art.includes('M166 96')?[150,104]:[104,112];}
  if(id==='pets-mouse'){[x,y]=art.includes('mouse-rise')?[166,169]:[100,129];}
  // Keep the dragon shield on the projecting muzzle, clear of the belly and arm.
  if(id==='sombrios-dragon'){x=139;y=104;}

@@ -1,4 +1,5 @@
 // Directional anatomy: redraw anatomy through a turn; never flatten or mirror the whole pet.
+import {consistentPaws} from './pet-paw-style.js';
 import {growthArt} from './growth-art.js';
 import {mouth} from './pet-art.js';
 import {babyPacifier} from './baby-pacifier.js';
@@ -26,5 +27,5 @@ export function dogTurnPreview(s,angle=0,mode='happy'){
  mouth(mode,muzzleX,muzzleY+6,19,{tongue:true});
  let art=tail+rearLegs+body+frontLegs+`<g class="pet-head">${farEar}${face}${nearEar}</g>`+(s.dirty?'<g class="pet-dirt" fill="#87623d" opacity=".5"><ellipse cx="86" cy="146" rx="11" ry="6"/><ellipse cx="135" cy="116" rx="8" ry="5"/></g>':'');
  if((s.growthLevel??2)===0)art=babyPacifier(art,'pets-1');
- return growthArt(`<svg xmlns="http://www.w3.org/2000/svg" class="creature standard-pet walking-pose species-pets-1 dog-turn-study ${mode}" viewBox="0 0 200 200"><defs></defs>${art}</svg>`,'pets-1',s.growthLevel??2);
+ return growthArt(consistentPaws(`<svg xmlns="http://www.w3.org/2000/svg" class="creature standard-pet walking-pose species-pets-1 dog-turn-study ${mode}" viewBox="0 0 200 200"><defs></defs>${art}</svg>`),'pets-1',s.growthLevel??2);
 }
