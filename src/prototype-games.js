@@ -124,8 +124,9 @@ export function hiddenGame(area,api){
   let level=1,score=0,interval=0,stopped=false;
   function round(){
     clearInterval(interval);const d=prototypeDifficulty('hidden',level);let seconds=d.seconds;
-    const targets=shuffle(hiddenCatalog).slice(0,d.targets).map(([symbol,name],id)=>({id,symbol,name,x:7+Math.random()*84,y:12+Math.random()*70}));
-    const decoys=Array.from({length:d.decoys},()=>({symbol:pick(['🌸','📚','🪴','🧸','🖼️','🛋️']),x:5+Math.random()*88,y:10+Math.random()*72}));
+    const positions=shuffle(Array.from({length:24},(_,index)=>({x:9+(index%6)*16.3,y:14+Math.floor(index/6)*19})));
+    const targets=shuffle(hiddenCatalog).slice(0,d.targets).map(([symbol,name],id)=>({id,symbol,name,...positions[id]}));
+    const decoys=Array.from({length:d.decoys},(_,index)=>({symbol:pick(['🌸','📚','🪴','🧸','🖼️','🛋️']),...positions[d.targets+index]}));
     const found=new Set();
     area.innerHTML=`${gameHeader(score,level,`<i id="hidden-time">${seconds}s</i>`)}<p class="proto-help">Encontre os objetos da lista.</p><div class="hidden-room" style="--object-scale:${d.scale}"><div class="hidden-window"><i></i></div><div class="hidden-bed">🛏️</div><div class="hidden-shelf">📚 🪴</div><div class="hidden-rug"></div><span class="hidden-pet">🐶</span>${decoys.map(o=>`<span class="hidden-decoy" style="--x:${o.x}%;--y:${o.y}%">${o.symbol}</span>`).join('')}${targets.map(o=>`<button data-hidden="${o.id}" style="--x:${o.x}%;--y:${o.y}%" aria-label="${o.name}">${o.symbol}</button>`).join('')}</div><div class="hidden-list">${targets.map(o=>`<span data-target="${o.id}">${o.symbol}<small>${o.name}</small></span>`).join('')}</div>`;
     area.querySelectorAll('[data-hidden]').forEach(button=>button.onclick=()=>{
