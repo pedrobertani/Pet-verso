@@ -1,3 +1,4 @@
+import {recolorItem} from './item-colors.js';
 export const PARK_INTELLIGENCE=75,PARK_COOLDOWN=30000;
 export const parkActions={
  'pets-1':'fetch','pets-0':'climb','pets-2':'tunnel-hop','pets-mouse':'wheel',
@@ -32,14 +33,14 @@ export function animateParkAction(world,target,id,{level=2,reducedMotion=false,o
  const hoop=point(115,66),right={x:hoop.x+b.width*.27,y:hoop.y};
  frames.push(move(0,zero),move(.24,{x:hoop.x-24,y:hoop.y-10},1,.85),move(.38,hoop,1,.72),move(.5,right,1,.85),move(.58,right,1,.85),move(.73,hoop,1,.72),move(.86,{x:hoop.x-24,y:hoop.y-10},1,.85),move(1,zero));animate(target,frames);animate(face,[{offset:0,transform:'scaleX(1)'},{offset:.5,transform:'scaleX(1)'},{offset:.58,transform:'scaleX(-1)'},{offset:.87,transform:'scaleX(-1)'},{offset:1,transform:'scaleX(1)'}]);
  // The near half of the ring masks the flyer as it crosses the opening.
- const ring=document.createElement('div');ring.className='park-hoop-foreground';ring.style.left=(b.left-w.left-world.clientLeft)+'px';ring.style.top=(b.top-w.top-world.clientTop)+'px';ring.style.width=b.width+'px';ring.innerHTML='<svg viewBox="0 0 220 180"><path d="M115 18a38 48 0 0 1 0 96" fill="none" stroke="#ac91d4" stroke-width="13"/></svg>';world.append(ring);effects.push(ring);
+ const ring=document.createElement('div');ring.className='park-hoop-foreground';ring.style.left=(b.left-w.left-world.clientLeft)+'px';ring.style.top=(b.top-w.top-world.clientTop)+'px';ring.style.width=b.width+'px';ring.innerHTML='<svg viewBox="0 0 220 180"><path d="M115 18a38 48 0 0 1 0 96" fill="none" stroke="#ac91d4" stroke-width="13"/></svg>';ring.innerHTML=recolorItem(ring.innerHTML,toy.dataset.itemColor,'flight-hoop');world.append(ring);effects.push(ring);
  animate(ring,[{offset:0,opacity:0},{offset:.23,opacity:0},{offset:.29,opacity:1},{offset:.43,opacity:1},{offset:.5,opacity:0},{offset:.65,opacity:0},{offset:.69,opacity:1},{offset:.8,opacity:1},{offset:.87,opacity:0},{offset:1,opacity:0}]);
  }
  else if(kind==='dragon-hoop'){
  const first=point(65,72),second=point(168,72),fit=Math.min(.82,b.width*(76/220)/(p.width*.88));
  frames.push(move(0,zero),move(.17,first,1,fit),move(.38,second,1,fit),move(.5,{x:second.x+14,y:second.y-8},1,fit),move(.56,second,1,fit),move(.76,first,1,fit),move(1,zero));animate(target,frames);
  animate(face,[{offset:0,transform:'scaleX(1)'},{offset:.5,transform:'scaleX(1)'},{offset:.56,transform:'scaleX(-1)'},{offset:.83,transform:'scaleX(-1)'},{offset:1,transform:'scaleX(1)'}]);
- for(const [x,color] of [[65,'#efbc7e'],[168,'#e9a995']]){const ring=document.createElement('div');ring.className='park-hoop-foreground';ring.style.left=(b.left-w.left-world.clientLeft)+'px';ring.style.top=(b.top-w.top-world.clientTop)+'px';ring.style.width=b.width+'px';ring.innerHTML=`<svg viewBox="0 0 220 180"><path d="M${x} 16a42 56 0 0 1 0 112" fill="none" stroke="${color}" stroke-width="10"/></svg>`;world.append(ring);effects.push(ring);animate(ring,[{offset:0,opacity:0},{offset:.12,opacity:1},{offset:.9,opacity:1},{offset:1,opacity:0}]);}
+ for(const [x,color] of [[65,'#efbc7e'],[168,'#e9a995']]){const ring=document.createElement('div');ring.className='park-hoop-foreground';ring.style.left=(b.left-w.left-world.clientLeft)+'px';ring.style.top=(b.top-w.top-world.clientTop)+'px';ring.style.width=b.width+'px';ring.innerHTML=`<svg viewBox="0 0 220 180"><path d="M${x} 16a42 56 0 0 1 0 112" fill="none" stroke="${color}" stroke-width="10"/></svg>`;ring.innerHTML=recolorItem(ring.innerHTML,toy.dataset.itemColor,'flight-hoop');world.append(ring);effects.push(ring);animate(ring,[{offset:0,opacity:0},{offset:.12,opacity:1},{offset:.9,opacity:1},{offset:1,opacity:0}]);}
  }
  else{
  const travel=(goal,hold=.68)=>animate(target,[move(0,zero),move(.25,goal),move(hold,goal),move(1,zero)]);
