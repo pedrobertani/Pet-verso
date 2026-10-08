@@ -7,3 +7,7 @@ Uma compra libera todas as sete cores: azul, rosa, verde, amarelo, preto suave, 
 As antigas versões de cômoda, abajur e banheira que só diferiam pela cor saem da aba Comprar. Compras existentes continuam em Já possui. Novos formatos poderão ser adicionados como modelos próprios depois.
 
 Os brinquedos de habilidade continuam específicos da espécie. O servidor de lógica `buy` rejeita brinquedo incompatível mesmo se houver tentativa fora da interface. Folhas naturais e água mantêm suas cores; o restante do desenho é pintado sem alterar a geometria ou transparências.
+
+
+## Acabamentos
+Os modelos tradicionais preservam madeira, água e estampas, personalizando detalhes específicos. A linha laqueada usa IDs próprios com `paintedModels`, compra separada e pintura de toda a estrutura. Inclui três camas, cômoda, estante, mesinha, banco e abajur. Os dois acabamentos mantêm sete cores gratuitas após a compra.
