@@ -29,7 +29,7 @@ export function tick(p,now=Date.now()){
   const h=Math.min(1,remaining);remaining-=h;cursor+=h*3600000;
   n.wasteClock+=h;const interval=n.sleeping?8:.75;if(n.wasteClock>=interval){const produced=Math.floor(n.wasteClock/interval);n.waste=Math.min(5,n.waste+produced);n.floorDirt=Math.min(5,n.floorDirt+produced);n.stats.hygiene=clamp(n.stats.hygiene-produced*8);n.wasteClock%=interval;}
   n.stats.food=clamp(n.stats.food-h*(n.sleeping?3:80));n.stats.hygiene=clamp(n.stats.hygiene-h*((n.sleeping?1:6)+(n.waste+(n.floorDirt??0))*.4));n.stats.joy=clamp(n.stats.joy-h*(n.sleeping?.5:22));
-  n.stats.energy=clamp(n.stats.energy+h*(n.sleeping?50:-22));
+  n.stats.energy=clamp(n.stats.energy+h*(n.sleeping?40:-22));
   const neglected=n.stats.food<=15||n.stats.energy<=10||n.stats.hygiene<=10||n.waste>=4;
   n.neglectHours=neglected?n.neglectHours+h:0;
   n.stats.health=clamp(n.stats.health+h*(neglected?-3:(n.sleeping?2:.5)));
