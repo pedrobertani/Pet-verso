@@ -117,3 +117,93 @@ nav button{padding-left:10px;padding-right:10px}nav button span{white-space:nowr
 @media(prefers-reduced-motion:reduce){.world .species-sombrios-dragon{animation:none!important}}
 .world .airborne.roaming .species-sombrios-dragon .wing-right{animation-name:dragon-flap-right;animation-direction:normal}
 @keyframes dragon-flap-right{0%,100%{transform:rotate(6deg) scaleX(.98)}50%{transform:rotate(-6deg) scaleX(1)}}
+
+/* Ratinho anda rente ao chão; levanta somente durante as pausas do passeio. */
+.world .roaming:has(.species-pets-mouse){animation:mouse-wander 18s ease-in-out infinite}
+.world .roaming:has(.species-pets-mouse) .pet-facing{animation:pet-facing-room 18s steps(1,end) infinite}
+.mouse-rise{transform-origin:78px 185px;animation:mouse-rear-up 18s ease-in-out infinite}
+.mouse-level{transform-origin:138px 155px;animation:mouse-level-head 18s ease-in-out infinite}
+@keyframes mouse-wander{0%,100%{left:40%}20%,35%{left:65%}60%,75%{left:28%}}
+@keyframes mouse-rear-up{0%,18%,35%,58%,75%,100%{transform:rotate(0deg)}23%,30%,63%,70%{transform:rotate(-52deg)}}
+@keyframes mouse-level-head{0%,18%,35%,58%,75%,100%{transform:rotate(0deg)}23%,30%,63%,70%{transform:rotate(52deg)}}
+.world .roaming .species-pets-mouse .pet-head{animation:none}
+.world .roaming .species-pets-mouse .pet-leg{animation:none}
+.world .roaming .species-pets-mouse .mouse-front{transform-origin:122px 168px;animation:mouse-forefeet 18s ease-in-out infinite}
+@keyframes mouse-forefeet{0%,18%,35%,58%,75%,100%{transform:rotate(0deg)}23%,30%,63%,70%{transform:rotate(-35deg)}}
+.reduce-motion .mouse-rise,.reduce-motion .mouse-level,.reduce-motion .mouse-front{animation:none!important}
+@media(prefers-reduced-motion:reduce){.mouse-rise,.mouse-level,.mouse-front{animation:none!important}}
+
+.world .roaming .species-pets-mouse .leg-0{animation:mouse-feet-a 18s linear infinite}
+.world .roaming .species-pets-mouse .leg-1{animation:mouse-feet-b 18s linear infinite}
+@keyframes mouse-feet-a{0%,4%,8%,12%,16%,36%,40%,44%,48%,52%,56%,76%,80%,84%,88%,92%,96%,100%{transform:translateX(-2px)}2%,6%,10%,14%,38%,42%,46%,50%,54%,78%,82%,86%,90%,94%,98%{transform:translateX(2px)}18%,35%,58%,75%{transform:translateX(0)}}
+@keyframes mouse-feet-b{0%,4%,8%,12%,16%,36%,40%,44%,48%,52%,56%,76%,80%,84%,88%,92%,96%,100%{transform:translateX(2px)}2%,6%,10%,14%,38%,42%,46%,50%,54%,78%,82%,86%,90%,94%,98%{transform:translateX(-2px)}18%,35%,58%,75%{transform:translateX(0)}}
+/* Crescimento e metas acumuladas. */
+.growth-card{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 18px;padding:12px 16px;text-align:left;border:3px solid #a8dfdd;border-radius:22px;background:#e6faf7;color:#354859;box-shadow:0 4px #8dcace}.growth-card>.icon{width:44px;height:44px;flex:none}.growth-card>span{flex:1}.growth-card strong{display:block;font:23px 'Lilita One',sans-serif}.growth-card small{display:block;margin-top:3px;font-size:12px}.growth-card>b{font-size:28px}.growth-dialog{width:min(460px,100%);padding:22px;max-height:calc(100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow:auto;background:#fffcf4}.growth-symbol{text-align:center}.growth-symbol .icon{width:58px;height:58px}.growth-dialog h2{text-align:center;margin:8px 0 0}.growth-dialog>p{text-align:center;margin:5px 0 18px;color:#7e8b82}.growth-phases{display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;margin:18px 0;color:#7d867e}.growth-phases b{background:#eeeae1;border-radius:16px;padding:6px 12px}.growth-phases .current{background:#fae0ee;color:#9e5686}.growth-phases .complete{background:#d7eee0;color:#397c55}.growth-mission{display:flex;align-items:center;gap:12px;padding:9px 0}.growth-mission>.icon{width:34px;height:34px;flex:none}.growth-mission>div{flex:1;min-width:0}.growth-label{display:flex;justify-content:space-between;gap:8px;font-size:14px}.growth-label b{color:#438b97;white-space:nowrap}.growth-track{height:10px;border-radius:12px;background:#e8e8ef;margin-top:6px;overflow:hidden}.growth-track i{display:block;height:100%;border-radius:12px;background:#74cdb8}.growth-dialog .growth-hint{font-size:12px;line-height:1.6;margin:18px 0}.growth-done{width:100%}.growth-overlay{z-index:1000}.growth-part{transform-box:view-box}.growth-card:focus-visible{outline:3px solid #7a62b6;outline-offset:3px}
+[data-theme=dark] .growth-card{background:#29494b;color:#e7f3f1;border-color:#4c8387;box-shadow:0 4px #234247}[data-theme=dark] .growth-dialog{background:#29363f;color:#eff4f5}[data-theme=dark] .growth-dialog>p{color:#c4cec8}[data-theme=dark] .growth-phases b{background:#40515b;color:#d5e0e5}[data-theme=dark] .growth-phases .current{background:#78566e;color:#fff0f7}[data-theme=dark] .growth-phases .complete{background:#395e4c;color:#c4f0d6}[data-theme=dark] .growth-label b{color:#91dddd}[data-theme=dark] .growth-track{background:#46505c}
+/* Species playground: separate from purchased garden furniture. */
+.park-background{position:absolute;inset:0;pointer-events:none}.park-background>.park-environment{width:100%;height:100%;display:block}.park-background>.park-environment{object-fit:fill}
+.garden .park-background>.park-environment,.playground .park-background>.park-environment{overflow:hidden}
+.park-navigation{position:absolute;top:16px;z-index:15;display:flex;align-items:center;gap:7px;padding:8px 12px;border:2px solid #ffffffb3;border-radius:17px;background:#fff9e8e8;box-shadow:0 3px #6a795629;font-size:14px;line-height:1.2;color:#365b67}.park-navigation span{font:26px 'Lilita One';line-height:20px}.park-next{right:13px}.park-back{left:13px}.park-heading{position:absolute;top:26px;right:17px;z-index:10;font:20px 'Lilita One';color:#354b66;background:#fff8;padding:3px 8px;border-radius:12px}
+.playground.world{height:auto;aspect-ratio:1.5;min-height:250px;isolation:isolate;touch-action:pan-y}.garden.world{touch-action:pan-y}.playground .park-object{position:absolute;bottom:12%;z-index:5;pointer-events:none}.playground .park-object>svg{display:block;width:100%;height:auto}.playground.world .park-pet{position:absolute;left:var(--park-pet-left);bottom:12%;width:var(--park-pet-width);height:auto;z-index:6;transform:none;animation:park-wander 18s ease-in-out infinite}.playground.world .park-pet svg.creature{width:100%!important;height:auto!important;display:block}.playground.world .park-pet .pet-facing{animation:pet-facing-room 18s steps(1,end) infinite}.playground .park-pet.grounded:after{bottom:3%;width:62%;height:7px;left:20%}.playground .park-pet.airborne{bottom:25%}.playground .room-caption{left:3%;right:3%;bottom:2%;padding:6px;font-size:12px}.playground.night .park-object{filter:brightness(.55)}
+@keyframes park-wander{0%,100%{left:var(--park-pet-left)}20%,35%{left:calc(var(--park-pet-left) + 7%)}60%,75%{left:calc(var(--park-pet-left) - 3%)}}
+.reduce-motion .playground .park-pet{animation:none!important}
+[data-theme=dark] .park-navigation{background:#344956;color:#f5ebd4;border-color:#69838d}[data-theme=dark] .park-heading{background:#344956dd;color:#f5ebd4}
+.playground.world{width:100%;max-width:100%;min-height:0}
+.garden.world{width:100%;height:auto;aspect-ratio:1;min-height:0}
+/* Compact name and age controls keep the scene close to the top. */
+.title-row>div{min-width:0;width:100%}.pet-name-age{display:flex;align-items:stretch;gap:9px;margin:0 0 17px;min-width:0}.pet-name-box{display:flex;align-items:center;gap:5px;min-width:0;flex:1;background:#fffaf1;border:2px solid #eddbbf;border-radius:18px;padding:10px 12px;box-shadow:0 3px #e8cdab}.pet-name-box h1{margin:0!important;font-size:clamp(24px,5vw,37px);line-height:1.15;overflow-wrap:anywhere;letter-spacing:0}.pet-name-box .edit{flex-shrink:0;padding:3px;font-size:17px}.growth-age{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex:0 0 66px;padding:7px;border:2px solid #b6dcdf;border-radius:17px;background:#e5faf7;box-shadow:0 3px #97cdd2}.growth-age>svg,.growth-age .icon{width:32px;height:32px}.growth-age .growth-paw-1 .icon{width:25px;height:25px}.growth-age .growth-paw{height:32px;display:flex;align-items:center;justify-content:center}.growth-age>span:last-child{font-size:12px;font-weight:800;color:#478494}.growth-symbol .growth-paw{display:block}.growth-symbol .growth-paw-1 .icon{width:44px;height:44px}.skill-badge{position:absolute;right:12px;bottom:55px;z-index:18;width:43px;height:43px;padding:5px;border:2px solid #fff2c3;border-radius:14px;background:#bba0e9;box-shadow:0 3px #8162b4}.skill-badge>svg{width:100%;height:100%;display:block}.skills-dialog{text-align:center;max-width:360px}.skills-brain svg{width:56px;height:56px}.skills-number{display:block;font:30px 'Lilita One';color:#8e6bbb;margin:13px 0}.skills-dialog ul{list-style:none;padding:0;margin:20px 0}.skills-dialog li{display:flex;justify-content:space-between;text-align:left;padding:9px 0;border-bottom:1px solid #e7dccc;font-size:14px}.skills-dialog li b{color:#9877ba}.skills-dialog .primary{width:100%}[data-theme=dark] .pet-name-box{background:#30434b;border-color:#637477;box-shadow:0 3px #192c38}[data-theme=dark] .growth-age{background:#344f59;border-color:#6595a0;box-shadow:0 3px #243946}[data-theme=dark] .growth-age>span:last-child{color:#d0efee}
+/* Keep the approved button, away from the pet and toy. */
+.world .skill-badge{top:12px;right:12px;bottom:auto;width:43px;height:43px}
+.world .pet-stage.call-controlled{transition:none!important}.world .call-controlled .pet-facing{animation:none!important}.world .called-idle svg,.world .called-idle svg *{animation-play-state:paused!important}.world .call-controlled.grounded.call-moving .creature{animation:grounded-walk .9s ease-in-out infinite}.world .call-controlled.airborne{z-index:9}.call-marker{position:absolute;width:24px;height:11px;border:3px solid #fff9cc;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 3px #e0b56377;pointer-events:none;z-index:12;animation:call-ring 1.5s ease-out forwards}@keyframes call-ring{from{opacity:1;scale:.6}to{opacity:0;scale:1.8}}
+.world .call-controlled.airborne.call-moving .creature{animation:dragon-hover 2.4s ease-in-out infinite}.world .call-controlled.airborne.call-moving .pet-wing{animation:dragon-flap .85s ease-in-out infinite;transform-box:fill-box;transform-origin:center}.world .call-controlled.airborne.call-moving .wing-right{animation:dragon-flap-right .85s ease-in-out infinite}
+.world .species-pets-mouse .mouse-rise,.world .species-pets-mouse .mouse-level,.world .species-pets-mouse .mouse-front{animation:none!important}
+
+.skill-badge.skill-locked,.skill-badge.skill-cooldown{background:#e0dee5;border-color:#c4c0cc;box-shadow:0 3px 0 #aca7b5;cursor:default}.skill-locked>svg,.skill-cooldown>svg{filter:grayscale(1);opacity:.55}.skill-lock{position:absolute;right:-3px;bottom:-2px;font-size:14px;line-height:1}.skill-seconds{position:absolute;inset:0;display:grid;place-items:center;font-weight:900;color:#453d5c;background:#e0dee5b8;border-radius:inherit}
+
+.performing-trick .creature,.performing-trick .creature *{animation:none!important}
+.trick-effect{position:absolute;pointer-events:none;z-index:6}.trick-effect svg{width:100%;height:100%;overflow:visible}
+.trick-flame{width:50%;height:30%;left:66%;top:39%;animation:trick-effect-pulse 2.4s both}
+.trick-splash{width:50%;height:60%;left:55%;top:-10%;animation:trick-effect-pulse 2.6s both}
+.trick-roar{width:65%;height:65%;left:50%;top:20%;animation:trick-effect-pulse 2.2s both}
+@keyframes trick-effect-pulse{0%,15%,100%{opacity:0;transform:scale(.5)}35%,75%{opacity:1;transform:scale(1)}}
+
+.performing-trick .pet-facing{position:relative}
+.reduce-motion .trick-effect{animation:none}
+@media(prefers-reduced-motion:reduce){.trick-effect{animation:none}}
+
+.world .airborne.roaming:has(.species-dinos-pterosaur,.species-selva-owl) .creature{animation:dragon-hover 2.4s ease-in-out infinite}.world .airborne.roaming .species-dinos-pterosaur .pet-wing,.world .airborne.roaming .species-selva-owl .pet-wing{animation:pet-wing-soft .75s ease-in-out infinite}.world .airborne.roaming .species-dinos-pterosaur .pet-leg,.world .airborne.roaming .species-selva-owl .pet-leg{animation:none}
+.park-performing .creature,.park-performing .creature *{animation:none!important}.park-performing.airborne .pet-wing{animation:pet-wing-soft .55s ease-in-out infinite!important}.park-action-effect{position:absolute;z-index:10;pointer-events:none}.park-splash{width:60px;height:36px;transform:translate(-50%,-80%)}.park-splash svg{width:100%;height:100%}.park-action-bubble{width:8px;height:8px;border:2px solid #d9ffff;border-radius:50%;background:#9be5f166;transform:translate(-50%,-50%)}.park-hoop-foreground{position:absolute;z-index:12;pointer-events:none}.park-hoop-foreground svg{width:100%;display:block}
+
+.park-action-ball{z-index:11;transform:translate(-50%,-50%);pointer-events:none}.park-action-ball svg{width:100%;height:100%}
+
+.pet-thought{position:absolute;z-index:14;width:60px;height:56px;transform:translateX(-50%);border:3px solid #c4b4da;border-radius:48% 48% 44% 44%;background:#fffaf0;box-shadow:0 3px 0 #aa91c333;display:grid;place-items:center;pointer-events:none}.pet-thought>.icon{width:38px;height:38px}.pet-thought i{position:absolute;right:12px;bottom:-12px;width:11px;height:11px;border:2px solid #c4b4da;border-radius:50%;background:#fffaf0}.pet-thought i+i{right:18px;bottom:-20px;width:6px;height:6px}.world[data-thinking="true"] .pet-stage,.world[data-thinking="true"] .pet-facing,.world[data-thinking="true"] .creature *{animation-play-state:paused!important}.world[data-thinking="true"] .airborne .pet-wing{animation-play-state:running!important}[data-theme="dark"] .pet-thought{background:#eee3ff}
+
+/* Wing strokes fold forward from the shoulder; both sides beat together. */
+.standard-pet:is(.species-sombrios-1,.species-sombrios-dragon,.species-dinos-pterosaur,.species-selva-owl){--wing-beat:1.15s}
+.standard-pet.species-sombrios-1{--wing-beat:.9s}
+.standard-pet.species-selva-owl{--wing-beat:1.4s}
+.standard-pet:is(.species-sombrios-1,.species-sombrios-dragon,.species-dinos-pterosaur,.species-selva-owl) .pet-wing{transform-box:view-box;animation-direction:normal}
+.standard-pet.species-sombrios-1 .wing-left{transform-origin:75px 146px}.standard-pet.species-sombrios-1 .wing-right{transform-origin:125px 146px}
+.standard-pet.species-sombrios-dragon .wing-left{transform-origin:83px 144px}.standard-pet.species-sombrios-dragon .wing-right{transform-origin:123px 144px}
+.standard-pet.species-dinos-pterosaur .wing-left{transform-origin:86px 117px}.standard-pet.species-dinos-pterosaur .wing-right{transform-origin:114px 117px}
+.standard-pet.species-selva-owl .wing-left{transform-origin:80px 108px}.standard-pet.species-selva-owl .wing-right{transform-origin:120px 108px}
+.world .airborne .standard-pet:is(.species-sombrios-1,.species-sombrios-dragon,.species-dinos-pterosaur,.species-selva-owl):not(.sleep):not(.sleepy) .wing-left{animation:wing-forward-left var(--wing-beat) ease-in-out infinite}
+.world .airborne .standard-pet:is(.species-sombrios-1,.species-sombrios-dragon,.species-dinos-pterosaur,.species-selva-owl):not(.sleep):not(.sleepy) .wing-right{animation:wing-forward-right var(--wing-beat) ease-in-out infinite}
+@keyframes wing-forward-left{0%,100%{transform:scaleX(1) skewY(0deg)}50%{transform:scaleX(.7) skewY(-5deg)}}
+@keyframes wing-forward-right{0%,100%{transform:scaleX(1) skewY(0deg)}50%{transform:scaleX(.7) skewY(5deg)}}
+.bath-composition .standard-pet .pet-wing{animation:none}
+.reduce-motion .standard-pet .pet-wing{animation:none!important}
+@media(prefers-reduced-motion:reduce){.standard-pet .pet-wing{animation:none!important}}
+/* Directional anatomy replaces whole-character mirroring only while roaming. */
+.world .directional-pet .pet-facing{transform:none!important;animation:none!important}
+.world .directional-art .directional-part{animation:none!important;transform-box:view-box;transform-origin:0 0}
+.world .directional-art .pet-leg{transform-box:fill-box;transform-origin:50% 10%}
+.world .airborne .directional-art .wing-left{animation:wing-forward-left var(--wing-beat,1.15s) ease-in-out infinite!important}
+.world .airborne .directional-art .wing-right{animation:wing-forward-right var(--wing-beat,1.15s) ease-in-out infinite!important}
+.world .called-idle .directional-art .pet-wing{animation-play-state:running!important}
+.reduce-motion .world .directional-art .pet-wing{animation:none!important}
+@media(prefers-reduced-motion:reduce){.world .directional-art .pet-wing{animation:none!important}}
+.world .directional-pet.call-moving .directional-art .leg-0{animation:pet-step-a 1.2s ease-in-out infinite}
+.world .directional-pet.call-moving .directional-art .leg-1{animation:pet-step-b 1.2s ease-in-out infinite}
+.ownership-tabs{display:flex;gap:10px;margin:16px 0}.ownership-tabs button{flex:1;background:#e7f8f8;border:3px solid #bbe1e7;font-weight:bold}.ownership-tabs .selected{background:#8edadd;color:#27556b;border-color:#63bdc6}.shop-card>span>svg{width:110px;height:95px}.item-overlay{position:fixed;inset:0;background:#26384e88;z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}.item-dialog{position:relative;background:#fff9ef;border:4px solid white;box-shadow:0 8px 0 #c9b5dd;border-radius:28px;padding:22px;width:min(440px,100%);max-height:calc(100dvh - 32px);overflow:auto;text-align:center}.item-dialog h2{padding:0 30px;margin:0 0 8px;font-size:27px}.item-close{position:absolute;top:8px;right:8px;background:transparent;font-size:30px;padding:2px 12px}.item-preview{height:170px;display:grid;place-items:center}.item-preview svg{width:220px;max-height:165px}.item-swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.item-swatches button{background:#fffdf9;border:2px solid #e1d5c8;padding:7px 2px;border-radius:14px}.item-swatches button[aria-pressed=true]{border-color:#3aafbb;background:#e2f7f8;box-shadow:0 0 0 2px #7dcdd6}.item-swatches i{display:block;width:30px;height:30px;border-radius:50%;background:var(--swatch);border:2px solid white;box-shadow:0 2px 4px #34485c33;margin:0 auto 3px}.item-swatches small{font-size:11px;color:#354859}.item-dialog p{font-size:13px}.item-dialog .primary{width:100%}.shop-empty{grid-column:1/-1;text-align:center;padding:30px}.play-rug:has(>svg){background:none;box-shadow:none}.play-rug>svg{width:100%;height:100%}
+[data-theme=dark] .item-dialog{background:#283747;color:#f7ecdf}[data-theme=dark] .item-swatches button{background:#36475a}[data-theme=dark] .item-swatches small{color:#f7ecdf}[data-theme=dark] .item-swatches button[aria-pressed=true]{background:#355e69}

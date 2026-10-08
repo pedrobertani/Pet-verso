@@ -11,6 +11,13 @@ export function createAudio({storage=localStorage,contextFactory=()=>new (window
  function startMusic(){stopMusic();if(!ctx||!unlocked||!prefs.music||prefs.muted||hidden)return;const notes=[523.25,659.25,783.99,659.25,587.33,659.25,523.25,0,440,523.25,659.25,523.25,392,440,523.25,0];const play=()=>{const f=notes[beat++%notes.length];if(f)tone(f,ctx.currentTime,.48,'sine',music);};play();timer=setInterval(play,650);}
  function unlock(){if(hidden||!setup())return;const first=!unlocked;unlocked=true;ctx.resume()?.catch(()=>{});if(first){startMusic();startAmbient();}}
  function sound(name='tap'){if(!unlocked||hidden||prefs.muted||!prefs.effects||!ctx)return;const t=ctx.currentTime;
+ if(name==='lion-roar'||name==='dino-roar'){
+ const dino=name==='dino-roar',duration=dino?1.65:1.3,base=dino?58:92;
+ const buffer=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate),data=buffer.getChannelData(0);let noise=0;
+ for(let i=0;i<data.length;i++){const time=i/ctx.sampleRate,progress=time/duration;noise=.86*noise+.14*(Math.random()*2-1);const envelope=Math.min(1,time/.12)*Math.pow(1-progress,.6),pulse=.7+.3*Math.sin(time*(dino?29:38));data[i]=noise*envelope*pulse;}
+ const source=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),gain=ctx.createGain();source.buffer=buffer;filter.type='lowpass';filter.frequency.setValueAtTime(dino?1100:850,t);filter.frequency.exponentialRampToValueAtTime(260,t+duration);gain.gain.value=.8;source.connect(filter);filter.connect(gain);gain.connect(effects);sources.add(source);source.onended=()=>{sources.delete(source);source.disconnect();filter.disconnect();gain.disconnect();};source.start(t);source.stop(t+duration);
+ for(let i=0;i<3;i++)tone(base*(1+i*.5),t+i*.12,duration-.12*i,'sawtooth',effects,base*.55);return;
+ }
  const patterns={tap:[660],feed:[240,300,220],pet:[660,880],soap:[390,520,650],clean:[500,780],sleep:[520,390,260],wake:[390,520,780],win:[523,659,784,1047],buy:[784,1047],match:[659,880],wrong:[220,170],jump:[300],adopt:[523,659,784,1047]};
  (patterns[name]||patterns.tap).forEach((f,i)=>tone(f,t+i*.09,name==='jump'?.18:.12,name==='feed'?'triangle':'sine',effects,name==='jump'?700:f));}
  function stopWater(){if(!water)return;try{water.source.stop();}catch{}water.source.disconnect();water.filter.disconnect();water.gain.disconnect();water=null;}
