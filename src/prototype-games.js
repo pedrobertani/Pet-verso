@@ -118,15 +118,41 @@ export function match3Game(area,api){
   }
   function draw(clearing=new Set()){
     const progress=clamp((score-levelStart)/target*100,0,100),size=board.length;
-    area.innerHTML=`${gameHeader(score,level,`${moves} jogadas`)}<div class="match-progress"><span style="width:${progress}%"></span></div><p class="proto-help">Meta: ${target} pontos nesta fase</p><div class="match-board" style="--match-size:${size}">${board.flatMap((row,r)=>row.map((value,c)=>`<button data-gem="${r},${c}" class="treat-${Math.max(0,treats.indexOf(value))} ${selected?.[0]===r&&selected?.[1]===c?'selected':''} ${clearing.has(`${r},${c}`)?'clearing':''}" aria-label="Petisco ${value||''}">${value||''}</button>`)).join('')}</div>`;
-    let dragStart=null,startPoint=null,dragHandled=false;
+    area.innerHTML=`${gameHeader(score,level,`${moves} jogadas`)}<div class="match-progress"><span style="width:${progress}%"></span></div><p class="proto-help">Meta: ${target} pontos nesta fase</p><div class="match-board" style="--match-size:${size}">${board.flatMap((row,r)=>row.map((value,c)=>`<button data-gem="${r},${c}" class="${selected?.[0]===r&&selected?.[1]===c?'selected':''} ${clearing.has(`${r},${c}`)?'clearing':''}" aria-label="Petisco ${value||''}"><span class="treat-art treat-${Math.max(0,treats.indexOf(value))}">${value||''}</span></button>`)).join('')}</div>`;
+    let dragStart=null,startPoint=null,dragMoved=false,ignoreClick=false;
     const currentOf=element=>element?.closest?.('[data-gem]')?.dataset.gem?.split(',').map(Number);
+    const same=(a,b)=>a&&b&&a[0]===b[0]&&a[1]===b[1];
     area.querySelectorAll('[data-gem]').forEach(button=>{
-      button.onpointerdown=event=>{if(locked||stopped)return;dragStart=currentOf(button);startPoint=[event.clientX,event.clientY];selected=dragStart;button.classList.add('selected');};
-      button.onclick=async()=>{if(dragHandled){dragHandled=false;return;}if(locked||stopped)return;const current=currentOf(button);if(!selected){selected=current;api.sound('tap');draw();return;}const from=selected;if(!(await attempt(from,current))&&from[0]===current[0]&&from[1]===current[1]){selected=null;draw();}};
+      button.onpointerdown=event=>{if(locked||stopped)return;dragStart=currentOf(button);startPoint=[event.clientX,event.clientY];dragMoved=false;button.setPointerCapture?.(event.pointerId);};
+      button.onclick=async()=>{
+        if(ignoreClick){ignoreClick=false;return;}
+        if(locked||stopped)return;
+        const current=currentOf(button);
+        if(!selected){selected=current;api.sound('tap');draw();return;}
+        if(same(selected,current)){selected=null;draw();return;}
+        if(Math.abs(selected[0]-current[0])+Math.abs(selected[1]-current[1])===1){await attempt(selected,current);return;}
+        selected=current;api.sound('tap');draw();
+      };
     });
-    area.onpointermove=event=>{if(!dragStart||!startPoint)return;if(Math.hypot(event.clientX-startPoint[0],event.clientY-startPoint[1])>8){event.preventDefault();const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-gem]');area.querySelectorAll('[data-gem]').forEach(x=>x.classList.toggle('drag-target',x===target));}};
-    area.onpointerup=async event=>{if(!dragStart)return;const from=dragStart,target=currentOf(document.elementFromPoint(event.clientX,event.clientY));dragStart=null;startPoint=null;area.querySelectorAll('[data-gem]').forEach(x=>x.classList.remove('drag-target'));if(target&&(target[0]!==from[0]||target[1]!==from[1])){dragHandled=true;await attempt(from,target);}};
+    area.onpointermove=event=>{
+      if(!dragStart||!startPoint)return;
+      if(Math.hypot(event.clientX-startPoint[0],event.clientY-startPoint[1])>8)dragMoved=true;
+      if(!dragMoved)return;
+      event.preventDefault();
+      const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-gem]');
+      area.querySelectorAll('[data-gem]').forEach(x=>x.classList.toggle('drag-target',x===target));
+    };
+    area.onpointerup=async event=>{
+      if(!dragStart)return;
+      const from=dragStart,target=currentOf(document.elementFromPoint(event.clientX,event.clientY));
+      dragStart=null;startPoint=null;
+      area.querySelectorAll('[data-gem]').forEach(x=>x.classList.remove('drag-target'));
+      if(!dragMoved)return;
+      ignoreClick=true;
+      if(target&&!same(target,from))await attempt(from,target);
+      else {selected=null;draw();}
+    };
+    area.onpointercancel=()=>{dragStart=null;startPoint=null;dragMoved=false;area.querySelectorAll('[data-gem]').forEach(x=>x.classList.remove('drag-target'));};
   }
   round();return()=>{stopped=true;};
 }
