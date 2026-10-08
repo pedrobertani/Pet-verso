@@ -67,5 +67,14 @@ shop.push(...[
 {id:'tub-basic',name:'Banheira simples',price:0,slot:'tub',room:'bathroom'},
 {id:'tub-mint',name:'Banheira menta',price:200,slot:'tub',room:'bathroom'},
 {id:'tub-rose',name:'Banheira rosinha',price:200,slot:'tub',room:'bathroom'}]);
+shop.push(...[
+{id:'bed-painted',name:'Cama laqueada',price:180,slot:'bed',room:'bedroom',paint:'full'},
+{id:'bed-cloud-painted',name:'Cama nuvem laqueada',price:240,slot:'bed',room:'bedroom',paint:'full'},
+{id:'bed-moon-painted',name:'Cama lunar laqueada',price:480,slot:'bed',room:'bedroom',paint:'full'},
+{id:'dresser-painted',name:'Cômoda laqueada',price:230,slot:'dresser',room:'bedroom',paint:'full'},
+{id:'shelf-painted',name:'Estante laqueada',price:280,slot:'shelf',room:'living',paint:'full'},
+{id:'table-painted',name:'Mesinha laqueada',price:220,slot:'table',room:'living',paint:'full'},
+{id:'bench-painted',name:'Banco laqueado',price:250,slot:'garden-bench',room:'garden',paint:'full'},
+{id:'lamp-painted',name:'Abajur laqueado',price:180,slot:'lamp',room:'bedroom',paint:'full'}]);
 shop.push(...parkToys);
 export function buy(p,id,color){const item=shop.find(x=>x.id===id);const n=structuredClone(p);if(n.dead)return n;n.inventory??=[];n.equipped??={};if(!item||(item.species&&item.species!==n.species)||color!==undefined&&!validItemColor(color))return n;if(n.inventory.includes(id)){n.equipped[item.slot]=id;if(color){n.itemColors??={};n.itemColors[id]=color;}return n;}if(n.coins<item.price)return n;n.coins-=item.price;n.inventory.push(id);n.equipped[item.slot]=id;if(color){n.itemColors??={};n.itemColors[id]=color;}return n;}
