@@ -36,8 +36,17 @@ function transformGroup(svg,cls,transform){
 export function growthArt(svg,id,level=2){
  if(level===2||!growthProfiles[id])return svg;
  const profile=growthProfiles[id],young=level===1;
+ const connectedLegs=['dinos-1','dinos-2','selva-capybara','selva-fox','selva-2'].includes(id);
+ if(id==='dinos-1'){
+  const scale=young?1+(.3-1)*.45:.25;
+  const horn=(d,x,y)=>`<path d="${d}" fill="#fff0c8" transform="translate(${x} ${y}) scale(${scale}) translate(${-x} ${-y})"/>`;
+  svg=svg.replace('<path d="M117 81q-8-22-1-35l18 34M163 79q0-19 15-30l-4 35" fill="#fff0c8" />',horn('M117 81q-8-22-1-35l18 34',125,81)+horn('M163 79q0-19 15-30l-4 35',169,82));
+  svg=svg.replace('<path d="M172 108l6-25 9 22Z" fill="#fff0c8" />',horn('M172 108l6-25 9 22Z',180,106));
+ }
  for(const [part,base] of Object.entries({body:[.82,.8],head:[.95,.94],tail:[.65,.72],leg:[.85,.74],arm:[.82,.8],...profile})){
-  const [sx,sy]=base.map(n=>young?1+(n-1)*.45:n);
+  if(id==='dinos-1'&&part==='horns')continue;
+  const proportion=part==='leg'&&connectedLegs?(profile.body||[.82,.8]):base;
+  const [sx,sy]=proportion.map(n=>young?1+(n-1)*.45:n);
   const pivot=id==='pets-mouse'&&part==='tail'?[svg.includes('mouse-rise')?66:120,svg.includes('mouse-rise')?151:163]:part==='wing'?[100,130]:part==='plates'?[100,112]:part==='horns'?[145,105]:part==='trunk'?[100,105]:[100,188];
   let partTransform=`translate(${pivot[0]} ${pivot[1]}) scale(${sx} ${sy}) translate(${-pivot[0]} ${-pivot[1]})`;
   if(part==='tail'&&['pets-1','pets-mouse'].includes(id)){

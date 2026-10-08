@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, release/petverso-v22]
   workflow_dispatch:
     inputs:
       signed_release:
@@ -14,7 +14,7 @@ on:
         description: Código da versão (maior que todos os já enviados à loja)
         type: string
         required: true
-        default: '21'
+        default: '22'
 permissions:
   contents: read
 jobs:
@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 20
     env:
       APP_SLUG: petverso
-      VERSION_CODE: ${{ inputs.version_code || '21' }}
+      VERSION_CODE: ${{ inputs.version_code || '22' }}
       SIGNED_RELEASE: ${{ github.event_name == 'push' || inputs.signed_release || false }}
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +46,7 @@ jobs:
         run: npm run build
       - run: npx cap add android
       - run: node .github/scripts/prepare-android.mjs
-      - name: Gerar bundle e assinatura opcional
+      - name: Gerar APK, bundle e assinatura opcional
         run: bash .github/scripts/build-play.sh
         env:
           ANDROID_KEYSTORE_BASE64: ${{ (github.event_name == 'push' || inputs.signed_release) && secrets.ANDROID_KEYSTORE_BASE64 || '' }}
