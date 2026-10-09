@@ -35,8 +35,10 @@ import {colorfulIcon} from './icons.js';
 import {brandLogo} from './brand-logo.js';
 import {bathScene} from './bath-scene.js';
 import {petDrawing} from './pets.js';
+import {petCareSignal} from './pet-care-alert.js';
 import '@fontsource/noto-emoji/400.css';
 import './style.css';
+import './pet-care-alert.css';
 import {families,species,activeSpecies,palettes,attrs,fresh,valid,tick,care,reward,stage,randomSpecies,shop,buy,revive} from './engine.js';
 const audio=createAudio();
 function applyPreferences(){document.documentElement.dataset.theme=audio.preferences.dark?'dark':'light';document.documentElement.classList.toggle('reduce-motion',!audio.preferences.motion);}
@@ -87,14 +89,16 @@ function drawing(s,mode='idle',walking=false){s={...s,growthLevel:testEnabled?te
 // A seleção exibe a aparência adulta como vitrine, sem mudar a idade do pet adotado.
 function adoptionPreview(s){return petDrawing({...s,growthLevel:2,walking:false,carePose:true,dirty:false},'idle');}
 function resetBath(){bathStep=0;bathProgress=0;waterOn=false;soapSelected=false;strokeDistance=0;}
-function petNeedIcon(need){return {health:'❤',food:'🍗',hygiene:'🚿',energy:'⚡',joy:'☺'}[need]||'!';}
 function openPetSwitcher(focusBorn=0){
  if(!collection)return;
  collection=saveActive(collection,pet);collection=refreshCollection(collection);pet=activePet(collection);
- const alerts=needyPets(collection,pet.born),price=adoptionPrice(collection),slots=Array.from({length:MAX_PETS},(_,index)=>collection.pets[index]||null),overlay=document.createElement('div');overlay.className='overlay pet-dialog-overlay pet-switch-overlay';
+ const alerts=needyPets(collection,null),price=adoptionPrice(collection),slots=Array.from({length:MAX_PETS},(_,index)=>collection.pets[index]||null),overlay=document.createElement('div');overlay.className='overlay pet-dialog-overlay pet-switch-overlay';
  const slotStyle='box-sizing:border-box!important;flex:1 1 0!important;width:calc((100% - 20px)/3)!important;min-width:0!important;max-width:calc((100% - 20px)/3)!important;height:206px!important;min-height:206px!important;max-height:206px!important;margin:0!important;transform:none!important';
  const cards=slots.map((p,index)=>{
-  if(p){const s=species.find(x=>x.id===p.species),alert=alerts.find(x=>x.pet.born===p.born);return `<button style="${slotStyle}" class="pet-switch-option ${p.born===pet.born?'active':''} ${p.born===focusBorn?'attention':''}" data-switch-born="${p.born}"><span class="pet-switch-avatar">${drawing(s,'happy')}</span><div class="pet-switch-info"><strong>${esc(p.name)}</strong><small>${stage(p)} · ${s.name}</small></div>${alert?`<em aria-label="Precisa de cuidados">${petNeedIcon(alert.need)}</em>`:''}</button>`;}
+  if(p){
+   const s=species.find(x=>x.id===p.species),alert=alerts.find(x=>x.pet.born===p.born),thought=alert?petCareSignal(alert.need,p):null;
+   return `<button style="${slotStyle}" class="pet-switch-option ${p.born===pet.born?'active':''} ${p.born===focusBorn?'attention':''}" data-switch-born="${p.born}" aria-label="${esc(p.name)}${thought?` · ${esc(thought.label)}`:''}"><span class="pet-switch-avatar">${drawing(s,'happy')}</span><div class="pet-switch-info"><strong>${esc(p.name)}</strong><small>${stage(p)} · ${s.name}</small></div>${thought?`<span class="pet-care-thought" role="img" aria-label="${esc(thought.label)}" title="${esc(thought.label)}"><span aria-hidden="true">${thought.icon}</span></span>`:''}</button>`;
+  }
   const unlocked=index<(collection.unlockedSlots||2),cost=index===2&&!unlocked?5000:0,disabled=cost>0&&collection.wallet<cost;
   return `<button style="${slotStyle}" class="pet-switch-option pet-switch-empty ${unlocked?'available':'locked'}" data-add-pet="${index}" ${disabled?'disabled':''}><span class="pet-switch-plus">${unlocked?'+':'🔒'}</span><div class="pet-switch-info"><strong>${unlocked?'Adotar pet':'3ª vaga'}</strong><small>${unlocked?'Vaga disponível':`${icon('coin')} 5.000`}</small></div></button>`;
  }).join('');
@@ -106,17 +110,11 @@ function openPetSwitcher(focusBorn=0){
  overlay.querySelectorAll('[data-add-pet]').forEach(b=>b.onclick=()=>{if(b.disabled)return;close();page='adopt';pendingSpecies=null;family='all';render();window.scrollTo(0,0);});
  overlay.querySelector('#remove-current-pet').onclick=async()=>{if(collection.pets.length<=1)return;const confirmed=await petConfirm('Remover '+pet.name,'O progresso, os móveis e os recordes deste pet serão apagados. A carteira compartilhada e a vaga já desbloqueada serão mantidas.','Remover pet',true);if(!confirmed)return;const result=removePet(collection,pet.born);if(!result.ok)return;collection=result.collection;pet=activePet(collection);scene=pet.sleeping?'bedroom':'living';page='home';save();close();render();};
 }
-function otherPetCareAlert(){
- const alert=needyPets(collection,pet?.born)[0];if(!alert)return '';
- const s=species.find(x=>x.id===alert.pet.species);
- return `<button id="other-pet-alert" class="other-pet-alert" data-pet-born="${alert.pet.born}" aria-label="${esc(alert.pet.name)} precisa de cuidados"><span>${drawing(s,'happy')}</span><b>${petNeedIcon(alert.need)}</b></button>`;
-}
-
 function render(){
  const visitKey=`${page}:${scene}:${pet?.born}:${pet?.species}`;const sceneMotion=visitKey===callVisitKey&&pet&&!pet.sleeping&&!pet.dead&&scene!=='bathroom'?captureSceneMotion(root):null;if(visitKey!==callVisitKey){callVisitKey=visitKey;callNoticeShown=false;skillNoticeShown=false;}
  sceneCleanup();sceneCleanup=()=>{};audio.setEnvironment(scene);
  const s=pet?species.find(x=>x.id===pet.species):null;
- root.innerHTML=`${testEnabled?`<div class="test-age-banner" role="status">🧪 Modo de teste: ${testAge===1?'Jovem':'Adulto'} · 50.000 moedas · 100 inteligência · <a href="?jovem">Jovem</a> / <a href="?adulto">Adulto</a></div>`:'' }<header><a class="brand" href="#"><img class="brand-logo-image" src="${brandLogo}" alt="" aria-hidden="true"> PetVerso<span>um pequeno mundo, uma grande amizade</span></a><div class="header-tools">${pet?`<div class="wallet">${icon('coin')} ${pet.coins}</div>`:''}<button id="open-settings" aria-label="Configurações">${icon('settings')}</button></div></header><main>${!pet||page==='adopt'?adoption():page==='shop'?store():page==='games'?games():pet.dead?memorial():home(s)}${pet&&page==='home'?otherPetCareAlert():''}</main>${pet?`<nav>${[['home','⌂','Meu pet'],['games','▶','Brincar'],['shop','✧','Lojinha']].map(([p,i,n])=>`<button data-page="${p}" class="${page===p?'active':''}">${icon(p)}<span>${n}</span></button>`).join('')}</nav>`:''}<div role="status" class="toast ${message?'show':''}">${esc(message)}</div>`;
+ root.innerHTML=`${testEnabled?`<div class="test-age-banner" role="status">🧪 Modo de teste: ${testAge===1?'Jovem':'Adulto'} · 50.000 moedas · 100 inteligência · <a href="?jovem">Jovem</a> / <a href="?adulto">Adulto</a></div>`:'' }<header><a class="brand" href="#"><img class="brand-logo-image" src="${brandLogo}" alt="" aria-hidden="true"> PetVerso<span>um pequeno mundo, uma grande amizade</span></a><div class="header-tools">${pet?`<div class="wallet">${icon('coin')} ${pet.coins}</div>`:''}<button id="open-settings" aria-label="Configurações">${icon('settings')}</button></div></header><main>${!pet||page==='adopt'?adoption():page==='shop'?store():page==='games'?games():pet.dead?memorial():home(s)}</main>${pet?`<nav>${[['home','⌂','Meu pet'],['games','▶','Brincar'],['shop','✧','Lojinha']].map(([p,i,n])=>`<button data-page="${p}" class="${page===p?'active':''}">${icon(p)}<span>${n}</span></button>`).join('')}</nav>`:''}<div role="status" class="toast ${message?'show':''}">${esc(message)}</div>`;
  root.querySelector('#open-settings').onclick=()=>openSettings({audio,reminders,pet:()=>pet,pets:()=>collection?.pets||[],onMotion:applyPreferences,icon});
  root.querySelector('.brand').onclick=e=>{e.preventDefault();if(pet){page='home';render();}};
  root.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{if(scene==='bathroom'&&b.dataset.page!=='home')resetBath();page=b.dataset.page;render();window.scrollTo(0,0);});
@@ -128,7 +126,6 @@ function render(){
  root.querySelector('#cancel-adopt')?.addEventListener('click',()=>{if(pendingSpecies){pendingSpecies=null;}else if(collection?.pets.length){page='home';pet=activePet(collection);}render();});
  if(page==='home'&&pet?.ill&&!healthPopupShown&&!document.querySelector('.pet-health-overlay')){healthPopupShown=true;queueMicrotask(()=>{if(!pet?.ill||document.querySelector('.pet-health-overlay'))return;const overlay=document.createElement('div');overlay.className='overlay pet-health-overlay';overlay.innerHTML='<section class="dialog pet-health-dialog" role="dialog" aria-modal="true" aria-label="Pet precisa de cuidados"><div class="health-kit-icon" aria-hidden="true">🧰</div><h2>Seu pet está doente!</h2><p>Use o remédio para recuperar a saúde. Acompanhe a barra de saúde até melhorar.</p><button class="primary" type="button">Entendi, vou cuidar</button></section>';document.body.append(overlay);overlay.querySelector('button').onclick=()=>overlay.remove();});}
  root.querySelector('#switch-pet')?.addEventListener('click',()=>openPetSwitcher());
- root.querySelector('#other-pet-alert')?.addEventListener('click',()=>openPetSwitcher(Number(root.querySelector('#other-pet-alert').dataset.petBorn)));
  root.querySelector('#open-growth')?.addEventListener('click',()=>{updatePetTime();save();openGrowth(pet);});
  restoreSceneMotion(root,sceneMotion);bindScene();root.querySelectorAll('[data-care]').forEach(b=>b.onclick=()=>action(b.dataset.care));
  root.querySelectorAll('[data-game]').forEach(b=>b.onclick=()=>start(b.dataset.game));
