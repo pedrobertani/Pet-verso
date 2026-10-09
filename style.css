@@ -681,3 +681,23 @@ html[data-theme="dark"] .care-actions button[data-action="medicine"]:disabled{
  }
  .pet-switch-option:last-child:nth-child(odd){width:calc((100% - 7px)/2)!important}
 }
+
+
+/* Mouse tail stays visible during turns and body movement. */
+.world .species-pets-mouse .mouse-tail-visible{transform-box:fill-box;transform-origin:90% 50%;animation:mouse-tail-soft 2.6s ease-in-out infinite}
+@keyframes mouse-tail-soft{0%,100%{transform:rotate(0deg)}50%{transform:rotate(5deg)}}
+/* The medicine effect belongs on the floor beside the pet, not on the wall. */
+.world.medicine-active .medicine-shot{position:absolute;left:50%;bottom:77px;width:68px;height:34px;transform:translateX(22px) rotate(-18deg);z-index:5;pointer-events:none}
+.world.medicine-active .medicine-shot svg{display:block;width:100%;height:100%;overflow:visible}
+.world.medicine-active .medicine-spark{position:absolute;left:42%;top:-13px;font-size:15px;color:#f5a9ca}
+@media(max-width:480px){.world.medicine-active .medicine-shot{width:54px;height:27px;bottom:76px;transform:translateX(15px) rotate(-18deg)}}
+@media(prefers-reduced-motion:reduce){.world .species-pets-mouse .mouse-tail-visible{animation:none}}
+
+/* Persistent, accessible health reminder; no thermometer drawn over the pet. */
+.pet-health-popup{display:flex;align-items:center;gap:12px;padding:12px 14px;margin:12px 0;border:2px solid #d6aac0;border-radius:18px;background:#fff0f3;color:#583e50;box-shadow:0 3px 0 #c79bac44}
+.pet-health-popup .pet-health-kit{font-size:30px;flex:none}.pet-health-popup div{display:grid;gap:3px;flex:1;min-width:0}.pet-health-popup small{font-size:12px;line-height:1.35}.pet-health-popup button{padding:9px 12px;background:#ffe1e8;border:2px solid #c986a7;color:#583e50;font-weight:700;flex:none}
+[data-theme="dark"] .pet-health-popup{background:#3a2a38;color:#fff0f4;border-color:#93627e}[data-theme="dark"] .pet-health-popup button{background:#644158;color:#fff0f4;border-color:#ae7c98}
+@media(max-width:440px){.pet-health-popup{gap:8px;padding:10px}.pet-health-popup .pet-health-kit{font-size:24px}.pet-health-popup button{font-size:12px;padding:8px}}
+
+/* Health alert appears once per illness instead of occupying permanent page space. */
+.pet-health-overlay{z-index:1100}.pet-health-dialog{text-align:center;max-width:390px;margin:auto}.pet-health-dialog .health-kit-icon{font-size:48px;margin-bottom:8px}.pet-health-dialog p{line-height:1.5;margin:12px 0 20px}.pet-health-dialog button{width:100%;min-height:46px}
