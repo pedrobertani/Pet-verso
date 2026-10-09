@@ -1,9 +1,5 @@
 name: Gerar APK PetVerso
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
@@ -34,6 +30,7 @@ jobs:
       - run: npm run build
       - run: npx cap add android
       - run: node .github/scripts/prepare-android.mjs
+      - uses: gradle/actions/setup-gradle@v4
       - name: Compilar APK de teste
         working-directory: android
         run: |

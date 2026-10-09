@@ -1,9 +1,5 @@
 name: Gerar AAB para Play Store
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main, release/petverso-v22]
   workflow_dispatch:
     inputs:
       signed_release:
@@ -24,7 +20,7 @@ jobs:
     env:
       APP_SLUG: petverso
       VERSION_CODE: ${{ inputs.version_code || '23' }}
-      SIGNED_RELEASE: ${{ github.event_name == 'push' || inputs.signed_release || false }}
+      SIGNED_RELEASE: ${{ inputs.signed_release || false }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -46,13 +42,14 @@ jobs:
         run: npm run build
       - run: npx cap add android
       - run: node .github/scripts/prepare-android.mjs
+      - uses: gradle/actions/setup-gradle@v4
       - name: Gerar APK, bundle e assinatura opcional
         run: bash .github/scripts/build-play.sh
         env:
-          ANDROID_KEYSTORE_BASE64: ${{ (github.event_name == 'push' || inputs.signed_release) && secrets.ANDROID_KEYSTORE_BASE64 || '' }}
-          ANDROID_KEYSTORE_PASSWORD: ${{ (github.event_name == 'push' || inputs.signed_release) && secrets.ANDROID_KEYSTORE_PASSWORD || '' }}
-          ANDROID_KEY_ALIAS: ${{ (github.event_name == 'push' || inputs.signed_release) && secrets.ANDROID_KEY_ALIAS || '' }}
-          ANDROID_KEY_PASSWORD: ${{ (github.event_name == 'push' || inputs.signed_release) && secrets.ANDROID_KEY_PASSWORD || '' }}
+          ANDROID_KEYSTORE_BASE64: ${{ inputs.signed_release && secrets.ANDROID_KEYSTORE_BASE64 || '' }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ inputs.signed_release && secrets.ANDROID_KEYSTORE_PASSWORD || '' }}
+          ANDROID_KEY_ALIAS: ${{ inputs.signed_release && secrets.ANDROID_KEY_ALIAS || '' }}
+          ANDROID_KEY_PASSWORD: ${{ inputs.signed_release && secrets.ANDROID_KEY_PASSWORD || '' }}
       - uses: actions/upload-artifact@v4
         with:
           name: petverso-play-store
