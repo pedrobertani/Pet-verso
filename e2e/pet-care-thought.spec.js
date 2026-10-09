@@ -5,8 +5,8 @@ test('balão de pensamento substitui o alerta inferior e funciona em ambos os te
  await page.evaluate(async()=>{
   const {fresh}=await import('/src/engine.js');
   const {normalizeCollection,addPet}=await import('/src/pet-collection.js');
-  const hungry=fresh('pets-0','Gatinho');
-  const healthy=fresh('pets-1','Auau');
+  const hungry=fresh('pets-0','Gatinho',Date.now()-60000);
+  const healthy=fresh('pets-1','Auau',Date.now()-1000);
   for(const p of [hungry,healthy]){
    Object.assign(p.stats,{food:100,health:100,energy:100,hygiene:100,joy:100});
    p.ill=false;p.waste=0;
