@@ -699,3 +699,14 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
  color:var(--shop-disabled-text)!important;-webkit-text-fill-color:var(--shop-disabled-text)!important;
  opacity:.82!important;box-shadow:none!important;
 }
+
+
+/* Mouse tail stays visible during turns and body movement. */
+.world .species-pets-mouse .mouse-tail-visible{transform-box:fill-box;transform-origin:90% 50%;animation:mouse-tail-soft 2.6s ease-in-out infinite}
+@keyframes mouse-tail-soft{0%,100%{transform:rotate(0deg)}50%{transform:rotate(5deg)}}
+/* The medicine effect belongs on the floor beside the pet, not on the wall. */
+.world.medicine-active .medicine-shot{position:absolute;left:50%;bottom:77px;width:68px;height:34px;transform:translateX(22px) rotate(-18deg);z-index:5;pointer-events:none}
+.world.medicine-active .medicine-shot svg{display:block;width:100%;height:100%;overflow:visible}
+.world.medicine-active .medicine-spark{position:absolute;left:42%;top:-13px;font-size:15px;color:#f5a9ca}
+@media(max-width:480px){.world.medicine-active .medicine-shot{width:54px;height:27px;bottom:76px;transform:translateX(15px) rotate(-18deg)}}
+@media(prefers-reduced-motion:reduce){.world .species-pets-mouse .mouse-tail-visible{animation:none}}
