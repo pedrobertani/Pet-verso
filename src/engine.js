@@ -50,11 +50,13 @@ export function tick(p,now=Date.now()){
  }
  n.last=Math.max(now,n.last);return advanceGrowth(n);
 }
+// Usamos a saciedade arredondada porque esse é o número exibido na barra.
+export const canFeedByHunger=p=>Number.isFinite(p?.stats?.food)&&Math.round(p.stats.food)<50;
 export function care(p,action){const n=structuredClone(p);if(n.dead)return n;const s=n.stats;
  if(action==='sleep'){n.sleeping=!n.sleeping;return n;}
  if(action==='clean'){n.coins+=n.waste??0;n.waste=0;n.floorDirt=0;return n;}if(action==='pickup'){if((n.waste??0)>0){n.waste--;n.floorDirt=Math.max(0,(n.floorDirt??0)-1);n.coins++;}return n;}
  if(n.sleeping)return n;
- if(action==='feed'&&n.coins>=5){const needed=s.food<=60;n.coins-=5;s.food=clamp(s.food+50);s.joy=clamp(s.joy+3);if(needed){n.xp+=2;countGrowthCare(n,'meals');}}
+ if(action==='feed'&&n.coins>=5&&canFeedByHunger(n)){n.coins-=5;s.food=clamp(s.food+50);s.joy=clamp(s.joy+3);n.xp+=2;countGrowthCare(n,'meals');}
  if(action==='bath'){const needed=s.hygiene<=75;s.hygiene=100;s.joy=clamp(s.joy+4);if(needed){n.xp+=2;countGrowthCare(n,'baths');}}
  if(action==='pet'){s.joy=clamp(s.joy+5);n.social={...n.social,affection:n.last};}
  if(action==='medicine'&&n.coins>=12&&s.health<90){n.coins-=12;s.health=clamp(s.health+20);}
