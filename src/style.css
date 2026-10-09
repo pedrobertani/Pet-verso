@@ -545,3 +545,35 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
 .pet-switch:active{
  box-shadow:0 1px 0 var(--compact-control-shadow)!important;
 }
+
+
+/* Compact controls share the exact room-tab palette in each theme. */
+:root{
+ --compact-control-bg:#e4faf5;
+ --compact-control-border:#c3edf0;
+ --compact-control-shadow:#92cbd6;
+ --compact-control-ink:#3d8699;
+}
+:root[data-theme="dark"]{
+ --compact-control-bg:#3e4660;
+ --compact-control-border:#677a91;
+ --compact-control-shadow:#1a2337;
+ --compact-control-ink:#d4edf3;
+}
+[data-theme="dark"] .pet-name-box,
+[data-theme="dark"] .pet-switch,
+[data-theme="dark"] .growth-age{
+ background:var(--compact-control-bg)!important;
+ background-color:var(--compact-control-bg)!important;
+ background-image:none!important;
+ border-color:var(--compact-control-border)!important;
+ box-shadow:0 3px 0 var(--compact-control-shadow)!important;
+}
+[data-theme="dark"] .pet-switch{
+ color:var(--compact-control-ink)!important;
+ -webkit-text-fill-color:var(--compact-control-ink)!important;
+}
+[data-theme="dark"] .pet-name-box .edit{
+ color:var(--compact-control-ink)!important;
+ -webkit-text-fill-color:var(--compact-control-ink)!important;
+}
