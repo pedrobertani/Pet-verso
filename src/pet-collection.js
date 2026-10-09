@@ -57,22 +57,6 @@ export function adoptionPrice(collection){
  return collection.pets.length<unlocked?0:unlocked<MAX_PETS?EXTRA_PET_PRICE:0;
 }
 
-// Buy the third slot independently from adoption. An unlocked empty slot stays
-// available even if the user closes the selector or later removes that pet.
-export function unlockPetSlot(collection,index){
- if(!collection)return {ok:false,reason:'invalid',collection};
- const unlocked=Math.max(FREE_PET_SLOTS,Math.min(MAX_PETS,collection.unlockedSlots||FREE_PET_SLOTS));
- if(!Number.isInteger(index)||index<0||index>=MAX_PETS)return {ok:false,reason:'invalid',collection};
- if(index<unlocked)return {ok:true,alreadyUnlocked:true,price:0,collection:clone(collection)};
- if(index!==unlocked)return {ok:false,reason:'order',collection};
- if(collection.wallet<EXTRA_PET_PRICE)return {ok:false,reason:'coins',price:EXTRA_PET_PRICE,collection};
- const next=clone(collection);
- next.unlockedSlots=index+1;
- next.wallet-=EXTRA_PET_PRICE;
- for(const p of next.pets)p.coins=next.wallet;
- return {ok:true,alreadyUnlocked:false,price:EXTRA_PET_PRICE,collection:next};
-}
-
 export function addPet(collection,pet){
  if(!valid(pet))return {ok:false,reason:'invalid',collection};
  if((collection?.pets.length||0)>=MAX_PETS)return {ok:false,reason:'limit',collection};
