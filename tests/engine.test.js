@@ -12,31 +12,34 @@ test('negligência offline causa doença e cinco dias sem cuidado causam morte',
 test('cuidados suficientes interrompem doença antes da morte',()=>{let p=fresh('pets-0','Lua',1000);p.ill=true;p.illnessHours=60;p.stats.health=40;p.coins=100;p=care(p,'medicine');p=care(p,'medicine');const n=tick(p,1000+15*60000);assert.equal(n.ill,false);assert.equal(n.dead,false);assert.equal(n.illnessHours,0);});
 test('seleção tem 25 espécies com saves antigos válidos',()=>{assert.equal(activeSpecies.length,25);assert.equal(new Set(activeSpecies.map(s=>s.id)).size,25);assert.equal(valid(fresh('pets-3','Hamster antigo')),true);});
 test('necessidades acumulam offline e limpeza não custa moedas nem dá banho',()=>{let p=fresh('pets-0','Lua',1000);p=tick(p,1000+1.75*3600000);assert.equal(p.waste,2);const clean=care(p,'clean');assert.equal(clean.waste,0);assert.equal(clean.coins,p.coins+p.waste);assert.equal(clean.stats.hygiene,p.stats.hygiene);});
-test('minijogo somente rende moedas quando consegue pontos',()=>{
- for(let score=0;score<=100;score++){
-  const p=fresh('pets-0','Lua');
-  const expected=score>0?3+Math.floor(score/10):0;
-  const n=reward(p,score,true);
-  assert.equal(n.coins-p.coins,expected,'pontuação '+score);
-  assert.equal(n.lastEarning,expected);
-  assert.ok(n.coins>=p.coins);
- }
- for(const game of ['memory','runner','flight','puzzle','sequence','words']){
-  const p=fresh('pets-0','Lua'),lost=reward(p,0,true,game);
-  assert.equal(lost.coins,p.coins,'nenhuma moeda por entrar e não jogar '+game);
-  assert.equal(lost.lastEarning,0);
-  assert.equal(reward(p,1,true,game).coins-p.coins,3);
-  assert.equal(reward(p,100,true,game).coins-p.coins,5);
-  assert.equal(reward(p,400,true,game).coins-p.coins,13);
+test('partidas sem pontos rendem zero moedas e as demais respeitam metas do jogo',()=>{
+ const gameThresholds={
+  memory:[100,240],sequence:[60,160],food:[50,140],
+  fruitmerge:[45,150],runner:[25,75],puzzle:[90,220],
+  hide:[60,140],flight:[25,65],words:[60,160],
+  blocks:[75,200],match3:[350,1000]
+ };
+ for(const [game,[good,excellent]] of Object.entries(gameThresholds)){
+  const p=fresh('pets-0','Lua'),score=(points)=>reward(p,points,true,game);
+  for(const value of [0,-50,NaN]){
+   const n=score(value);
+   assert.equal(n.coins,p.coins,game+' não deve render sem pontos');
+   assert.equal(n.lastEarning,0);
+  }
+  for(const [points,expected] of [[1,5],[good-1,5],[good,10],[excellent-1,10],[excellent,15],[1000000,15]]){
+   const n=score(points);
+   assert.equal(n.coins-p.coins,expected,game+' com '+points+' pontos');
+   assert.equal(n.lastEarning,expected);
+  }
  }
 });
 
 test('recolher cocô remove a marca correspondente sem dar banho',()=>{const p=fresh('pets-0','Lua',1000);const n=tick(p,1000+.75*3600000);assert.equal(n.waste,1);assert.equal(n.floorDirt,1);assert.ok(n.stats.hygiene<81);const pickup=care(n,'pickup');assert.equal(pickup.waste,0);assert.equal(pickup.floorDirt,0);const clean=care(pickup,'clean');assert.equal(clean.floorDirt,0);assert.equal(clean.stats.hygiene,n.stats.hygiene);const bath=care(n,'bath');assert.equal(bath.stats.hygiene,100);assert.equal(bath.floorDirt,1);});
 
-test('fome e fezes em 45min; energia e diversão em cerca de 3h',()=>{const p=fresh('pets-0','Lua',1000);const n=tick(p,1000+45*60000);assert.equal(n.stats.food,25);assert.equal(n.waste,1);const later=tick(p,1000+3*3600000);assert.equal(later.stats.energy,72);assert.equal(later.stats.joy,14);});
+test('fome cai devagar em 45min; energia e diversão em cerca de 3h',()=>{const p=fresh('pets-0','Lua',1000);const n=tick(p,1000+45*60000);assert.equal(n.stats.food,76);assert.equal(n.waste,1);const later=tick(p,1000+3*3600000);assert.equal(later.stats.energy,72);assert.equal(later.stats.joy,14);});
 test('energia completa mantém o pet dormindo até o jogador acordá-lo',()=>{const p=fresh('pets-0','Lua',1000);p.sleeping=true;p.stats.energy=20;const n=tick(p,1000+8*3600000);assert.equal(n.stats.energy,100);assert.equal(n.sleeping,true);assert.equal(care(n,'sleep').sleeping,false);assert.ok(n.stats.food>=60);assert.ok(n.stats.hygiene>=60);assert.equal(n.ill,false);assert.equal(n.dead,false);});
 
-test('refeição repõe 45min de comida e sono completa energia em até duas horas',()=>{const p=fresh('pets-0','Lua',1000);p.stats.food=25;const fed=care(p,'feed');assert.equal(fed.stats.food,85);assert.equal(tick(fed,1000+45*60000).stats.food,25);p.sleeping=true;p.stats.energy=35;const rested=tick(p,1000+2*3600000);assert.equal(rested.stats.energy,100);assert.equal(rested.sleeping,true);});
+test('refeição dá várias horas de saciedade e sono completa energia em até duas horas',()=>{const p=fresh('pets-0','Lua',1000);p.stats.food=25;const fed=care(p,'feed');assert.equal(fed.stats.food,85);assert.equal(tick(fed,1000+45*60000).stats.food,76);p.sleeping=true;p.stats.energy=35;const rested=tick(p,1000+2*3600000);assert.equal(rested.stats.energy,100);assert.equal(rested.sleeping,true);});
 test('cada cocô recolhido rende uma moeda sem repetir nem premiar manchas',()=>{const p=fresh('pets-0','Lua');p.waste=2;p.floorDirt=2;const first=care(p,'pickup');assert.equal(first.coins,p.coins+1);const second=care(first,'pickup');assert.equal(second.coins,p.coins+2);assert.equal(care(second,'pickup').coins,second.coins);assert.equal(care(second,'clean').coins,second.coins);assert.equal(care(p,'clean').coins,p.coins+2);});
 
 test('cinco dias críticos e renascimento preservam identidade e progresso',async()=>{const {revive}=await import('../src/engine.js');const p=fresh('pets-0','Lua',1000);p.ill=true;p.neglectHours=119;p.stats.food=0;p.stats.energy=0;p.stats.hygiene=0;p.stats.health=0;assert.equal(tick(p,1000+30*60000).dead,false);const dead=tick(p,1000+3600000);assert.equal(dead.dead,true);dead.coins=4999;assert.deepEqual(revive(dead),dead);dead.coins=5000;dead.stats.intelligence=60;const live=revive(dead,9000000);assert.equal(live.coins,0);assert.equal(live.dead,false);assert.equal(live.species,p.species);assert.equal(live.stats.intelligence,60);assert.equal(live.neglectHours,0);assert.equal(live.last,9000000);});
@@ -98,4 +101,18 @@ test('sono de energia zero até 100 demora exatamente duas horas e nunca despert
  const full=tick(p,1000+2*3600000);assert.equal(full.stats.energy,100);assert.equal(full.sleeping,true);
  const later=tick(full,full.last+6*3600000);assert.equal(later.stats.energy,100);assert.equal(later.sleeping,true);
  const manual=care(full,'sleep');assert.equal(manual.sleeping,false);assert.equal(manual.stats.energy,100);
+});
+
+test('saciedade acordada diminui 12/h e comida mantém 60 pontos por refeição a 5 moedas',()=>{
+ const p=fresh('pets-0','Lua',1000);p.stats.food=25;p.coins=20;
+ const fed=care(p,'feed');
+ assert.equal(fed.stats.food,85);
+ assert.equal(fed.coins,15);
+ assert.equal(tick(fed,1000+3600000).stats.food,73);
+ assert.equal(tick(fed,1000+5*3600000).stats.food,25);
+ assert.equal(tick(fed,1000+10*60000).stats.food,83);
+ assert.equal(tick({...fed,sleeping:true},1000+2*3600000).stats.food,79);
+ assert.equal(care(fed,'medicine').coins,15,'preço do remédio não foi modificado');
+ const patient={...fed,stats:{...fed.stats,health:50}};
+ assert.equal(care(patient,'medicine').coins,3,'remédio custa 12 moedas');
 });
