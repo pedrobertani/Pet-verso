@@ -504,3 +504,44 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
  box-shadow:0 3px 0 #28263f!important;
 }
 [data-theme="dark"] .pet-switch:active{box-shadow:0 1px 0 #28263f!important}
+
+
+/* Reusable compact-control tokens: name, pet switcher and growth badge. */
+:root{
+ --compact-control-bg:#e5faf7;
+ --compact-control-border:#b6dcdf;
+ --compact-control-shadow:#97cdd2;
+ --compact-control-ink:#478494;
+ --compact-control-icon:#76609a;
+}
+:root[data-theme="dark"]{
+ --compact-control-bg:#344f59;
+ --compact-control-border:#6595a0;
+ --compact-control-shadow:#243946;
+ --compact-control-ink:#d0efee;
+ --compact-control-icon:#f2cbe2;
+}
+.pet-name-box,
+.pet-switch,
+.growth-age{
+ background:var(--compact-control-bg)!important;
+ border-color:var(--compact-control-border)!important;
+ box-shadow:0 3px 0 var(--compact-control-shadow)!important;
+}
+.pet-switch{
+ color:var(--compact-control-icon)!important;
+ -webkit-text-fill-color:var(--compact-control-icon)!important;
+}
+.pet-name-box .edit,
+.pet-name-box .edit:hover,
+.pet-name-box .edit:active{
+ color:var(--compact-control-icon)!important;
+ -webkit-text-fill-color:var(--compact-control-icon)!important;
+}
+.growth-age>span:last-child{
+ color:var(--compact-control-ink)!important;
+ -webkit-text-fill-color:var(--compact-control-ink)!important;
+}
+.pet-switch:active{
+ box-shadow:0 1px 0 var(--compact-control-shadow)!important;
+}
