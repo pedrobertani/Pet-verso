@@ -1,6 +1,7 @@
 import {validItemColor} from './item-colors.js';
 import {dietForSpecies} from './pet-diets.js';
 import {parkToys} from './park-toys.js';
+import {gameCoinReward} from './game-economy.js';
 import {advanceGrowth,countGrowthCare,growthProgress} from './growth.js';
 export const families = [
  {id:'pets',name:'Pets',icon:'🐾',color:'#eab483',names:['Gato','Cachorro','Coelho','Hamster','Porquinho-da-índia','Calopsita','Poodle','Gatinho preto'],food:'ração',toy:'bola'},
@@ -34,7 +35,7 @@ export function tick(p,now=Date.now()){
   if(h<=0){n.sleeping=true;continue;}
   remaining-=h;cursor+=h*3600000;
   n.wasteClock+=h;const interval=n.sleeping?8:.75;if(n.wasteClock>=interval){const produced=Math.floor(n.wasteClock/interval);n.waste=Math.min(5,n.waste+produced);n.floorDirt=Math.min(5,n.floorDirt+produced);n.stats.hygiene=clamp(n.stats.hygiene-produced*8);n.wasteClock%=interval;}
-  n.stats.food=clamp(n.stats.food-h*(n.sleeping?3:80));n.stats.hygiene=clamp(n.stats.hygiene-h*((n.sleeping?1:6)+(n.waste+(n.floorDirt??0))*.4));n.stats.joy=clamp(n.stats.joy-h*(n.sleeping?.5:22));
+  n.stats.food=clamp(n.stats.food-h*(n.sleeping?3:12));n.stats.hygiene=clamp(n.stats.hygiene-h*((n.sleeping?1:6)+(n.waste+(n.floorDirt??0))*.4));n.stats.joy=clamp(n.stats.joy-h*(n.sleeping?.5:22));
   n.stats.energy=clamp(n.stats.energy+h*(n.sleeping?50:-6));
   if(!n.sleeping&&n.stats.energy<=0)n.sleeping=true;
   const neglected=n.stats.food<=15||n.stats.energy<=10||n.stats.hygiene<=10||n.waste>=4;
@@ -59,7 +60,7 @@ export function care(p,action){const n=structuredClone(p);if(n.dead)return n;con
  if(action==='medicine'&&n.coins>=12&&s.health<90){n.coins-=12;s.health=clamp(s.health+20);}
  return n;
 }
-export function reward(p,score,smart,gameId){const n=structuredClone(p);if(!n.dead&&n.stats.energy<10)return n;const points=Math.max(0,Math.min(100,Math.floor(score)));const earnedPoints=Math.max(0,Math.floor(Number.isFinite(score)?score:0));n.totalPoints=(n.totalPoints||0)+earnedPoints;n.records??={};if(gameId)n.records[gameId]=Math.max(n.records[gameId]||0,earnedPoints);n.lastEarning=earnedPoints>0?(gameId?3+Math.floor(earnedPoints/40):3+Math.floor(points/10)):0;n.coins+=n.lastEarning;if(n.dead)return n;n.growth??={version:1,level:growthProgress(n).level,baths:0,meals:0,games:n.games};n.games++;if(earnedPoints>0)n.growth.games++;n.xp+=3+Math.floor(points/20);n.stats.energy=clamp(n.stats.energy-5);n.stats.joy=clamp(n.stats.joy+5+points/20);if(smart&&earnedPoints>0){const intelligenceGain=Math.min(n.stats.health<40?2:3,1+Math.floor(points/50));n.stats.intelligence=clamp(n.stats.intelligence+intelligenceGain);}return advanceGrowth(n);}
+export function reward(p,score,smart,gameId){const n=structuredClone(p);if(!n.dead&&n.stats.energy<10)return n;const points=Math.max(0,Math.min(100,Math.floor(score)));const earnedPoints=Math.max(0,Math.floor(Number.isFinite(score)?score:0));n.totalPoints=(n.totalPoints||0)+earnedPoints;n.records??={};if(gameId)n.records[gameId]=Math.max(n.records[gameId]||0,earnedPoints);n.lastEarning=gameCoinReward(gameId,earnedPoints);n.coins+=n.lastEarning;if(n.dead)return n;n.growth??={version:1,level:growthProgress(n).level,baths:0,meals:0,games:n.games};n.games++;if(earnedPoints>0)n.growth.games++;n.xp+=3+Math.floor(points/20);n.stats.energy=clamp(n.stats.energy-5);n.stats.joy=clamp(n.stats.joy+5+points/20);if(smart&&earnedPoints>0){const intelligenceGain=Math.min(n.stats.health<40?2:3,1+Math.floor(points/50));n.stats.intelligence=clamp(n.stats.intelligence+intelligenceGain);}return advanceGrowth(n);}
 export function stage(p){return growthProgress(p).name;}
 export function randomSpecies(random=Math.random){return activeSpecies[Math.min(activeSpecies.length-1,Math.max(0,Math.floor(random()*activeSpecies.length)))].id;}
 export const shop=[{id:'bed-cloud',name:'Caminha nuvem',icon:'☁️',price:180,slot:'bed'},{id:'bed-leaf',name:'Cama folha',icon:'🍃',price:240,slot:'bed'},{id:'bed-moon',name:'Cama lunar',icon:'🌙',price:420,slot:'bed'},{id:'rug',name:'Tapete colorido',icon:'🌈',price:110,slot:'rug'},{id:'plant',name:'Plantinha',icon:'🪴',price:90,slot:'decor'},{id:'lamp',name:'Abajur estrela',icon:'⭐',price:260,slot:'lamp',room:'bedroom'},{id:'castle',name:'Castelinho',icon:'🏰',price:600,slot:'decor'},{id:'ball',name:'Bola colorida',icon:'⚽',price:120,slot:'toy'},{id:'rocket',name:'Foguete de brincar',icon:'🚀',price:350,slot:'toy'},{id:'sofa',name:'Sofá aconchegante',price:280,slot:'sofa',room:'living'},{id:'shelf',name:'Estante de livros',price:220,slot:'shelf',room:'living'},{id:'table',name:'Mesinha redonda',price:160,slot:'table',room:'living'},{id:'swing',name:'Balanço do quintal',price:360,slot:'garden-swing',room:'garden'},{id:'slide',name:'Escorregador',price:450,slot:'garden-slide',room:'garden'},{id:'trampoline',name:'Cama elástica',price:520,slot:'garden-trampoline',room:'garden'},{id:'bench',name:'Banco do jardim',price:190,slot:'garden-bench',room:'garden'}];
