@@ -30,6 +30,7 @@ import '@fontsource/nunito/700.css';
 import {furniture} from './furniture.js';
 import {setupNotifications} from './notifications.js';
 import {colorfulIcon} from './icons.js';
+import {brandLogo} from './brand-logo.js';
 import {bathScene} from './bath-scene.js';
 import {petDrawing} from './pets.js';
 import '@fontsource/noto-emoji/400.css';
@@ -61,7 +62,7 @@ function render(){
  const visitKey=`${page}:${scene}:${pet?.born}:${pet?.species}`;const sceneMotion=visitKey===callVisitKey&&pet&&!pet.sleeping&&!pet.dead&&scene!=='bathroom'?captureSceneMotion(root):null;if(visitKey!==callVisitKey){callVisitKey=visitKey;callNoticeShown=false;skillNoticeShown=false;}
  sceneCleanup();sceneCleanup=()=>{};audio.setEnvironment(scene);
  const s=pet?species.find(x=>x.id===pet.species):null;
- root.innerHTML=`<header><a class="brand" href="#">${icon('brandLogo')} PetVerso<span>um pequeno mundo, uma grande amizade</span></a><div class="header-tools">${pet?`<div class="wallet">${icon('coin')} ${pet.coins}</div>`:''}<button id="open-settings" aria-label="Configurações">${icon('settings')}</button></div></header><main>${!pet?adoption():page==='shop'?store():page==='games'?games():pet.dead?memorial():home(s)}</main>${pet?`<nav>${[['home','⌂','Meu pet'],['games','▶','Brincar'],['shop','✧','Lojinha']].map(([p,i,n])=>`<button data-page="${p}" class="${page===p?'active':''}">${icon(p)}<span>${n}</span></button>`).join('')}</nav>`:''}<div role="status" class="toast ${message?'show':''}">${esc(message)}</div>`;
+ root.innerHTML=`<header><a class="brand" href="#"><img class="brand-logo-image" src="${brandLogo}" alt="" aria-hidden="true"> PetVerso<span>um pequeno mundo, uma grande amizade</span></a><div class="header-tools">${pet?`<div class="wallet">${icon('coin')} ${pet.coins}</div>`:''}<button id="open-settings" aria-label="Configurações">${icon('settings')}</button></div></header><main>${!pet?adoption():page==='shop'?store():page==='games'?games():pet.dead?memorial():home(s)}</main>${pet?`<nav>${[['home','⌂','Meu pet'],['games','▶','Brincar'],['shop','✧','Lojinha']].map(([p,i,n])=>`<button data-page="${p}" class="${page===p?'active':''}">${icon(p)}<span>${n}</span></button>`).join('')}</nav>`:''}<div role="status" class="toast ${message?'show':''}">${esc(message)}</div>`;
  root.querySelector('#open-settings').onclick=()=>openSettings({audio,reminders,pet:()=>pet,onMotion:applyPreferences,icon,onNewPet:()=>{if(!confirm('Iniciar uma nova adoção? Isso apaga o pet, as moedas e os móveis atuais.'))return false;cleanup();cleanup=()=>{};game=null;pet=null;page='home';scene='living';family='all';pendingSpecies=null;pendingColor=0;surprise=false;activity='idle';message='';sessionScore=0;sessionRounds=0;resetBath();save();render();window.scrollTo(0,0);return true;}});
  root.querySelector('.brand').onclick=e=>{e.preventDefault();if(pet){page='home';render();}};
  root.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{if(scene==='bathroom'&&b.dataset.page!=='home')resetBath();page=b.dataset.page;render();window.scrollTo(0,0);});
