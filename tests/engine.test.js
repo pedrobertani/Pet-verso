@@ -1,4 +1,4 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';import {species,activeSpecies,fresh,valid,tick,care,reward,randomSpecies} from '../src/engine.js';
+import {test} from 'node:test';import assert from 'node:assert/strict';import {species,activeSpecies,fresh,valid,tick,care,canFeedByHunger,reward,randomSpecies} from '../src/engine.js';
 test('catálogo cobre todas as famílias com identidades únicas',()=>{assert.equal(species.length,50);assert.equal(new Set(species.map(s=>s.id)).size,50);assert.equal(new Set(species.map(s=>s.family)).size,5);});
 test('sorteio alcança todas as espécies',()=>{activeSpecies.forEach((s,i)=>assert.equal(randomSpecies(()=>(i+.5)/activeSpecies.length),s.id));});
 test('sono recupera energia offline sem multiplicar tempo ao reabrir',()=>{let p=fresh('pets-0','Lua',1000);p.stats.energy=10;p.sleeping=true;const n=tick(p,3601000);assert.equal(n.stats.energy,60);assert.equal(n.sleeping,true);assert.deepEqual(tick(n,3601000),n);assert.equal(n.stats.intelligence,0);});
@@ -148,4 +148,32 @@ test('cada cocô diminui 15 de higiene, além da sujeira acumulada',()=>{
  // O tick longo divide o tempo em blocos de até 1h: 100-15-30-1,6 = 53,4.
  assert.ok(Math.abs(second.stats.hygiene-53.4)<1e-9,second.stats.hygiene);
  assert.equal(care(second,'bath').stats.hygiene,100,'banho continua gratuito e restaura toda higiene');
+});
+
+test('ração só pode ser comprada abaixo de 50 de saciedade, sem desperdício',()=>{
+ const base=fresh('pets-0','Lua',1000);
+ base.coins=40;base.stats.food=100;
+ for(const value of [100,85,70,50,49.5]){
+  const p={...base,stats:{...base.stats,food:value}};
+  assert.equal(canFeedByHunger(p),false,'deve bloquear com '+value+' de saciedade');
+  const after=care(p,'feed');
+  assert.deepEqual(after,p,'não deve descontar moedas nem alterar o pet com '+value);
+ }
+ for(const value of [49.49,49,25,0]){
+  const p={...base,stats:{...base.stats,food:value}};
+  assert.equal(canFeedByHunger(p),true,'deve liberar com '+value+' de saciedade');
+  const after=care(p,'feed');
+  assert.equal(after.coins,p.coins-5);
+  assert.equal(after.stats.food,Math.min(100,value+50));
+  assert.equal(after.growth.meals,p.growth.meals+1);
+  assert.equal(after.xp,p.xp+2);
+  assert.equal(canFeedByHunger(after),false,'após ração, trava automaticamente');
+  assert.deepEqual(care(after,'feed'),after,'segunda ração não cobra nem conta missão');
+ }
+ const noMoney={...base,coins:0,stats:{...base.stats,food:20}};
+ assert.deepEqual(care(noMoney,'feed'),noMoney,'sem moedas continua proibido');
+ const asleep={...base,sleeping:true,stats:{...base.stats,food:20}};
+ assert.deepEqual(care(asleep,'feed'),asleep,'dormindo continua proibido');
+ const dead={...base,dead:true,stats:{...base.stats,food:20}};
+ assert.deepEqual(care(dead,'feed'),dead,'pet morto continua proibido');
 });
