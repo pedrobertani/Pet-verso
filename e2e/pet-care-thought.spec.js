@@ -32,6 +32,23 @@ test('balão de pensamento substitui o alerta inferior e funciona em ambos os te
  await expect(hungryCard).toHaveAttribute('aria-label',/Gatinho.*Estou com fome/);
 
  const bubble=hungryCard.locator('.pet-care-thought');
+ // Regression: the thought was previously positioned at the top-right of the
+ // entire modal instead of the card it belongs to.
+ const expectThoughtInsideOwnCard=async()=>{
+  const positions=await hungryCard.evaluate(card=>{
+   const bubble=card.querySelector('.pet-care-thought');
+   const a=card.getBoundingClientRect(),b=bubble.getBoundingClientRect();
+   return {position:getComputedStyle(card).position,
+    contained:b.left>=a.left-1&&b.right<=a.right+1&&b.top>=a.top-1&&b.bottom<=a.bottom+1,
+    centerInside:b.left+b.width/2>=a.left&&b.left+b.width/2<=a.right};
+  });
+  expect(positions.position).toBe('relative');
+  expect(positions.contained).toBe(true);
+  expect(positions.centerInside).toBe(true);
+ };
+ await expectThoughtInsideOwnCard();
+ await page.setViewportSize({width:390,height:844});
+ await expectThoughtInsideOwnCard();
  const light=await bubble.evaluate(el=>getComputedStyle(el).backgroundColor);
  await page.evaluate(()=>document.documentElement.dataset.theme='dark');
  const dark=await bubble.evaluate(el=>getComputedStyle(el).backgroundColor);
