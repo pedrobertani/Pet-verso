@@ -264,3 +264,6 @@ nav button{padding-left:10px;padding-right:10px}nav button span{white-space:nowr
  color:#f4eddd;
  box-shadow:0 3px #17203955;
 }
+
+/* Ícones substituídos: o raio acompanha o nível de energia. */
+.need[data-need="energy"].good .energy-fill{fill:#60bd79}.need[data-need="energy"].fair .energy-fill,.need[data-need="energy"].low .energy-fill{fill:#f2c94c}.need[data-need="energy"].critical .energy-fill{fill:#e45d65}
