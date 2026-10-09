@@ -557,3 +557,14 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
  .pet-switch-option>.pet-switch-info strong{font-size:15px!important}
  .pet-switch-option>.pet-switch-info small{font-size:10px!important}
 }
+
+
+/* Keep the final card centered without changing its size when pet count is odd. */
+.pet-switch-option:last-child:nth-child(odd){
+ grid-column:1 / -1;
+ width:calc(50% - 5px)!important;
+ justify-self:center;
+}
+@media(max-width:370px){
+ .pet-switch-option:last-child:nth-child(odd){width:calc(50% - 3.5px)!important}
+}
