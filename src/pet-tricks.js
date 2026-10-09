@@ -45,7 +45,26 @@ export function animateTrick(target,id,{draw,sound=()=>{},reducedMotion=false,on
  case 'pounce':part('root',motion(['translate(0,0) rotate(0)','translate(-5px,3px) rotate(-6deg)','translate(16px,-17px) rotate(8deg)','translate(20px,4px) rotate(12deg)','translate(0,0) rotate(0)']),2200,'50% 90%');break;
  case 'owl-turn':part('.wing-left',motion(['rotate(0deg)','rotate(-100deg)','rotate(-100deg)','rotate(0deg)']),2800,'100% 55%');part('.wing-right',motion(['rotate(0deg)','rotate(100deg)','rotate(100deg)','rotate(0deg)']),2800,'0% 55%');part('.pet-head',motion(['rotateY(0deg)','rotateY(-55deg) rotate(-8deg)','rotateY(55deg) rotate(8deg)','rotateY(0deg)']),2800,'50% 75%');duration=3000;break;
  case 'flap':part('.wing-left',motion(['rotate(0deg)','rotate(35deg)','rotate(0deg)']),450,'80% 15%',{iterations:5});part('.wing-right',motion(['rotate(0deg)','rotate(-35deg)','rotate(0deg)']),450,'20% 15%',{iterations:5});break;
- case 'dash':if(id==='dinos-3'){part('root',motion(['translateX(0) scaleX(1)','translateX(18px) scaleX(1)','translateX(24px) scaleX(-1)','translateX(16px) translateY(-18px) scaleX(-1)','translateX(10px) scaleX(-1)','translateX(6px) translateY(-18px) scaleX(-1)','translateX(2px) scaleX(-1)','translateX(-2px) translateY(-18px) scaleX(-1)','translateX(-6px) scaleX(-1)','translateX(0) scaleX(1)']),3100,'50% 85%');duration=3200;sound('jump');}else{part('root',motion(['translateX(0)','translateX(25px)','translateX(-25px)','translateX(0)']),2100);part('.pet-leg',motion(['rotate(-18deg)','rotate(18deg)','rotate(-18deg)']),240,'50% 0%',{iterations:8});}break;
+ case 'dash':if(id==='dinos-3'){
+ // Translate the dinosaur while flipping its outer facing wrapper; flipping the SVG root
+ // alone is overwritten by its nested transform animations and looks like reversing.
+ const oldFacingAnimation=face.style.animation;face.style.animation='none';
+ animations.push(face.animate([
+ {offset:0,transform:'scaleX(1)'},{offset:.25,transform:'scaleX(1)'},
+ {offset:.27,transform:'scaleX(-1)'},{offset:.93,transform:'scaleX(-1)'},
+ {offset:1,transform:'scaleX(1)'}
+ ],{duration:reducedMotion?800:3600,easing:'steps(1,end)',fill:'none'}));
+ effects.push({remove(){face.style.animation=oldFacingAnimation;}});
+ part('root',[
+ {offset:0,transform:'translate(0,0)'},
+ {offset:.23,transform:'translate(25px,0)'},
+ {offset:.27,transform:'translate(25px,0)'},
+ {offset:.36,transform:'translate(18px,-20px)'},{offset:.43,transform:'translate(12px,0)'},
+ {offset:.52,transform:'translate(6px,-20px)'},{offset:.59,transform:'translate(0,0)'},
+ {offset:.68,transform:'translate(-6px,-20px)'},{offset:.75,transform:'translate(-12px,0)'},
+ {offset:.94,transform:'translate(-25px,0)'},{offset:1,transform:'translate(0,0)'}
+ ],3600,'50% 85%');duration=3650;sound('jump');
+ }else{part('root',motion(['translateX(0)','translateX(25px)','translateX(-25px)','translateX(0)']),2100);part('.pet-leg',motion(['rotate(-18deg)','rotate(18deg)','rotate(-18deg)']),240,'50% 0%',{iterations:8});}break;
  case 'vanish':part('root',[{opacity:1,filter:'drop-shadow(0 0 0 #d5bdff)'},{opacity:0,filter:'drop-shadow(0 0 12px #d5bdff)'},{opacity:0},{opacity:1,filter:'drop-shadow(0 0 8px #d5bdff)'},{opacity:1,filter:'none'}],2800);duration=3000;break;
  case 'spin':part('root',motion(['rotate(0deg)','rotate(360deg)']),1600);break;
  case 'flame':effect('<svg viewBox="0 0 120 60"><path d="M4 30Q45 10 51 17L76 3 69 21 109 13 94 30 116 42 71 40 82 57 44 44Q26 38 4 30Z" fill="#ff9364"/><path d="M7 30Q42 22 69 26l-8 6 14 7Q40 39 7 30" fill="#ffe391"/></svg>','trick-flame');part('.pet-head',motion(['rotate(0)','rotate(-5deg)','rotate(0)']),2400);sound('jump');break;
