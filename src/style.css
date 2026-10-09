@@ -426,3 +426,81 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
  box-shadow:none!important;
  transform:none!important;
 }
+
+
+/* Waste is an illustration, not a themed button: keep its canvas transparent. */
+.poop,
+.poop:hover,
+.poop:focus,
+.poop:active,
+[data-theme="dark"] .poop,
+[data-theme="dark"] .poop:hover,
+[data-theme="dark"] .poop:focus,
+[data-theme="dark"] .poop:active{
+ appearance:none!important;
+ -webkit-appearance:none!important;
+ background:transparent!important;
+ background-color:transparent!important;
+ background-image:none!important;
+ border:0!important;
+ border-radius:0!important;
+ box-shadow:none!important;
+ outline-offset:4px;
+ padding:0!important;
+ transform:none!important;
+}
+
+
+/* Header controls keep the PetVerso pastel identity in both themes. */
+.pet-name-box .edit,
+.pet-name-box .edit:hover,
+.pet-name-box .edit:active{
+ appearance:none!important;
+ background:transparent!important;
+ border:0!important;
+ box-shadow:none!important;
+ color:#8664aa!important;
+ -webkit-text-fill-color:#8664aa!important;
+ font-size:21px!important;
+ line-height:1!important;
+ transform:none!important;
+}
+.pet-switch{
+ position:relative;
+ flex:0 0 66px!important;
+ width:66px!important;
+ min-width:66px!important;
+ padding:7px!important;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ border:2px solid #c9b7df!important;
+ border-radius:17px!important;
+ background:linear-gradient(#f3e5f5,#e2d6f1)!important;
+ color:#75578f!important;
+ -webkit-text-fill-color:#75578f!important;
+ font:900 29px/1 'Lilita One',sans-serif!important;
+ box-shadow:0 3px 0 #aa91c8!important;
+}
+.pet-switch:active{transform:translateY(2px)!important;box-shadow:0 1px 0 #aa91c8!important}
+.pet-switch i{
+ position:absolute;right:-5px;top:-7px;min-width:21px;height:21px;padding:1px 5px;
+ display:grid;place-items:center;border:2px solid #fff;border-radius:20px;
+ background:#ef7188;color:#fff;font:900 12px/1 'Nunito',sans-serif;
+ -webkit-text-fill-color:#fff
+}
+[data-theme="dark"] .pet-name-box .edit,
+[data-theme="dark"] .pet-name-box .edit:hover,
+[data-theme="dark"] .pet-name-box .edit:active{
+ background:transparent!important;
+ color:#f2cbe2!important;
+ -webkit-text-fill-color:#f2cbe2!important;
+}
+[data-theme="dark"] .pet-switch{
+ background:linear-gradient(#655b80,#4e496c)!important;
+ border-color:#9485ae!important;
+ color:#f5d8e8!important;
+ -webkit-text-fill-color:#f5d8e8!important;
+ box-shadow:0 3px 0 #28263f!important;
+}
+[data-theme="dark"] .pet-switch:active{box-shadow:0 1px 0 #28263f!important}
