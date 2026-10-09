@@ -12,25 +12,34 @@ export function createAudio({storage=localStorage,contextFactory=()=>new (window
  function unlock(){if(hidden||!setup())return;const first=!unlocked;unlocked=true;ctx.resume()?.catch(()=>{});if(first){startMusic();startAmbient();}}
  function sound(name='tap'){if(!unlocked||hidden||prefs.muted||!prefs.effects||!ctx)return;const t=ctx.currentTime;
  if(name==='lion-roar'||name==='dino-roar'){
- // Smooth band-limited growl with a low resonant throat; avoid harsh sawtooth stacks.
- const dino=name==='dino-roar',duration=dino?2.3:1.7;
+ // Reintroduce the textured growl (the smoother pure-tone replacement was
+ // too quiet), but omit the high-pitched oscillator stack and button tap.
+ const dino=name==='dino-roar',duration=dino?2.25:1.75;
  const buffer=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate),data=buffer.getChannelData(0);
- let filtered=0,phase=0;const rate=ctx.sampleRate;
+ let noise=0,phase=0;const rate=ctx.sampleRate;
  for(let i=0;i<data.length;i++){
- const sec=i/rate,x=sec/duration,attack=Math.min(1,sec/(dino?.3:.17));
- const envelope=attack*Math.pow(Math.max(0,1-x),dino?.8:1.3);
- const pitch=(dino?58:106)*(1-.36*x)+(dino?7:13)*Math.sin(sec*(dino?5:9));
- phase+=2*Math.PI*pitch/rate;
- const throat=Math.sin(phase)+.32*Math.sin(phase*2)+.12*Math.sin(phase*3);
- filtered=.985*filtered+.015*(Math.random()*2-1);
- const chuff=dino?(.85+.15*Math.sin(sec*17)):(.65+.35*Math.pow(Math.sin(sec*23),2));
- data[i]=Math.tanh((throat*.46+filtered*.36)*chuff)*envelope*.58;
+  const sec=i/rate,progress=sec/duration;
+  noise=.89*noise+.11*(Math.random()*2-1);
+  const attack=Math.min(1,sec/(dino?.19:.12));
+  const release=Math.pow(Math.max(0,1-progress),dino?.55:.85);
+  const pulse=dino?(.8+.2*Math.sin(sec*18)):(.72+.28*Math.pow(Math.sin(sec*25),2));
+  const pitch=(dino?61:107)*(1-progress*(dino?.35:.24));
+  phase+=2*Math.PI*pitch/rate;
+  const sub=.27*Math.sin(phase)+.08*Math.sin(2*phase);
+  // Bounded waveform avoids clipping while keeping a clearly audible texture.
+  data[i]=Math.tanh((noise*.9+sub)*1.4)*attack*release*pulse;
  }
- const source=ctx.createBufferSource(),low=ctx.createBiquadFilter(),gain=ctx.createGain();source.buffer=buffer;
- low.type='lowpass';low.frequency.setValueAtTime(dino?620:1050,t);low.frequency.exponentialRampToValueAtTime(dino?240:390,t+duration);
- gain.gain.value=.62;source.connect(low);low.connect(gain);gain.connect(effects);
- sources.add(source);source.onended=()=>{sources.delete(source);source.disconnect();low.disconnect();gain.disconnect();};source.start(t);source.stop(t+duration);
- return;
+ const source=ctx.createBufferSource(),filter=ctx.createBiquadFilter(),gain=ctx.createGain();
+ source.buffer=buffer;filter.type='lowpass';
+ filter.frequency.setValueAtTime(dino?950:1300,t);
+ filter.frequency.exponentialRampToValueAtTime(dino?250:390,t+duration);
+ // The effects bus is already attenuated to 0.3, so the previous value 0.62
+ // made these relatively low-frequency sounds almost inaudible.
+ gain.gain.value=2.1;
+ source.connect(filter);filter.connect(gain);gain.connect(effects);
+ sources.add(source);
+ source.onended=()=>{sources.delete(source);source.disconnect();filter.disconnect();gain.disconnect();};
+ source.start(t);source.stop(t+duration);return;
  }
  const patterns={tap:[660],feed:[240,300,220],pet:[660,880],soap:[390,520,650],clean:[500,780],sleep:[520,390,260],wake:[390,520,780],win:[523,659,784,1047],buy:[784,1047],match:[659,880],wrong:[220,170],jump:[300],adopt:[523,659,784,1047]};
  (patterns[name]||patterns.tap).forEach((f,i)=>tone(f,t+i*.09,name==='jump'?.18:.12,name==='feed'?'triangle':'sine',effects,name==='jump'?700:f));}
