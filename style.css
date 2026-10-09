@@ -440,3 +440,54 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
  .other-pet-alert{right:24px;top:300px;width:70px;height:58px}
  .pet-switch-option{grid-template-columns:58px 1fr 30px;padding:7px 9px}.pet-switch-avatar{width:52px;height:52px}
 }
+
+
+/* Dark-mode and multi-pet polish after device review. */
+[data-theme="dark"] .poop,
+[data-theme="dark"] .poop:hover,
+[data-theme="dark"] .poop:active{
+ background:transparent!important;
+ border:0!important;
+ box-shadow:none!important;
+ outline:0;
+}
+[data-theme="dark"] .actions.care-actions button,
+[data-theme="dark"] .actions.care-actions button b{
+ color:#403947!important;
+ -webkit-text-fill-color:#403947;
+}
+[data-theme="dark"] .actions.care-actions button:disabled{
+ opacity:1!important;
+ filter:saturate(.72);
+}
+[data-theme="dark"] .actions.care-actions button:disabled,
+[data-theme="dark"] .actions.care-actions button:disabled b{
+ color:#625967!important;
+ -webkit-text-fill-color:#625967;
+}
+[data-theme="dark"] .actions.care-actions button small,
+[data-theme="dark"] .actions.care-actions button:disabled small{
+ color:#695441!important;
+ -webkit-text-fill-color:#695441;
+}
+.pet-switch-list{width:100%}
+.pet-switch-option{
+ display:grid!important;
+ grid-template-columns:64px minmax(0,1fr) 34px!important;
+ width:100%!important;
+ max-width:none!important;
+ min-height:78px;
+}
+.pet-switch-option>.pet-switch-avatar{grid-column:1;grid-row:1}
+.pet-switch-option>.pet-switch-info{
+ grid-column:2;grid-row:1;display:flex!important;flex-direction:column;align-items:flex-start;justify-content:center;
+ min-width:0;gap:4px;line-height:1.15
+}
+.pet-switch-option>.pet-switch-info b{display:block;width:100%;font-size:17px;line-height:1.15}
+.pet-switch-option>.pet-switch-info small{display:block;width:100%;font-size:12px;line-height:1.25}
+.pet-switch-option>em{grid-column:3;grid-row:1}
+@media(max-width:430px){
+ .pet-switch-option{grid-template-columns:58px minmax(0,1fr) 30px!important;min-height:70px}
+ .pet-switch-option>.pet-switch-info b{font-size:16px}
+ .pet-switch-option>.pet-switch-info small{font-size:11px}
+}
