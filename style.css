@@ -633,3 +633,14 @@ html[data-theme="dark"] .care-actions button[data-action="sleep"]:disabled,
 html[data-theme="dark"] .care-actions button[data-action="medicine"]:disabled{
  opacity:1!important;
 }
+
+
+/* Multi-pet collection controls. */
+.pet-switch-info br{display:block!important}
+.pet-switch-info strong,.pet-switch-info small{display:block!important}
+.pet-remove{
+ width:100%;margin:0 0 11px;padding:10px 12px;border:2px solid #e5a4ab;border-radius:14px;
+ background:#fff0f1;color:#904852;font-weight:900;box-shadow:0 3px 0 #d58d96
+}
+.pet-remove:disabled{display:none}
+[data-theme="dark"] .pet-remove{background:#51383f;border-color:#a86270;color:#ffd9dc;box-shadow:0 3px 0 #251f32}
