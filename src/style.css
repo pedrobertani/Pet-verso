@@ -285,3 +285,12 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
 .brand>.brand-logo{width:36px;height:36px;vertical-align:middle;margin-right:6px;filter:drop-shadow(0 2px 2px #60496a22)}.memory-board{grid-template-columns:repeat(var(--columns),1fr)}.memory-board.dense button{height:58px}.memory-board.dense .icon{width:32px;height:32px}@media(max-width:390px){.brand>.brand-logo{width:32px;height:32px}.memory-board.dense{gap:5px}.memory-board.dense button{height:52px;padding:5px}}
 
 .brand>.brand-logo-image{width:38px;height:38px;vertical-align:middle;margin-right:7px;border-radius:11px;object-fit:cover;filter:drop-shadow(0 2px 3px #60496a2b)}@media(max-width:600px){.brand>.brand-logo-image{width:34px;height:34px;border-radius:10px}}
+
+/* Memória em tons pastel: verso único, frente clara e pares em verde-menta. */
+.memory-board{padding:8px;border:3px solid #ead8c3;border-radius:20px;background:linear-gradient(145deg,#fff4e6,#f7e8dc)}
+.memory-board button{color:#665184!important;border:3px solid #cbb6e5!important;background:linear-gradient(145deg,#e8dcf7,#d5c1ed)!important;box-shadow:0 5px 0 #aa8bc9!important;transition:transform .16s,filter .16s,background .16s!important}
+.memory-board button:nth-child(3n){color:#665184!important;border-color:#cbb6e5!important;background:linear-gradient(145deg,#e8dcf7,#d5c1ed)!important;box-shadow:0 5px 0 #aa8bc9!important}
+.memory-board button:has(.icon):not(.matched){background:linear-gradient(145deg,#fffdf7,#fff3df)!important;border-color:#ead2ad!important;box-shadow:0 4px 0 #d3ad79!important;animation:memory-reveal .2s ease-out}
+.memory-board button.matched{background:linear-gradient(145deg,#dcf4e5,#bfe8d1)!important;border-color:#82c7a1!important;box-shadow:0 4px 0 #62aa83!important;animation:match-pop .35s ease-out}
+@keyframes memory-reveal{0%{transform:scaleX(.25)}100%{transform:scaleX(1)}}
+@media(prefers-reduced-motion:reduce){.memory-board button:has(.icon){animation:none}}
