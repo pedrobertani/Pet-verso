@@ -46,7 +46,7 @@ const bedroomLights={left:false,right:false};
 let sceneCleanup=()=>{},callVisitKey='',callNoticeShown=false,skillNoticeShown=false,notificationTimer=0;
 document.addEventListener('pointerdown',()=>audio.unlock(),{capture:true});
 document.addEventListener('keydown',()=>audio.unlock(),{capture:true});
-document.addEventListener('click',e=>{if(e.target.closest('button')&&!e.target.closest('#bath-shower,#bath-soap'))audio.sound('tap');},{capture:true});
+document.addEventListener('click',e=>{if(e.target.closest('button')&&!e.target.closest('#bath-shower,#bath-soap,.skill-badge'))audio.sound('tap');},{capture:true});
 document.addEventListener('visibilitychange',()=>audio.setHidden(document.hidden));
 // Branch-only sandbox: URL ?jovem or ?adulto enables 50,000 coins and 100 intelligence.
 // Do not persist sandbox state to the normal game's localStorage.
