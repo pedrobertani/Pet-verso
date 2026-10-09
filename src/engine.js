@@ -34,8 +34,8 @@ export function tick(p,now=Date.now()){
   const h=Math.min(1,remaining,...(!n.sleeping?[n.stats.energy/6]:[]));
   if(h<=0){n.sleeping=true;continue;}
   remaining-=h;cursor+=h*3600000;
-  n.wasteClock+=h;const interval=n.sleeping?8:.75;if(n.wasteClock>=interval){const produced=Math.floor(n.wasteClock/interval);n.waste=Math.min(5,n.waste+produced);n.floorDirt=Math.min(5,n.floorDirt+produced);n.stats.hygiene=clamp(n.stats.hygiene-produced*8);n.wasteClock%=interval;}
-  n.stats.food=clamp(n.stats.food-h*(n.sleeping?3:24));n.stats.hygiene=clamp(n.stats.hygiene-h*((n.sleeping?1:6)+(n.waste+(n.floorDirt??0))*.4));n.stats.joy=clamp(n.stats.joy-h*(n.sleeping?.5:22));
+  n.wasteClock+=h;const interval=n.sleeping?8:.75;if(n.wasteClock>=interval){const produced=Math.floor(n.wasteClock/interval);n.waste=Math.min(5,n.waste+produced);n.floorDirt=Math.min(5,n.floorDirt+produced);n.stats.hygiene=clamp(n.stats.hygiene-produced*15);n.wasteClock%=interval;}
+  n.stats.food=clamp(n.stats.food-h*(n.sleeping?3:24));n.stats.hygiene=clamp(n.stats.hygiene-h*((n.sleeping?5:10)+(n.waste+(n.floorDirt??0))*.4));n.stats.joy=clamp(n.stats.joy-h*(n.sleeping?.5:22));
   n.stats.energy=clamp(n.stats.energy+h*(n.sleeping?50:-6));
   if(!n.sleeping&&n.stats.energy<=0)n.sleeping=true;
   const neglected=n.stats.food<=15||n.stats.energy<=10||n.stats.hygiene<=10||n.waste>=4;
