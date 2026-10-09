@@ -24,35 +24,43 @@ export function notificationPlan(pet,now=Date.now(),lastTimes={}){
  return plan;
 }
 export function notificationManager({api,platform,storage,onStatus=()=>{}}){
- const key='petverso-reminders-v1',historyKey='petverso-reminder-history-v1';let enabled=storage.getItem(key)==='true',queue=Promise.resolve(),generation=0;
+ const key='petverso-reminders-v1',historyKey='petverso-reminder-history-v2';let enabled=storage.getItem(key)==='true',queue=Promise.resolve(),generation=0;
  const native=platform!=='web';
  const status=()=>native?(enabled?'enabled':'disabled'):'web';
- async function replace(pet,token){
+ async function replace(input,token){
   if(!native)return;
   const pending=await api.getPending();
   if(token!==generation)return;
   const owned=pending.notifications.filter(n=>n.id>=100000000&&n.id<200000000);
   if(owned.length)await api.cancel({notifications:owned.map(n=>({id:n.id}))});
-  if(token!==generation||!enabled||!pet||pet.dead)return;
+  const pets=(Array.isArray(input)?input:[input]).filter(p=>p&&!p.dead);
+  if(token!==generation||!enabled||!pets.length)return;
   const permission=await api.checkPermissions();
   if(permission.display!=='granted'){enabled=false;storage.setItem(key,'false');onStatus('denied');return;}
-  if(platform==='android')await api.createChannel({id:'pet-care',name:'Cuidados do pet',description:'Lembretes por necessidade do pet',importance:3,visibility:1});
+  if(platform==='android')await api.createChannel({id:'pet-care',name:'Cuidados dos pets',description:'Lembretes por necessidade de cada pet',importance:3,visibility:1});
   if(token!==generation)return;
   const now=Date.now();let history={};try{history=JSON.parse(storage.getItem(historyKey)||'{}');}catch{}
-  const past=history.petBorn===pet.born?(history.events||[]).filter(e=>e.at<=now&&e.at>now-24*3600000):[];
-  const lastTimes={};for(const event of past)for(const code of event.codes||[])lastTimes[code]=Math.max(lastTimes[code]||0,event.at);
-  const notifications=notificationPlan(pet,now,lastTimes);
+  const nextHistory={},notifications=[];
+  pets.slice(0,20).forEach((pet,index)=>{
+   const saved=history[pet.born]||[];
+   const past=saved.filter(e=>e.at<=now&&e.at>now-24*3600000);
+   const lastTimes={};for(const event of past)for(const code of event.codes||[])lastTimes[code]=Math.max(lastTimes[code]||0,event.at);
+   const planned=notificationPlan(pet,now,lastTimes).slice(0,40).map((notice,sequence)=>({...notice,id:100000000+index*1000+sequence,extra:{...notice.extra,petBorn:pet.born}}));
+   notifications.push(...planned);
+   nextHistory[pet.born]=[...past,...planned.map(item=>({at:item.schedule.at.getTime(),codes:item.extra.codes}))];
+  });
+  notifications.sort((a,b)=>a.schedule.at-b.schedule.at);
   if(notifications.length)await api.schedule({notifications});
-  storage.setItem(historyKey,JSON.stringify({petBorn:pet.born,events:[...past,...notifications.map(n=>({at:n.schedule.at.getTime(),codes:n.extra.codes}))]}));
+  storage.setItem(historyKey,JSON.stringify(nextHistory));
  }
- function sync(pet){const token=++generation,snapshot=pet?structuredClone(pet):null;queue=queue.catch(()=>{}).then(()=>replace(snapshot,token)).catch(()=>{onStatus('error');return false;});return queue;}
- async function toggle(pet){
+ function sync(input){const token=++generation,snapshot=input?structuredClone(input):null;queue=queue.catch(()=>{}).then(()=>replace(snapshot,token)).catch(()=>{onStatus('error');return false;});return queue;}
+ async function toggle(input){
   if(!native){onStatus('web');return;}
-  if(enabled){enabled=false;storage.setItem(key,'false');await api.cancel({notifications:[{id:99999}]});await sync(pet);onStatus('disabled');return;}
+  if(enabled){enabled=false;storage.setItem(key,'false');await api.cancel({notifications:[{id:99999}]});await sync(input);onStatus('disabled');return;}
   const current=await api.checkPermissions();const permission=current.display==='granted'?current:await api.requestPermissions();
   if(permission.display!=='granted'){onStatus('denied');return;}
-  enabled=true;storage.setItem(key,'true');const ok=await sync(pet);if(enabled&&ok!==false)onStatus('enabled');
+  enabled=true;storage.setItem(key,'true');const ok=await sync(input);if(enabled&&ok!==false)onStatus('enabled');
  }
- async function test(){if(!native||!enabled)return;const p=await api.checkPermissions();if(p.display!=='granted'){onStatus('denied');return;}await api.schedule({notifications:[{id:99999,title:'PetVerso',body:'Tudo pronto! Os lembretes do seu pet estão ativados.',channelId:'pet-care',isExactNotification:false,schedule:{at:new Date(Date.now()+10000)}}]});onStatus('test');}
+ async function test(){if(!native||!enabled)return;const p=await api.checkPermissions();if(p.display!=='granted'){onStatus('denied');return;}await api.schedule({notifications:[{id:99999,title:'PetVerso',body:'Tudo pronto! Os lembretes dos seus pets estão ativados.',channelId:'pet-care',isExactNotification:false,schedule:{at:new Date(Date.now()+10000)}}]});onStatus('test');}
  return {status,sync,toggle,test};
 }

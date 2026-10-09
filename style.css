@@ -374,55 +374,310 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
 @media(max-width:380px){.pet-dialog{padding:21px 15px 17px}.pet-dialog-actions{grid-template-columns:1fr}.pet-dialog-mark{width:52px;height:52px}}
 
 
-/* Fixed three-slot pet selector: occupied, available or locked. */
-.pet-switch-dialog{width:min(640px,calc(100vw - 28px))!important}
-.pet-switch-dialog .pet-switch-list{display:flex!important;grid-template-columns:none!important;gap:10px!important;align-items:stretch!important}
-.pet-switch-dialog .pet-switch-option,
-.pet-switch-dialog .pet-switch-option.active,
-.pet-switch-dialog .pet-switch-option.attention,
-.pet-switch-dialog .pet-switch-option:last-child:nth-child(odd){
- box-sizing:border-box!important;flex:1 1 0!important;width:calc((100% - 20px)/3)!important;
- min-width:0!important;max-width:calc((100% - 20px)/3)!important;height:206px!important;
- min-height:206px!important;max-height:206px!important;margin:0!important;transform:none!important;
- padding:10px 6px!important;overflow:hidden
+/* Keep pastel care controls readable when the interface uses the dark theme. */
+[data-theme="dark"] .care-hint{
+  color:#d8d2c5!important;
 }
-.pet-switch-dialog .pet-switch-avatar{height:112px!important;min-height:112px!important;display:flex!important;align-items:center!important;justify-content:center!important}
-.pet-switch-dialog .pet-switch-avatar svg{max-width:100%!important;max-height:108px!important}
-.pet-switch-dialog .pet-switch-info{width:100%;min-width:0}
-.pet-switch-dialog .pet-switch-info strong,
-.pet-switch-dialog .pet-switch-info small{display:block!important;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pet-switch-dialog .pet-switch-info strong{font-size:1rem}
-.pet-switch-dialog .pet-switch-info small{font-size:.72rem}
-.pet-switch-empty{border-style:dashed!important;justify-content:center!important}
-.pet-switch-empty.available{background:#fdf4e7!important;border-color:#e6b5c8!important;color:#51465c!important}
-.pet-switch-empty.locked{background:#eee9f3!important;border-color:#a89bbd!important;color:#665a76!important}
-.pet-switch-empty:disabled{opacity:.7!important}
-.pet-switch-plus{display:flex;width:68px;height:68px;margin:10px auto 14px;border-radius:22px;align-items:center;justify-content:center;background:#f2c4dc;color:#604c68;font:900 2.8rem/1 'Lilita One',sans-serif;box-shadow:0 5px 0 #d59cbd}
-.pet-switch-empty.locked .pet-switch-plus{font-size:1.7rem;background:#d8cfe2;box-shadow:0 5px 0 #b6a8c7}
-.pet-switch-empty .icon{width:16px;height:16px;vertical-align:-3px}
-[data-theme="dark"] .pet-switch-empty.available{background:#45415c!important;border-color:#d79fc0!important;color:#fff2dc!important}
-[data-theme="dark"] .pet-switch-empty.locked{background:#39374d!important;border-color:#817792!important;color:#ddd5e8!important}
+[data-theme="dark"] .actions.care-actions button,
+[data-theme="dark"] .actions.care-actions button b{
+  color:#51495d;
+}
+[data-theme="dark"] .actions.care-actions button small{
+  color:#725e4d;
+}
+[data-theme="dark"] .actions.care-actions button:disabled,
+[data-theme="dark"] .actions.care-actions button:disabled b{
+  color:#736b72;
+  opacity:.82;
+}
+[data-theme="dark"] .actions.care-actions button:disabled small{
+  color:#796959;
+}
+
+
+/* Multi-pet switcher, shared wallet and care calls. */
+.pet-name-age{gap:10px}
+.pet-switch{
+ position:relative;display:grid;place-items:center;flex:0 0 48px;width:48px;height:48px;padding:0;
+ border:3px solid #9edadd;border-radius:16px;background:linear-gradient(145deg,#efffff,#cceff0);
+ box-shadow:0 4px 0 #7ebfc3;color:#397b85;font:900 25px/1 'Nunito',sans-serif
+}
+.pet-switch i{
+ position:absolute;right:-7px;top:-8px;display:grid;place-items:center;min-width:22px;height:22px;padding:0 5px;
+ border:2px solid #fff;border-radius:12px;background:#ee7182;color:#fff;font:900 11px/1 'Nunito',sans-serif
+}
+.pet-switch-dialog{max-height:min(86dvh,680px);overflow:auto}
+.pet-switch-list{display:grid;gap:10px;margin:15px 0 18px}
+.pet-switch-option{
+ display:grid;grid-template-columns:64px 1fr 34px;align-items:center;gap:12px;width:100%;min-height:74px;padding:7px 12px;
+ border:3px solid #dfd1bd;border-radius:18px;background:#fffaf0;box-shadow:0 3px 0 #ceb99d;color:#4c5368;text-align:left
+}
+.pet-switch-option.active{border-color:#78c9cc;background:#e5f8f6}
+.pet-switch-option.attention{animation:pet-care-pulse 1.5s ease-in-out infinite}
+.pet-switch-avatar{display:grid;place-items:center;width:58px;height:58px;overflow:hidden;border-radius:16px;background:#f4e5d7}
+.pet-switch-avatar svg{width:68px;height:68px}
+.pet-switch-option span:nth-child(2){display:grid;gap:3px}.pet-switch-option b{font-size:17px}.pet-switch-option small{color:#766f6a}
+.pet-switch-option em{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#ffe2b8;color:#8a5a43;font-style:normal;font-size:18px}
+.pet-add{width:100%;margin-bottom:12px}.pet-add:disabled{opacity:.55}
+.adoption-price{display:inline-flex;align-items:center;gap:5px;margin:0 0 13px;padding:7px 11px;border-radius:13px;background:#fff1c8;color:#7c623a;font-weight:900}
+.other-pet-alert{
+ position:absolute;z-index:35;right:38px;top:315px;display:flex;align-items:center;justify-content:center;width:76px;height:62px;padding:3px;
+ border:3px solid #fff;border-radius:50%;background:#fffdf6;box-shadow:0 5px 0 #ccb79e,0 7px 18px #4f3a2930;
+ animation:pet-care-float 2.2s ease-in-out infinite
+}
+.other-pet-alert:after{content:"";position:absolute;right:4px;bottom:-11px;width:17px;height:17px;border:3px solid #fff;border-radius:50%;background:#fffdf6}
+.other-pet-alert span{display:grid;place-items:center;width:52px;height:52px;overflow:hidden}.other-pet-alert span svg{width:60px;height:60px}
+.other-pet-alert b{position:absolute;right:-7px;top:-9px;display:grid;place-items:center;width:30px;height:30px;border:2px solid #fff;border-radius:50%;background:#ffd98d;color:#704f42;font-size:16px}
+@keyframes pet-care-float{50%{transform:translateY(-6px)}}@keyframes pet-care-pulse{50%{box-shadow:0 3px 0 #ceb99d,0 0 0 5px #f4b9c555}}
+[data-theme="dark"] .pet-switch{border-color:#64848e;background:linear-gradient(145deg,#445262,#343b50);box-shadow:0 4px 0 #202438;color:#c8f0ef}
+[data-theme="dark"] .pet-switch-option{border-color:#5c596e;background:#36364c;box-shadow:0 3px 0 #202236;color:#f5ebdf}
+[data-theme="dark"] .pet-switch-option.active{border-color:#65aeb5;background:#344b55}
+[data-theme="dark"] .pet-switch-option small{color:#d1c8c0}
+[data-theme="dark"] .other-pet-alert{border-color:#676076;background:#3a394e;box-shadow:0 5px 0 #202236,0 7px 18px #0006}
+[data-theme="dark"] .other-pet-alert:after{border-color:#676076;background:#3a394e}
 @media(max-width:430px){
- .pet-switch-dialog .pet-switch-list{gap:7px!important}
- .pet-switch-dialog .pet-switch-option,
- .pet-switch-dialog .pet-switch-option.active,
- .pet-switch-dialog .pet-switch-option.attention,
- .pet-switch-dialog .pet-switch-option:last-child:nth-child(odd){
-  width:calc((100% - 14px)/3)!important;max-width:calc((100% - 14px)/3)!important;
-  height:190px!important;min-height:190px!important;max-height:190px!important;padding:8px 4px!important
- }
- .pet-switch-dialog .pet-switch-avatar{height:98px!important;min-height:98px!important}
- .pet-switch-dialog .pet-switch-avatar svg{max-height:94px!important}
- .pet-switch-dialog .pet-switch-info strong{font-size:.9rem}
- .pet-switch-dialog .pet-switch-info small{font-size:.64rem}
- .pet-switch-plus{width:58px;height:58px;border-radius:18px;font-size:2.35rem}
+ .pet-name-age{gap:7px}.pet-switch{flex-basis:44px;width:44px;height:44px;border-radius:14px;font-size:22px}
+ .other-pet-alert{right:24px;top:300px;width:70px;height:58px}
+ .pet-switch-option{grid-template-columns:58px 1fr 30px;padding:7px 9px}.pet-switch-avatar{width:52px;height:52px}
 }
 
 
-/* Flat close button in the pet selector. */
-.pet-switch-dialog .pet-dialog-cancel,
-.pet-switch-dialog .pet-dialog-cancel:hover,
-.pet-switch-dialog .pet-dialog-cancel:active{
+/* Dark-mode and multi-pet polish after device review. */
+[data-theme="dark"] .poop,
+[data-theme="dark"] .poop:hover,
+[data-theme="dark"] .poop:active{
+ background:transparent!important;
+ border:0!important;
  box-shadow:none!important;
- transform:none!important;
+ outline:0;
+}
+[data-theme="dark"] .actions.care-actions button,
+[data-theme="dark"] .actions.care-actions button b{
+ color:#403947!important;
+ -webkit-text-fill-color:#403947;
+}
+[data-theme="dark"] .actions.care-actions button:disabled{
+ opacity:1!important;
+ filter:saturate(.72);
+}
+[data-theme="dark"] .actions.care-actions button:disabled,
+[data-theme="dark"] .actions.care-actions button:disabled b{
+ color:#625967!important;
+ -webkit-text-fill-color:#625967;
+}
+[data-theme="dark"] .actions.care-actions button small,
+[data-theme="dark"] .actions.care-actions button:disabled small{
+ color:#695441!important;
+ -webkit-text-fill-color:#695441;
+}
+.pet-switch-list{width:100%}
+.pet-switch-option{
+ display:grid!important;
+ grid-template-columns:64px minmax(0,1fr) 34px!important;
+ width:100%!important;
+ max-width:none!important;
+ min-height:78px;
+}
+.pet-switch-option>.pet-switch-avatar{grid-column:1;grid-row:1}
+.pet-switch-option>.pet-switch-info{
+ grid-column:2;grid-row:1;display:flex!important;flex-direction:column;align-items:flex-start;justify-content:center;
+ min-width:0;gap:4px;line-height:1.15
+}
+.pet-switch-option>.pet-switch-info b{display:block;width:100%;font-size:17px;line-height:1.15}
+.pet-switch-option>.pet-switch-info small{display:block;width:100%;font-size:12px;line-height:1.25}
+.pet-switch-option>em{grid-column:3;grid-row:1}
+@media(max-width:430px){
+ .pet-switch-option{grid-template-columns:58px minmax(0,1fr) 30px!important;min-height:70px}
+ .pet-switch-option>.pet-switch-info b{font-size:16px}
+ .pet-switch-option>.pet-switch-info small{font-size:11px}
+}
+
+
+/* Equal-sized pet cards: two balanced columns on phones and tablets. */
+.pet-switch-list{
+ display:grid!important;
+ grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ align-items:stretch!important;
+ gap:10px!important;
+}
+.pet-switch-option{
+ display:flex!important;
+ flex-direction:column!important;
+ align-items:center!important;
+ justify-content:flex-start!important;
+ gap:9px!important;
+ width:100%!important;
+ min-width:0!important;
+ height:100%!important;
+ min-height:226px!important;
+ padding:13px 8px 12px!important;
+ text-align:center!important;
+}
+.pet-switch-option>.pet-switch-avatar{
+ display:grid!important;
+ place-items:center!important;
+ flex:0 0 126px!important;
+ width:126px!important;
+ height:126px!important;
+ max-width:100%!important;
+ border-radius:18px!important;
+}
+.pet-switch-option>.pet-switch-avatar svg{
+ width:118px!important;
+ height:118px!important;
+ max-width:100%!important;
+}
+.pet-switch-option>.pet-switch-info{
+ display:flex!important;
+ flex-direction:column!important;
+ align-items:center!important;
+ justify-content:flex-start!important;
+ width:100%!important;
+ min-width:0!important;
+ gap:5px!important;
+}
+.pet-switch-option>.pet-switch-info strong,
+.pet-switch-option>.pet-switch-info small{
+ display:block!important;
+ width:100%!important;
+ margin:0!important;
+ line-height:1.15!important;
+ text-align:center!important;
+ overflow-wrap:anywhere;
+}
+.pet-switch-option>.pet-switch-info strong{font-size:17px!important;color:inherit}
+.pet-switch-option>.pet-switch-info small{font-size:11px!important}
+.pet-switch-option>em{position:absolute;right:7px;top:7px}
+.pet-switch-option{position:relative}
+@media(max-width:370px){
+ .pet-switch-list{gap:7px!important}
+ .pet-switch-option{min-height:205px!important;padding:10px 5px!important}
+ .pet-switch-option>.pet-switch-avatar{flex-basis:110px!important;width:110px!important;height:110px!important}
+ .pet-switch-option>.pet-switch-avatar svg{width:104px!important;height:104px!important}
+ .pet-switch-option>.pet-switch-info strong{font-size:15px!important}
+ .pet-switch-option>.pet-switch-info small{font-size:10px!important}
+}
+
+
+/* Keep the final card centered without changing its size when pet count is odd. */
+.pet-switch-option:last-child:nth-child(odd){
+ grid-column:1 / -1;
+ width:calc(50% - 5px)!important;
+ justify-self:center;
+}
+@media(max-width:370px){
+ .pet-switch-option:last-child:nth-child(odd){width:calc(50% - 3.5px)!important}
+}
+
+
+/* Medicine feedback: the pet stays still while a syringe applies the treatment. */
+.world.medicine-active .pet-stage,
+.world.medicine-active .pet-facing{
+ animation:none!important;
+ transition:none!important;
+}
+.world.medicine-active .pet-facing{transform:translateY(0)!important}
+.medicine-shot{
+ position:absolute;z-index:24;left:50%;bottom:78px;width:120px;height:58px;
+ pointer-events:none;opacity:0;transform:translate(72px,-4px) rotate(-8deg);
+ animation:medicine-approach 2.3s ease-in-out forwards;
+ filter:drop-shadow(0 4px 3px #47344945)
+}
+.medicine-shot svg{display:block;width:120px;height:52px;overflow:visible}
+.medicine-spark{
+ position:absolute;z-index:2;left:-4px;top:12px;width:28px;height:28px;color:#ffe179;font-size:27px;
+ opacity:0;transform:scale(.3);text-shadow:0 0 7px #fff7b8;
+ animation:medicine-spark 2.3s ease-out forwards
+}
+@keyframes medicine-approach{
+ 0%{opacity:0;transform:translate(78px,-7px) rotate(-8deg)}
+ 18%{opacity:1}
+ 48%{opacity:1;transform:translate(14px,4px) rotate(-8deg)}
+ 68%{opacity:1;transform:translate(8px,4px) rotate(-8deg)}
+ 84%{opacity:1;transform:translate(30px,-1px) rotate(-8deg)}
+ 100%{opacity:0;transform:translate(80px,-8px) rotate(-8deg)}
+}
+@keyframes medicine-spark{
+ 0%,45%{opacity:0;transform:scale(.3) rotate(0)}
+ 53%{opacity:1;transform:scale(1.25) rotate(18deg)}
+ 66%{opacity:.8;transform:scale(.85) rotate(35deg)}
+ 78%,100%{opacity:0;transform:scale(.4) rotate(55deg)}
+}
+@media(max-width:430px){
+ .medicine-shot{bottom:72px;width:104px;transform-origin:left center}
+ .medicine-shot svg{width:104px}
+}
+[data-theme="dark"] .medicine-shot{filter:drop-shadow(0 4px 4px #0008)}
+
+
+/* Final device-specific contrast for care card labels in dark mode. */
+html[data-theme="dark"] .care-actions button[data-action="feed"] b,
+html[data-theme="dark"] .care-actions button[data-action="sleep"] b,
+html[data-theme="dark"] .care-actions button[data-action="medicine"] b{
+ color:#302b35!important;
+ -webkit-text-fill-color:#302b35!important;
+ opacity:1!important;
+ visibility:visible!important;
+ font-weight:900!important;
+ text-shadow:0 1px 0 #ffffff80;
+}
+html[data-theme="dark"] .care-actions button[data-action="feed"] small,
+html[data-theme="dark"] .care-actions button[data-action="medicine"] small{
+ color:#4f4137!important;
+ -webkit-text-fill-color:#4f4137!important;
+ opacity:1!important;
+ font-weight:900!important;
+}
+html[data-theme="dark"] .care-actions button[data-action="feed"]:disabled,
+html[data-theme="dark"] .care-actions button[data-action="sleep"]:disabled,
+html[data-theme="dark"] .care-actions button[data-action="medicine"]:disabled{
+ opacity:1!important;
+}
+
+
+/* Multi-pet collection controls. */
+.pet-switch-info br{display:block!important}
+.pet-switch-info strong,.pet-switch-info small{display:block!important}
+.pet-remove{
+ width:100%;margin:0 0 11px;padding:10px 12px;border:2px solid #e5a4ab;border-radius:14px;
+ background:#fff0f1;color:#904852;font-weight:900;box-shadow:0 3px 0 #d58d96
+}
+.pet-remove:disabled{display:none}
+[data-theme="dark"] .pet-remove{background:#51383f;border-color:#a86270;color:#ffd9dc;box-shadow:0 3px 0 #251f32}
+
+
+/* Hard dimensions prevent species artwork or active state from resizing cards. */
+.pet-switch-list{
+ grid-template-columns:calc((100% - 10px)/2) calc((100% - 10px)/2)!important;
+ grid-auto-columns:calc((100% - 10px)/2)!important;
+ grid-auto-rows:226px!important;
+}
+.pet-switch-option,
+.pet-switch-option.active,
+.pet-switch-option.attention{
+ box-sizing:border-box!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:100%!important;
+ height:226px!important;
+ min-height:226px!important;
+ max-height:226px!important;
+ margin:0!important;
+ transform:none;
+}
+.pet-switch-option:last-child:nth-child(odd){
+ width:calc((100% - 10px)/2)!important;
+}
+@media(max-width:370px){
+ .pet-switch-list{
+  grid-template-columns:calc((100% - 7px)/2) calc((100% - 7px)/2)!important;
+  grid-auto-columns:calc((100% - 7px)/2)!important;
+  grid-auto-rows:205px!important;
+ }
+ .pet-switch-option,
+ .pet-switch-option.active,
+ .pet-switch-option.attention{
+  height:205px!important;min-height:205px!important;max-height:205px!important
+ }
+ .pet-switch-option:last-child:nth-child(odd){width:calc((100% - 7px)/2)!important}
 }
