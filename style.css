@@ -608,3 +608,28 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
  .medicine-shot svg{width:104px}
 }
 [data-theme="dark"] .medicine-shot{filter:drop-shadow(0 4px 4px #0008)}
+
+
+/* Final device-specific contrast for care card labels in dark mode. */
+html[data-theme="dark"] .care-actions button[data-action="feed"] b,
+html[data-theme="dark"] .care-actions button[data-action="sleep"] b,
+html[data-theme="dark"] .care-actions button[data-action="medicine"] b{
+ color:#302b35!important;
+ -webkit-text-fill-color:#302b35!important;
+ opacity:1!important;
+ visibility:visible!important;
+ font-weight:900!important;
+ text-shadow:0 1px 0 #ffffff80;
+}
+html[data-theme="dark"] .care-actions button[data-action="feed"] small,
+html[data-theme="dark"] .care-actions button[data-action="medicine"] small{
+ color:#4f4137!important;
+ -webkit-text-fill-color:#4f4137!important;
+ opacity:1!important;
+ font-weight:900!important;
+}
+html[data-theme="dark"] .care-actions button[data-action="feed"]:disabled,
+html[data-theme="dark"] .care-actions button[data-action="sleep"]:disabled,
+html[data-theme="dark"] .care-actions button[data-action="medicine"]:disabled{
+ opacity:1!important;
+}
