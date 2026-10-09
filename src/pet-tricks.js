@@ -93,14 +93,14 @@ export function animateTrick(target,id,{draw,sound=()=>{},reducedMotion=false,on
  case 'owl-turn':part('.wing-left',motion(['rotate(0deg)','rotate(-100deg)','rotate(-100deg)','rotate(0deg)']),2800,'100% 55%');part('.wing-right',motion(['rotate(0deg)','rotate(100deg)','rotate(100deg)','rotate(0deg)']),2800,'0% 55%');part('.pet-head',motion(['rotateY(0deg)','rotateY(-55deg) rotate(-8deg)','rotateY(55deg) rotate(8deg)','rotateY(0deg)']),2800,'50% 75%');duration=3000;break;
  case 'flap':part('.wing-left',motion(['rotate(0deg)','rotate(35deg)','rotate(0deg)']),450,'80% 15%',{iterations:5});part('.wing-right',motion(['rotate(0deg)','rotate(-35deg)','rotate(0deg)']),450,'20% 15%',{iterations:5});break;
  case 'dash':if(id==='dinos-3'){
- // The directional renderer used transform:none!important, which prevents
- // Web Animations from flipping this wrapper until the inline priority is released.
- const priorTransform=face.style.getPropertyValue('transform');
- const priorPriority=face.style.getPropertyPriority('transform');
- face.style.removeProperty('transform');
- effects.push({remove(){if(priorTransform)face.style.setProperty('transform',priorTransform,priorPriority);else face.style.removeProperty('transform');}});
+ // The directional renderer enforces transform:none!important on .pet-facing.
+ // Turn the SVG itself instead: its transforms are not subject to that rule.
+ // The stage handles position separately, so returning never looks like reversing.
+ const previousBox=svg.style.transformBox,previousOrigin=svg.style.transformOrigin;
+ svg.style.transformBox='view-box';svg.style.transformOrigin='50% 58%';
+ effects.push({remove(){svg.style.transformBox=previousBox;svg.style.transformOrigin=previousOrigin;}});
  const time=reducedMotion?800:3800;
- animations.push(face.animate(stegoTurnFrames,{duration:time,easing:'steps(1,end)',fill:'none'}));
+ animations.push(svg.animate(stegoTurnFrames,{duration:time,easing:'linear',fill:'none'}));
  animations.push(target.animate(stegoReturnFrames,{duration:time,easing:'linear',fill:'none'}));
  duration=3820;sound('jump');
  }else{
