@@ -20,11 +20,13 @@ test('leão e T-Rex usam arquivos OGG locais, sem ruído sintetizado',()=>{
  player.sound('dino-roar');
  assert.equal(players.length,2);
  assert.equal(players[0].src,roarAssets['lion-roar']);
+ assert.match(players[0].src,/^\/audio\/lion-roar\.mp3$/);
  assert.equal(players[1].src,roarAssets['dino-roar']);
+ assert.match(players[1].src,/^\/audio\/trex-roar\.mp3$/);
  assert.equal(players[0].calls,1);
  assert.equal(players[1].calls,1);
  assert.ok(players[0].volume>.5);
- assert.equal(players[1].playbackRate,.88);
+ assert.equal(players[1].playbackRate,1);
  player.sound('lion-roar');
  assert.equal(players.length,2,'should reuse the loaded player for repeated roars');
  assert.equal(players[0].calls,2);
