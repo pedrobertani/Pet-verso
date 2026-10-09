@@ -18,7 +18,7 @@ function lion(s,m,c,f){const age=s.growthLevel??2;let mane='';for(let i=0;i<(age
 function mouse(s,m,c,f){
  const d=s.palette?.detail||'#acb8c7';
  if(!s.walking)return mouseSeated(s,m,c,f);
- return g('pet-leg leg-0',path('M72 173l-5 12 14 3 8-13Z',c)+oval(77,188,9,3,'#e7b4c3'))+g('pet-leg leg-1',path('M76 171l-5 14 14 2 4-14Z',d)+oval(80,187,9,3,'#e7b4c3'))+'<g class="mouse-rise">'+g('pet-tail tail-left',stroke('M66 151Q32 153 12 169','#dda2b4',2.5))+
+ return g('pet-leg leg-0',path('M72 173l-5 12 14 3 8-13Z',c)+oval(77,188,9,3,'#e7b4c3'))+g('pet-leg leg-1',path('M76 171l-5 14 14 2 4-14Z',d)+oval(80,187,9,3,'#e7b4c3'))+g('pet-tail tail-left mouse-tail-visible',stroke('M66 151Q35 150 13 163q-8 5-12-2','#dda2b4',3.6))+'<g class="mouse-rise">'+
  g('pet-body',path('M60 160q4-23 32-23 32 0 43 22l-7 19H77q-18-1-17-18Z',f))+
  
  '<g class="mouse-front">'+g('pet-leg leg-0',path('M122 168l4 16 8 2-2-18Z',d)+oval(133,186,8,3,'#e7b4c3'))+g('pet-leg leg-1',path('M115 171l4 15 9 2-3-17Z',c)+oval(126,188,8,3,'#e7b4c3'))+'</g>'+
