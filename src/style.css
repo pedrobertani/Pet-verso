@@ -355,3 +355,20 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
 
 /* Terrestrial dinosaurs have extra transparent space below their SVG feet. */
 .garden .garden-pet.grounded:has(.species-dinos-0,.species-dinos-1,.species-dinos-2,.species-dinos-3) .pet-facing{translate:0 7px}
+
+/* PetVerso replaces native Android/browser prompts and confirmations. */
+.pet-dialog-overlay{z-index:1400;background:#20213db8;backdrop-filter:blur(3px)}
+.pet-dialog{width:min(92vw,430px);padding:25px 22px 21px;text-align:center;border:3px solid #f0d8bd;border-radius:26px;background:linear-gradient(155deg,#fffdf7,#fff0df);box-shadow:0 9px 0 #c9a984,0 18px 35px #33251e40}
+.pet-dialog-mark{display:grid;place-items:center;width:58px;height:58px;margin:-3px auto 12px;border:3px solid #fff5cf;border-radius:20px;background:linear-gradient(145deg,#f5b7cb,#d9b9eb);box-shadow:0 4px 0 #bd91c9;color:#fff;font:30px 'Lilita One','Nunito',sans-serif}
+.pet-dialog h2{margin:0 0 8px;color:#4c5368}.pet-dialog>p{margin:0 auto 18px;max-width:340px;color:#766a61;font-size:14px;line-height:1.45}
+.pet-dialog-label{display:block;margin:4px 0 18px;text-align:left;color:#665e59;font-size:13px}
+.pet-dialog-input{display:block;width:100%;margin-top:7px;padding:13px 14px;border:3px solid #b9dfe0;border-radius:15px;background:#fffdf8;color:#4c5368;font:700 17px 'Nunito',sans-serif;outline:none}
+.pet-dialog-input:focus{border-color:#73c9cf;box-shadow:0 0 0 4px #bfecef66}.pet-dialog-input.invalid{border-color:#e77d8b;animation:proto-shake .25s}
+.pet-dialog-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pet-dialog-actions button{min-height:48px;padding:11px 12px;border-radius:15px;font-weight:900}
+.pet-dialog-cancel{border:2px solid #cfceda;background:#f0edf4;color:#666275;box-shadow:0 3px 0 #b9b5c3}
+.pet-dialog-confirm{border:2px solid #78c6bd;background:#c9efe8;color:#356b68;box-shadow:0 3px 0 #70aea7}
+.pet-dialog-confirm.danger{border-color:#e18b94;background:#f8c9cc;color:#8c4651;box-shadow:0 3px 0 #c77982}
+[data-theme="dark"] .pet-dialog{background:linear-gradient(155deg,#3c3a52,#2f3047);border-color:#645b72;box-shadow:0 9px 0 #1d1f31,0 18px 35px #0007}
+[data-theme="dark"] .pet-dialog h2{color:#ffe0b3}[data-theme="dark"] .pet-dialog>p,[data-theme="dark"] .pet-dialog-label{color:#ddd3ce}
+[data-theme="dark"] .pet-dialog-input{background:#292b40;border-color:#667b88;color:#f7f0e7}
+@media(max-width:380px){.pet-dialog{padding:21px 15px 17px}.pet-dialog-actions{grid-template-columns:1fr}.pet-dialog-mark{width:52px;height:52px}}
