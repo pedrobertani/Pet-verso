@@ -50,8 +50,8 @@ export function tick(p,now=Date.now()){
  }
  n.last=Math.max(now,n.last);return advanceGrowth(n);
 }
-// Usamos a saciedade arredondada porque esse é o número exibido na barra.
-export const canFeedByHunger=p=>Number.isFinite(p?.stats?.food)&&Math.round(p.stats.food)<70;
+// Ração é permitida em qualquer valor abaixo do máximo, mesmo com fome zero.
+export const canFeedByHunger=p=>Number.isFinite(p?.stats?.food)&&p.stats.food<100;
 export function care(p,action){const n=structuredClone(p);if(n.dead)return n;const s=n.stats;
  if(action==='sleep'){n.sleeping=!n.sleeping;return n;}
  if(action==='clean'){n.coins+=n.waste??0;n.waste=0;n.floorDirt=0;return n;}if(action==='pickup'){if((n.waste??0)>0){n.waste--;n.floorDirt=Math.max(0,(n.floorDirt??0)-1);n.coins++;}return n;}
