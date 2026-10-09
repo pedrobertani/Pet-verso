@@ -417,3 +417,12 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
  .pet-switch-dialog .pet-switch-info small{font-size:.64rem}
  .pet-switch-plus{width:58px;height:58px;border-radius:18px;font-size:2.35rem}
 }
+
+
+/* Flat close button in the pet selector. */
+.pet-switch-dialog .pet-dialog-cancel,
+.pet-switch-dialog .pet-dialog-cancel:hover,
+.pet-switch-dialog .pet-dialog-cancel:active{
+ box-shadow:none!important;
+ transform:none!important;
+}
