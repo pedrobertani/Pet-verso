@@ -1,3 +1,4 @@
+import {treatSvgs,treatIds} from './treat-assets.js';
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 
 export function prototypeDifficulty(kind,level=1){
@@ -93,7 +94,7 @@ export function blocksGame(area,api){
   next();return()=>{stopped=true;};
 }
 
-const treats=['🦴','🐟','🍓','🥕','🐾','🥛'];
+const treats=treatIds;
 export function match3Game(area,api){
   let level=1,score=0,levelStart=0,target=0,moves=0,board=[],selected=null,locked=false,stopped=false;
   function makeBoard(size,kinds){
@@ -112,13 +113,16 @@ export function match3Game(area,api){
   function round(){const d=prototypeDifficulty('match3',level);board=makeBoard(d.size,d.kinds);moves=d.moves;target=d.target;levelStart=score;selected=null;locked=false;draw();}
   async function attempt(from,current){
     if(locked||stopped)return false;const [r,c]=from,[r2,c2]=current;if(Math.abs(r-r2)+Math.abs(c-c2)!==1)return false;
-    [board[r][c],board[r2][c2]]=[board[r2][c2],board[r][c]];const hits=findMatches(board);
-    if(!hits.size){[board[r][c],board[r2][c2]]=[board[r2][c2],board[r][c]];api.sound('wrong');selected=null;draw();return false;}
-    selected=null;moves--;locked=true;draw();await resolve();return true;
+    locked=true;[board[r][c],board[r2][c2]]=[board[r2][c2],board[r][c]];draw();
+    area.querySelector(`[data-gem="${r},${c}"]`)?.classList.add('swap-from');
+    area.querySelector(`[data-gem="${r2},${c2}"]`)?.classList.add('swap-to');
+    await wait(170);const hits=findMatches(board);
+    if(!hits.size){[board[r][c],board[r2][c2]]=[board[r2][c2],board[r][c]];api.sound('wrong');selected=null;draw();area.querySelector(`[data-gem="${r},${c}"]`)?.classList.add('swap-reject');locked=false;return false;}
+    selected=null;moves--;draw();await resolve();return true;
   }
   function draw(clearing=new Set()){
     const progress=clamp((score-levelStart)/target*100,0,100),size=board.length;
-    area.innerHTML=`${gameHeader(score,level,`${moves} jogadas`)}<div class="match-progress"><span style="width:${progress}%"></span></div><p class="proto-help">Meta: ${target} pontos nesta fase</p><div class="match-board" style="--match-size:${size}">${board.flatMap((row,r)=>row.map((value,c)=>`<button data-gem="${r},${c}" class="${selected?.[0]===r&&selected?.[1]===c?'selected':''} ${clearing.has(`${r},${c}`)?'clearing':''}" aria-label="Petisco ${value||''}"><span class="treat-art treat-${Math.max(0,treats.indexOf(value))}">${value||''}</span></button>`)).join('')}</div>`;
+    area.innerHTML=`${gameHeader(score,level,`${moves} jogadas`)}<div class="match-progress"><span style="width:${progress}%"></span></div><p class="proto-help">Meta: ${target} pontos nesta fase</p><div class="match-board" style="--match-size:${size}">${board.flatMap((row,r)=>row.map((value,c)=>`<button data-gem="${r},${c}" class="${selected?.[0]===r&&selected?.[1]===c?'selected':''} ${clearing.has(`${r},${c}`)?'clearing':''}" aria-label="Petisco ${value||''}"><span class="treat-art treat-${Math.max(0,treats.indexOf(value))}">${value?treatSvgs[value]:''}</span></button>`)).join('')}</div>`;
     let dragStart=null,startPoint=null,dragMoved=false,ignoreClick=false;
     const currentOf=element=>element?.closest?.('[data-gem]')?.dataset.gem?.split(',').map(Number);
     const same=(a,b)=>a&&b&&a[0]===b[0]&&a[1]===b[1];
@@ -140,7 +144,7 @@ export function match3Game(area,api){
       if(!dragMoved)return;
       event.preventDefault();
       const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-gem]');
-      area.querySelectorAll('[data-gem]').forEach(x=>x.classList.toggle('drag-target',x===target));
+      area.querySelectorAll('[data-gem]').forEach(x=>x.classList.toggle('drag-target',x===target));const source=area.querySelector(`[data-gem="${dragStart[0]},${dragStart[1]}"]`);if(source){source.style.setProperty('--drag-x',`${event.clientX-startPoint[0]}px`);source.style.setProperty('--drag-y',`${event.clientY-startPoint[1]}px`);source.classList.add('dragging');}
     };
     area.onpointerup=async event=>{
       if(!dragStart)return;
