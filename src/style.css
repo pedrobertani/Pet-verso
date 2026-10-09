@@ -354,7 +354,7 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
 }
 
 /* Terrestrial dinosaurs have extra transparent space below their SVG feet. */
-.garden .garden-pet.grounded:has(.species-dinos-0,.species-dinos-1,.species-dinos-2,.species-dinos-3) .pet-facing{translate:0 7px}
+.world .pet-stage.grounded:has(.species-dinos-0,.species-dinos-1,.species-dinos-2,.species-dinos-3) .pet-facing{translate:0 7px}
 
 /* PetVerso replaces native Android/browser prompts and confirmations. */
 .pet-dialog-overlay{z-index:1400;background:#20213db8;backdrop-filter:blur(3px)}
