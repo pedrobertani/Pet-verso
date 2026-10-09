@@ -568,3 +568,43 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
 @media(max-width:370px){
  .pet-switch-option:last-child:nth-child(odd){width:calc(50% - 3.5px)!important}
 }
+
+
+/* Medicine feedback: the pet stays still while a syringe applies the treatment. */
+.world.medicine-active .pet-stage,
+.world.medicine-active .pet-facing{
+ animation:none!important;
+ transition:none!important;
+}
+.world.medicine-active .pet-facing{transform:translateY(0)!important}
+.medicine-shot{
+ position:absolute;z-index:24;left:50%;bottom:78px;width:120px;height:58px;
+ pointer-events:none;opacity:0;transform:translate(72px,-4px) rotate(-8deg);
+ animation:medicine-approach 2.3s ease-in-out forwards;
+ filter:drop-shadow(0 4px 3px #47344945)
+}
+.medicine-shot svg{display:block;width:120px;height:52px;overflow:visible}
+.medicine-spark{
+ position:absolute;z-index:2;left:-4px;top:12px;width:28px;height:28px;color:#ffe179;font-size:27px;
+ opacity:0;transform:scale(.3);text-shadow:0 0 7px #fff7b8;
+ animation:medicine-spark 2.3s ease-out forwards
+}
+@keyframes medicine-approach{
+ 0%{opacity:0;transform:translate(78px,-7px) rotate(-8deg)}
+ 18%{opacity:1}
+ 48%{opacity:1;transform:translate(14px,4px) rotate(-8deg)}
+ 68%{opacity:1;transform:translate(8px,4px) rotate(-8deg)}
+ 84%{opacity:1;transform:translate(30px,-1px) rotate(-8deg)}
+ 100%{opacity:0;transform:translate(80px,-8px) rotate(-8deg)}
+}
+@keyframes medicine-spark{
+ 0%,45%{opacity:0;transform:scale(.3) rotate(0)}
+ 53%{opacity:1;transform:scale(1.25) rotate(18deg)}
+ 66%{opacity:.8;transform:scale(.85) rotate(35deg)}
+ 78%,100%{opacity:0;transform:scale(.4) rotate(55deg)}
+}
+@media(max-width:430px){
+ .medicine-shot{bottom:72px;width:104px;transform-origin:left center}
+ .medicine-shot svg{width:104px}
+}
+[data-theme="dark"] .medicine-shot{filter:drop-shadow(0 4px 4px #0008)}
