@@ -21,11 +21,6 @@ export const attrs={food:'Saciedade',joy:'Felicidade',energy:'Energia',hygiene:'
 export const fresh=(id,name,now=Date.now())=>({revision:1,species:id,name:name.trim().slice(0,24)||species.find(s=>s.id===id)?.name||'Meu pet',born:now,last:now,sleeping:false,coins:40,stats:{food:85,joy:80,energy:90,hygiene:90,health:100,intelligence:0},xp:0,growth:{version:1,level:0,baths:0,meals:0,games:0},personality:['Curioso','Brincalhão','Tranquilo'][Math.floor(Math.random()*3)],games:0,ill:false,illnessHours:0,neglectHours:0,dead:false,deadAt:null,inventory:[],equipped:{},waste:0,wasteClock:0,floorDirt:0,lastEarning:0,totalPoints:0,records:{}});
 const clamp=x=>Math.max(0,Math.min(100,x));
 export function valid(p){return p?.revision===1&&species.some(s=>s.id===p.species)&&typeof p.name==='string'&&p.name.length>0&&p.name.length<=24&&typeof p.sleeping==='boolean'&&Number.isFinite(p.last)&&Number.isFinite(p.born)&&p.born<=p.last&&Number.isFinite(p.coins)&&p.coins>=0&&Number.isFinite(p.xp)&&p.xp>=0&&Number.isFinite(p.games)&&p.games>=0&&['Curioso','Brincalhão','Tranquilo'].includes(p.personality)&&Object.keys(attrs).every(k=>Number.isFinite(p.stats?.[k])&&p.stats[k]>=0&&p.stats[k]<=100);}
-// Fully rested pets keep sleeping until their owner opens or resumes the game.
-export function wakeRested(p){
- if(!p||p.dead||!p.sleeping||p.stats.energy<100)return p;
- return {...p,sleeping:false};
-}
 export function tick(p,now=Date.now()){
  const n=structuredClone(p);let remaining=Math.max(0,(now-n.last)/3600000),cursor=n.last;
  n.ill??=false;n.illnessHours??=0;n.neglectHours??=0;n.dead??=false;n.waste??=0;n.wasteClock??=0;n.floorDirt??=n.waste;
@@ -40,7 +35,7 @@ export function tick(p,now=Date.now()){
   remaining-=h;cursor+=h*3600000;
   n.wasteClock+=h;const interval=n.sleeping?8:.75;if(n.wasteClock>=interval){const produced=Math.floor(n.wasteClock/interval);n.waste=Math.min(5,n.waste+produced);n.floorDirt=Math.min(5,n.floorDirt+produced);n.stats.hygiene=clamp(n.stats.hygiene-produced*8);n.wasteClock%=interval;}
   n.stats.food=clamp(n.stats.food-h*(n.sleeping?3:80));n.stats.hygiene=clamp(n.stats.hygiene-h*((n.sleeping?1:6)+(n.waste+(n.floorDirt??0))*.4));n.stats.joy=clamp(n.stats.joy-h*(n.sleeping?.5:22));
-  n.stats.energy=clamp(n.stats.energy+h*(n.sleeping?40:-6));
+  n.stats.energy=clamp(n.stats.energy+h*(n.sleeping?50:-6));
   if(!n.sleeping&&n.stats.energy<=0)n.sleeping=true;
   const neglected=n.stats.food<=15||n.stats.energy<=10||n.stats.hygiene<=10||n.waste>=4;
   n.neglectHours=neglected?n.neglectHours+h:0;
