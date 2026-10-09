@@ -12,7 +12,7 @@ export function openSettings({audio,reminders,pet,onMotion,onNewPet,icon}){
  q('#setting-dark').onchange=e=>{audio.update({dark:e.target.checked});onMotion();};
  q('#setting-muted').onchange=e=>audio.update({muted:e.target.checked});
  q('#setting-ambient').onchange=e=>audio.update({ambient:e.target.checked});
- q('#settings-new-pet')?.addEventListener('click',()=>{if(onNewPet())close();});
+ q('#settings-new-pet')?.addEventListener('click',async()=>{if(await onNewPet())close();});
  q('#setting-effects').onchange=e=>{audio.update({effects:e.target.checked});audio.sound('tap');};
  q('#setting-music').onchange=e=>audio.update({music:e.target.checked});
  q('#setting-motion').onchange=e=>{audio.update({motion:e.target.checked});onMotion();};
