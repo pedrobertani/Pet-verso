@@ -281,3 +281,5 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
 .actions.care-actions [data-action="sleep"]{background:linear-gradient(#f8f3ff,#e7dcfa);border-color:#c2afe4}
 .actions.care-actions [data-action="medicine"]{background:linear-gradient(#fff5f7,#ffdce4);border-color:#e8aeba}
 @media(max-width:390px){.actions.care-actions{gap:7px}.actions.care-actions button{min-width:120px;padding:8px 10px;grid-template-columns:28px auto auto}.actions.care-actions button .icon{width:26px;height:26px}}
+
+.brand>.brand-logo{width:36px;height:36px;vertical-align:middle;margin-right:6px;filter:drop-shadow(0 2px 2px #60496a22)}.memory-board{grid-template-columns:repeat(var(--columns),1fr)}.memory-board.dense button{height:58px}.memory-board.dense .icon{width:32px;height:32px}@media(max-width:390px){.brand>.brand-logo{width:32px;height:32px}.memory-board.dense{gap:5px}.memory-board.dense button{height:52px;padding:5px}}
