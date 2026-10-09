@@ -81,10 +81,18 @@ export function blocksGame(area,api){
   function draw(){
     area.innerHTML=`${gameHeader(score,level,`Linhas ${linesDone}/${lineGoal()}`)}<div class="block-board" style="--block-size:${size}">${board.flatMap((row,r)=>row.map((value,c)=>`<button data-cell="${r},${c}" class="block-color-${value}" aria-label="Linha ${r+1}, coluna ${c+1}"></button>`)).join('')}</div><p class="proto-help">Arraste a peça para o tabuleiro ou toque na peça e no local.</p><div class="block-tray">${tray.map(piece=>{const width=Math.max(...piece.shape.map(p=>p[0]))+1,height=Math.max(...piece.shape.map(p=>p[1]))+1;return `<button data-piece="${piece.id}" class="${selected?.id===piece.id?'selected':''}"><i class="piece-preview" style="--pw:${width};--ph:${height}">${piece.shape.map(([x,y])=>`<span class="block-color-${piece.color}" style="--x:${x};--y:${y}"></span>`).join('')}</i></button>`;}).join('')}</div>`;
     area.querySelectorAll('[data-piece]').forEach(button=>{
+      let start=null,moved=false,suppressClick=false,lastCell='';
       const choose=()=>{selected=tray.find(piece=>piece.id===+button.dataset.piece);area.querySelectorAll('[data-piece]').forEach(x=>x.classList.toggle('selected',x===button));api.sound('tap');};
-      button.onclick=choose;button.onpointerdown=event=>{choose();button.setPointerCapture?.(event.pointerId);};
-      button.onpointermove=event=>{if(!selected)return;const cell=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-cell]');if(cell&&area.contains(cell)){const [row,col]=cell.dataset.cell.split(',').map(Number);preview(row,col);}};
-      button.onpointerup=event=>{const cell=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-cell]');if(cell&&area.contains(cell)){event.preventDefault();const [row,col]=cell.dataset.cell.split(',').map(Number);place(row,col);}};
+      const resetDrag=()=>{button.classList.remove('piece-dragging');button.style.removeProperty('--piece-x');button.style.removeProperty('--piece-y');};
+      button.onclick=()=>{if(suppressClick){suppressClick=false;return;}choose();};
+      button.onpointerdown=event=>{choose();start=[event.clientX,event.clientY];moved=false;lastCell='';button.setPointerCapture?.(event.pointerId);};
+      button.onpointermove=event=>{
+        if(!selected||!start)return;const dx=event.clientX-start[0],dy=event.clientY-start[1];if(Math.hypot(dx,dy)>6)moved=true;if(!moved)return;
+        event.preventDefault();button.classList.add('piece-dragging');button.style.setProperty('--piece-x',`${dx}px`);button.style.setProperty('--piece-y',`${dy}px`);
+        const cell=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-cell]');if(cell&&area.contains(cell)&&cell.dataset.cell!==lastCell){lastCell=cell.dataset.cell;const [row,col]=lastCell.split(',').map(Number);preview(row,col);}
+      };
+      button.onpointerup=event=>{const cell=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-cell]');resetDrag();start=null;if(moved)suppressClick=true;if(cell&&area.contains(cell)){event.preventDefault();const [row,col]=cell.dataset.cell.split(',').map(Number);place(row,col);}};
+      button.onpointercancel=()=>{resetDrag();start=null;moved=false;};
     });
     area.querySelectorAll('[data-cell]').forEach(button=>{
       button.onpointerenter=()=>{if(selected){const [row,col]=button.dataset.cell.split(',').map(Number);preview(row,col);}};
