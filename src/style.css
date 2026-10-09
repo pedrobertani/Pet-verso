@@ -716,3 +716,6 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
 .pet-health-popup .pet-health-kit{font-size:30px;flex:none}.pet-health-popup div{display:grid;gap:3px;flex:1;min-width:0}.pet-health-popup small{font-size:12px;line-height:1.35}.pet-health-popup button{padding:9px 12px;background:#ffe1e8;border:2px solid #c986a7;color:#583e50;font-weight:700;flex:none}
 [data-theme="dark"] .pet-health-popup{background:#3a2a38;color:#fff0f4;border-color:#93627e}[data-theme="dark"] .pet-health-popup button{background:#644158;color:#fff0f4;border-color:#ae7c98}
 @media(max-width:440px){.pet-health-popup{gap:8px;padding:10px}.pet-health-popup .pet-health-kit{font-size:24px}.pet-health-popup button{font-size:12px;padding:8px}}
+
+/* Health alert appears once per illness instead of occupying permanent page space. */
+.pet-health-overlay{z-index:1100}.pet-health-dialog{text-align:center;max-width:390px;margin:auto}.pet-health-dialog .health-kit-icon{font-size:48px;margin-bottom:8px}.pet-health-dialog p{line-height:1.5;margin:12px 0 20px}.pet-health-dialog button{width:100%;min-height:46px}
