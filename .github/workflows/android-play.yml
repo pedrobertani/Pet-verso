@@ -31,7 +31,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-          cache: gradle
       - uses: android-actions/setup-android@v3
         with:
           packages: platform-tools
@@ -43,6 +42,7 @@ jobs:
         run: npm run build
       - run: npx cap add android
       - run: node .github/scripts/prepare-android.mjs
+      - uses: gradle/actions/setup-gradle@v4
       - name: Gerar APK, bundle e assinatura opcional
         run: bash .github/scripts/build-play.sh
         env:
