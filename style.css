@@ -644,3 +644,40 @@ html[data-theme="dark"] .care-actions button[data-action="medicine"]:disabled{
 }
 .pet-remove:disabled{display:none}
 [data-theme="dark"] .pet-remove{background:#51383f;border-color:#a86270;color:#ffd9dc;box-shadow:0 3px 0 #251f32}
+
+
+/* Hard dimensions prevent species artwork or active state from resizing cards. */
+.pet-switch-list{
+ grid-template-columns:calc((100% - 10px)/2) calc((100% - 10px)/2)!important;
+ grid-auto-columns:calc((100% - 10px)/2)!important;
+ grid-auto-rows:226px!important;
+}
+.pet-switch-option,
+.pet-switch-option.active,
+.pet-switch-option.attention{
+ box-sizing:border-box!important;
+ width:100%!important;
+ min-width:0!important;
+ max-width:100%!important;
+ height:226px!important;
+ min-height:226px!important;
+ max-height:226px!important;
+ margin:0!important;
+ transform:none;
+}
+.pet-switch-option:last-child:nth-child(odd){
+ width:calc((100% - 10px)/2)!important;
+}
+@media(max-width:370px){
+ .pet-switch-list{
+  grid-template-columns:calc((100% - 7px)/2) calc((100% - 7px)/2)!important;
+  grid-auto-columns:calc((100% - 7px)/2)!important;
+  grid-auto-rows:205px!important;
+ }
+ .pet-switch-option,
+ .pet-switch-option.active,
+ .pet-switch-option.attention{
+  height:205px!important;min-height:205px!important;max-height:205px!important
+ }
+ .pet-switch-option:last-child:nth-child(odd){width:calc((100% - 7px)/2)!important}
+}
