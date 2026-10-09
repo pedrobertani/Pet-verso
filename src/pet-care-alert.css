@@ -1,0 +1,81 @@
+/* Thought bubbles live on each pet's card, never detached below the game.
+   Keep the same friendly contrast in light and dark mode. */
+.pet-switch-dialog{
+ --care-thought-bg:#fffaf1;
+ --care-thought-border:#cda8d2;
+ --care-thought-shadow:#b58cbc;
+ --care-thought-ink:#67465e;
+}
+[data-theme="dark"] .pet-switch-dialog{
+ --care-thought-bg:#454057;
+ --care-thought-border:#b8a4d1;
+ --care-thought-shadow:#282238;
+ --care-thought-ink:#fff2f9;
+}
+/* Anchor each thought to its own pet card, never to the outer dialog. */
+.pet-switch-dialog .pet-switch-option[data-switch-born]{
+ position:relative!important;
+ isolation:isolate;
+}
+.pet-switch-dialog .pet-switch-option>.pet-care-thought{
+ position:absolute!important;
+ z-index:4;
+ top:8px!important;
+ right:8px!important;
+ display:grid!important;
+ place-items:center!important;
+ box-sizing:border-box!important;
+ width:49px!important;
+ height:46px!important;
+ padding:0!important;
+ margin:0!important;
+ overflow:visible!important;
+ border:2px solid var(--care-thought-border)!important;
+ border-radius:48% 48% 44% 44%!important;
+ background:var(--care-thought-bg)!important;
+ color:var(--care-thought-ink)!important;
+ -webkit-text-fill-color:var(--care-thought-ink)!important;
+ box-shadow:0 3px 0 var(--care-thought-shadow),0 5px 12px #0002!important;
+ pointer-events:none!important;
+ animation:care-thought-bob 3s ease-in-out infinite;
+}
+.pet-switch-dialog .pet-care-thought>span{
+ display:block!important;
+ font-size:23px!important;
+ line-height:1!important;
+ width:auto!important;
+ height:auto!important;
+}
+.pet-switch-dialog .pet-care-thought::before,
+.pet-switch-dialog .pet-care-thought::after{
+ content:"";
+ position:absolute;
+ z-index:-1;
+ background:var(--care-thought-bg);
+ border:2px solid var(--care-thought-border);
+ border-radius:50%;
+ pointer-events:none;
+}
+.pet-switch-dialog .pet-care-thought::before{
+ width:11px;height:11px;right:8px;bottom:-9px;
+}
+.pet-switch-dialog .pet-care-thought::after{
+ width:6px;height:6px;right:17px;bottom:-17px;
+}
+@keyframes care-thought-bob{
+ 0%,100%{translate:0 0}
+ 50%{translate:0 -3px}
+}
+@media(max-width:430px){
+ .pet-switch-dialog .pet-switch-option>.pet-care-thought{
+  top:5px!important;right:4px!important;
+  width:43px!important;height:40px!important;
+ }
+ .pet-switch-dialog .pet-care-thought>span{font-size:20px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .pet-switch-dialog .pet-switch-option>.pet-care-thought{animation:none!important}
+}
+.reduce-motion .pet-switch-dialog .pet-switch-option>.pet-care-thought{
+ animation:none!important;
+}
