@@ -491,3 +491,69 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
  .pet-switch-option>.pet-switch-info b{font-size:16px}
  .pet-switch-option>.pet-switch-info small{font-size:11px}
 }
+
+
+/* Equal-sized pet cards: two balanced columns on phones and tablets. */
+.pet-switch-list{
+ display:grid!important;
+ grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ align-items:stretch!important;
+ gap:10px!important;
+}
+.pet-switch-option{
+ display:flex!important;
+ flex-direction:column!important;
+ align-items:center!important;
+ justify-content:flex-start!important;
+ gap:9px!important;
+ width:100%!important;
+ min-width:0!important;
+ height:100%!important;
+ min-height:226px!important;
+ padding:13px 8px 12px!important;
+ text-align:center!important;
+}
+.pet-switch-option>.pet-switch-avatar{
+ display:grid!important;
+ place-items:center!important;
+ flex:0 0 126px!important;
+ width:126px!important;
+ height:126px!important;
+ max-width:100%!important;
+ border-radius:18px!important;
+}
+.pet-switch-option>.pet-switch-avatar svg{
+ width:118px!important;
+ height:118px!important;
+ max-width:100%!important;
+}
+.pet-switch-option>.pet-switch-info{
+ display:flex!important;
+ flex-direction:column!important;
+ align-items:center!important;
+ justify-content:flex-start!important;
+ width:100%!important;
+ min-width:0!important;
+ gap:5px!important;
+}
+.pet-switch-option>.pet-switch-info strong,
+.pet-switch-option>.pet-switch-info small{
+ display:block!important;
+ width:100%!important;
+ margin:0!important;
+ line-height:1.15!important;
+ text-align:center!important;
+ overflow-wrap:anywhere;
+}
+.pet-switch-option>.pet-switch-info strong{font-size:17px!important;color:inherit}
+.pet-switch-option>.pet-switch-info small{font-size:11px!important}
+.pet-switch-option>em{position:absolute;right:7px;top:7px}
+.pet-switch-option{position:relative}
+@media(max-width:370px){
+ .pet-switch-list{gap:7px!important}
+ .pet-switch-option{min-height:205px!important;padding:10px 5px!important}
+ .pet-switch-option>.pet-switch-avatar{flex-basis:110px!important;width:110px!important;height:110px!important}
+ .pet-switch-option>.pet-switch-avatar svg{width:104px!important;height:104px!important}
+ .pet-switch-option>.pet-switch-info strong{font-size:15px!important}
+ .pet-switch-option>.pet-switch-info small{font-size:10px!important}
+}
