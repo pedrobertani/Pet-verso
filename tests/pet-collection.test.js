@@ -46,3 +46,14 @@ test('coleção aceita no máximo três pets e remoção preserva a carteira',()
  assert.equal(removed.collection.wallet,5000);assert.ok(removed.collection.pets.every(p=>p.coins===5000));
  assert.equal(removePet(normalizeCollection(fresh('pets-0','Único',5000),5000),5000).ok,false);
 });
+
+
+test('terceira vaga é comprada uma vez e reutilizada sem nova cobrança',()=>{
+ let collection=normalizeCollection(fresh('pets-0','Lua',1000),1000);collection.wallet=10000;collection.pets[0].coins=10000;
+ collection=addPet(collection,fresh('dinos-0','Rex',2000)).collection;
+ const third=addPet(collection,fresh('selva-0','Léo',3000));assert.equal(third.price,5000);collection=third.collection;
+ assert.equal(collection.unlockedSlots,3);assert.equal(collection.wallet,5000);
+ collection=removePet(collection,3000).collection;assert.equal(adoptionPrice(collection),0);
+ const replacement=addPet(collection,fresh('pets-1','Bolt',4000));assert.equal(replacement.ok,true);assert.equal(replacement.price,0);
+ assert.equal(replacement.collection.wallet,5000);assert.equal(replacement.collection.unlockedSlots,3);
+});
