@@ -3,21 +3,24 @@ import {tick,valid} from './engine.js';
 export const MULTI_PET_REVISION=2;
 export const EXTRA_PET_PRICE=5000;
 export const MAX_PETS=3;
+export const FREE_PET_SLOTS=2;
 
 const clone=value=>structuredClone(value);
 
 export function normalizeCollection(raw,now=Date.now()){
  if(valid(raw)){
   const pet=tick(raw,now);
-  return {revision:MULTI_PET_REVISION,wallet:pet.coins,activeBorn:pet.born,pets:[pet]};
+  return {revision:MULTI_PET_REVISION,wallet:pet.coins,activeBorn:pet.born,unlockedSlots:FREE_PET_SLOTS,pets:[pet]};
  }
  if(raw?.revision!==MULTI_PET_REVISION||!Array.isArray(raw.pets)||!raw.pets.length)return null;
  const pets=raw.pets.filter(valid).map(p=>tick(p,now));
  if(!pets.length)return null;
  const wallet=Math.max(0,Math.floor(Number.isFinite(raw.wallet)?raw.wallet:pets[0].coins||0));
+ const inferredSlots=Math.max(FREE_PET_SLOTS,Math.min(MAX_PETS,pets.length));
+ const unlockedSlots=Math.max(FREE_PET_SLOTS,Math.min(MAX_PETS,Math.floor(Number.isFinite(raw.unlockedSlots)?raw.unlockedSlots:inferredSlots)));
  for(const pet of pets)pet.coins=wallet;
  const activeBorn=pets.some(p=>p.born===raw.activeBorn)?raw.activeBorn:pets[0].born;
- return {revision:MULTI_PET_REVISION,wallet,activeBorn,pets};
+ return {revision:MULTI_PET_REVISION,wallet,activeBorn,unlockedSlots,pets};
 }
 
 export function activePet(collection){
@@ -27,6 +30,7 @@ export function activePet(collection){
 export function saveActive(collection,pet){
  if(!collection||!pet)return collection;
  const next=clone(collection),index=next.pets.findIndex(p=>p.born===pet.born);
+ next.unlockedSlots??=Math.max(FREE_PET_SLOTS,Math.min(MAX_PETS,next.pets.length));
  next.wallet=Math.max(0,Math.floor(pet.coins));
  const saved={...clone(pet),coins:next.wallet};
  if(index<0)next.pets.push(saved);else next.pets[index]=saved;
@@ -48,7 +52,9 @@ export function switchActive(collection,born){
 }
 
 export function adoptionPrice(collection){
- return (collection?.pets.length||0)<2?0:EXTRA_PET_PRICE;
+ if(!collection)return 0;
+ const unlocked=Math.max(FREE_PET_SLOTS,collection.unlockedSlots||FREE_PET_SLOTS);
+ return collection.pets.length<unlocked?0:unlocked<MAX_PETS?EXTRA_PET_PRICE:0;
 }
 
 export function addPet(collection,pet){
@@ -57,7 +63,8 @@ export function addPet(collection,pet){
  const price=adoptionPrice(collection);
  if((collection?.wallet||0)<price)return {ok:false,reason:'coins',price,collection};
  const next=clone(collection);
- next.wallet-=price;
+ next.unlockedSlots=Math.max(FREE_PET_SLOTS,next.unlockedSlots||FREE_PET_SLOTS);
+ if(price){next.wallet-=price;next.unlockedSlots=Math.min(MAX_PETS,next.unlockedSlots+1);}
  const adopted={...clone(pet),coins:next.wallet};
  next.pets.push(adopted);
  next.activeBorn=adopted.born;
