@@ -1,5 +1,5 @@
 export const growthNames=['Bebê','Jovem','Adulto'];
-export const growthGoals=[{days:2,baths:8,meals:12,games:6,intelligence:15},{days:7,baths:24,meals:40,games:20,intelligence:40}];
+export const growthGoals=[{days:2,baths:8,meals:12,games:6,intelligence:15},{days:4,baths:24,meals:40,games:20,intelligence:40}];
 const count=x=>Number.isFinite(x)?Math.max(0,Math.floor(x)):0;
 export function growthState(p){
  const old=p.growth;
