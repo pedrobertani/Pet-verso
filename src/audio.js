@@ -1,7 +1,7 @@
 // Interface tones are procedural; species roars are locally bundled CC0 recordings.
 export const roarAssets={
- 'lion-roar':'/audio/lion-roar.ogg',
- 'dino-roar':'/audio/trex-roar.ogg'
+ 'lion-roar':'/audio/lion-roar.mp3',
+ 'dino-roar':'/audio/trex-roar.mp3'
 };
 const defaults={effects:true,music:false,volume:0.45,motion:true,ambient:true,muted:false,dark:false};
 export function readPreferences(storage){try{const p=JSON.parse(storage.getItem('petverso-settings-v1')||'{}');return {ambient:typeof p.ambient==='boolean'?p.ambient:defaults.ambient,muted:p.muted===true,dark:p.dark===true,effects:typeof p.effects==='boolean'?p.effects:defaults.effects,music:typeof p.music==='boolean'?p.music:defaults.music,volume:Number.isFinite(p.volume)?Math.max(0,Math.min(1,p.volume)):defaults.volume,motion:typeof p.motion==='boolean'?p.motion:defaults.motion};}catch{return {...defaults};}}
@@ -19,7 +19,7 @@ export function createAudio({storage=localStorage,contextFactory=()=>new (window
  function sound(name='tap'){if(!unlocked||hidden||prefs.muted||!prefs.effects||!ctx)return;const t=ctx.currentTime;
  if(roarAssets[name]){
  // Play a pre-recorded file, not filtered random noise. Cached per species;
- // the browser can serve bundled OGG files even when the device is offline.
+ // the browser can serve bundled MP3 files without requesting a third-party host.
  let player=roarPlayers.get(name);
  if(!player){
   try{player=audioFactory(roarAssets[name]);player.preload='auto';roarPlayers.set(name,player);}
@@ -27,7 +27,7 @@ export function createAudio({storage=localStorage,contextFactory=()=>new (window
  }
  try{
   player.pause();player.currentTime=0;
-  player.playbackRate=name==='dino-roar'?.88:1;
+  player.playbackRate=1;
   player.volume=roarVolume();
   const result=player.play();result?.catch?.(()=>{});
  }catch{}
