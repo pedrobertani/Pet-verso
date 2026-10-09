@@ -37,7 +37,7 @@ test('partidas sem pontos rendem zero moedas e as demais respeitam metas do jogo
 test('recolher cocô remove a marca correspondente sem dar banho',()=>{const p=fresh('pets-0','Lua',1000);const n=tick(p,1000+.75*3600000);assert.equal(n.waste,1);assert.equal(n.floorDirt,1);assert.ok(n.stats.hygiene<81);const pickup=care(n,'pickup');assert.equal(pickup.waste,0);assert.equal(pickup.floorDirt,0);const clean=care(pickup,'clean');assert.equal(clean.floorDirt,0);assert.equal(clean.stats.hygiene,n.stats.hygiene);const bath=care(n,'bath');assert.equal(bath.stats.hygiene,100);assert.equal(bath.floorDirt,1);});
 
 test('fome cai 24/h; energia e diversão mantêm seu ritmo',()=>{const p=fresh('pets-0','Lua',1000);const n=tick(p,1000+45*60000);assert.equal(n.stats.food,67);assert.equal(n.waste,1);const later=tick(p,1000+3*3600000);assert.equal(later.stats.energy,72);assert.equal(later.stats.joy,14);});
-test('energia completa mantém o pet dormindo até o jogador acordá-lo',()=>{const p=fresh('pets-0','Lua',1000);p.sleeping=true;p.stats.energy=20;const n=tick(p,1000+8*3600000);assert.equal(n.stats.energy,100);assert.equal(n.sleeping,true);assert.equal(care(n,'sleep').sleeping,false);assert.ok(n.stats.food>=60);assert.ok(n.stats.hygiene>=60);assert.equal(n.ill,false);assert.equal(n.dead,false);});
+test('energia completa mantém o pet dormindo até o jogador acordá-lo',()=>{const p=fresh('pets-0','Lua',1000);p.sleeping=true;p.stats.energy=20;const n=tick(p,1000+8*3600000);assert.equal(n.stats.energy,100);assert.equal(n.sleeping,true);assert.equal(care(n,'sleep').sleeping,false);assert.ok(n.stats.food>=60);assert.ok(n.stats.hygiene>30&&n.stats.hygiene<40,'perda noturna maior incluindo um cocô');assert.equal(n.ill,false);assert.equal(n.dead,false);});
 
 test('refeição recupera 50 pontos de saciedade e sono completo leva duas horas',()=>{const p=fresh('pets-0','Lua',1000);p.stats.food=25;const fed=care(p,'feed');assert.equal(fed.stats.food,75);assert.equal(tick(fed,1000+45*60000).stats.food,57);p.sleeping=true;p.stats.energy=35;const rested=tick(p,1000+2*3600000);assert.equal(rested.stats.energy,100);assert.equal(rested.sleeping,true);});
 test('cada cocô recolhido rende uma moeda sem repetir nem premiar manchas',()=>{const p=fresh('pets-0','Lua');p.waste=2;p.floorDirt=2;const first=care(p,'pickup');assert.equal(first.coins,p.coins+1);const second=care(first,'pickup');assert.equal(second.coins,p.coins+2);assert.equal(care(second,'pickup').coins,second.coins);assert.equal(care(second,'clean').coins,second.coins);assert.equal(care(p,'clean').coins,p.coins+2);});
@@ -125,4 +125,26 @@ test('saciedade cai 24/h e cada refeição repõe 50 pontos por 5 moedas',()=>{
  assert.equal(care(fed,'medicine').coins,15,'preço do remédio não foi modificado');
  const patient={...fed,stats:{...fed.stats,health:50}};
  assert.equal(care(patient,'medicine').coins,3,'remédio custa 12 moedas');
+});
+
+test('higiene cai 10 por hora acordado e 5 por hora dormindo, antes de produzir cocô',()=>{
+ const p=fresh('pets-0','Lua',1000);p.stats.hygiene=100;p.stats.energy=90;
+ const awake=tick(p,1000+30*60000);
+ assert.ok(Math.abs(awake.stats.hygiene-95)<1e-9,awake.stats.hygiene);
+ assert.equal(awake.waste,0);
+ const sleeping=tick({...p,sleeping:true},1000+60*60000);
+ assert.ok(Math.abs(sleeping.stats.hygiene-95)<1e-9,sleeping.stats.hygiene);
+ assert.equal(sleeping.waste,0);
+});
+test('cada cocô diminui 15 de higiene, além da sujeira acumulada',()=>{
+ const p=fresh('pets-0','Lua',1000);p.stats.hygiene=100;p.stats.energy=90;
+ const first=tick(p,1000+45*60000);
+ assert.equal(first.waste,1);
+ // 7,5 pontos por 45min acordado + 15 pelo cocô + 0,6 pela sujeira.
+ assert.ok(Math.abs(first.stats.hygiene-76.9)<1e-9,first.stats.hygiene);
+ const second=tick(p,1000+90*60000);
+ assert.equal(second.waste,2);
+ // Ao longo de 90min, dois cocôs custam 30 pontos, além do desgaste e sujeira.
+ assert.ok(Math.abs(second.stats.hygiene-53.2)<1e-9,second.stats.hygiene);
+ assert.equal(care(second,'bath').stats.hygiene,100,'banho continua gratuito e restaura toda higiene');
 });
