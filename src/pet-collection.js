@@ -2,6 +2,7 @@ import {tick,valid} from './engine.js';
 
 export const MULTI_PET_REVISION=2;
 export const EXTRA_PET_PRICE=5000;
+export const MAX_PETS=3;
 
 const clone=value=>structuredClone(value);
 
@@ -52,6 +53,7 @@ export function adoptionPrice(collection){
 
 export function addPet(collection,pet){
  if(!valid(pet))return {ok:false,reason:'invalid',collection};
+ if((collection?.pets.length||0)>=MAX_PETS)return {ok:false,reason:'limit',collection};
  const price=adoptionPrice(collection);
  if((collection?.wallet||0)<price)return {ok:false,reason:'coins',price,collection};
  const next=clone(collection);
@@ -61,6 +63,14 @@ export function addPet(collection,pet){
  next.activeBorn=adopted.born;
  for(const item of next.pets)item.coins=next.wallet;
  return {ok:true,price,collection:next};
+}
+
+export function removePet(collection,born){
+ if(!collection||collection.pets.length<=1||!collection.pets.some(p=>p.born===born))return {ok:false,collection};
+ const next=clone(collection);next.pets=next.pets.filter(p=>p.born!==born);
+ if(next.activeBorn===born)next.activeBorn=next.pets[0].born;
+ for(const pet of next.pets)pet.coins=next.wallet;
+ return {ok:true,collection:next};
 }
 
 export function needyPets(collection,activeBorn){
