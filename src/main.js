@@ -130,6 +130,7 @@ function bindScene(){
  const target=root.querySelector('#touch-pet');if(!target)return;
  const previousCleanup=sceneCleanup;const callCleanup=bindCallPet({world:root.querySelector('.world'),target,getPet:()=>pet,scene,drawWalking:()=>drawing(species.find(s=>s.id===pet.species),activity,true),onLocked:()=>{if(!callNoticeShown){callNoticeShown=true;notify(`🧠 ${Math.floor(pet.stats.intelligence)} / 25 para seguir seu toque`,3000);}},onBlocked:()=>notify('Escolha um espaço livre no chão.'),reducedMotion:()=>!audio.preferences.motion||matchMedia('(prefers-reduced-motion: reduce)').matches});const thoughtCleanup=bindPetThoughts({world:root.querySelector('.world'),target,getPet:()=>pet,scene,icon});const turnCleanup=bindDirectionalPet({world,target,getPet:()=>pet,getSpecies:()=>({...species.find(s=>s.id===pet.species),growthLevel:growthProgress(pet).level,palette:palettes[pet.species]?.find(c=>c.id===pet.color),dirty:pet.stats.hygiene<60}),getMode:()=>activity==='idle'?mood():activity,reducedMotion:()=>!audio.preferences.motion||matchMedia('(prefers-reduced-motion: reduce)').matches});sceneCleanup=()=>{turnCleanup();thoughtCleanup();callCleanup();previousCleanup();};
  let dragging=false,last=null,total=0,lastReward=0;
+ function insidePet(x,y){const box=target.getBoundingClientRect(),padX=box.width*.16,padTop=box.height*.1,padBottom=box.height*.14;return x>=box.left+padX&&x<=box.right-padX&&y>=box.top+padTop&&y<=box.bottom-padBottom;}
  function rub(amount,x,y){
   if(pet.sleeping||pet.dead||root.querySelector('.world')?.dataset.skillBusy==='true')return;
   if(scene==='bathroom'){
@@ -139,8 +140,8 @@ function bindScene(){
    if(bathProgress>=45){bathStep=2;soapSelected=false;render();}
   }else{total+=amount;target.classList.add('petted');if(total>=60&&Date.now()-lastReward>1500){lastReward=Date.now();total=0;updatePetTime();pet=care(pet,'pet');audio.sound('pet');save();}}
  }
- function down(e){if(world.dataset.skillBusy==='true')return;dragging=true;last={x:e.clientX,y:e.clientY};e.currentTarget.setPointerCapture(e.pointerId);target.classList.add('being-touched');}
- function move(e){if(!dragging)return;const distance=Math.hypot(e.clientX-last.x,e.clientY-last.y);last={x:e.clientX,y:e.clientY};const box=target.getBoundingClientRect();if(scene==='bathroom'&&(e.clientX<box.left||e.clientX>box.right||e.clientY<box.top||e.clientY>box.bottom))return;if(distance>2)rub(Math.min(20,distance*.6),e.clientX,e.clientY);}
+ function down(e){if(world.dataset.skillBusy==='true'||!insidePet(e.clientX,e.clientY))return;dragging=true;last={x:e.clientX,y:e.clientY};e.currentTarget.setPointerCapture(e.pointerId);target.classList.add('being-touched');}
+ function move(e){if(!dragging)return;const distance=Math.hypot(e.clientX-last.x,e.clientY-last.y);last={x:e.clientX,y:e.clientY};if(!insidePet(e.clientX,e.clientY))return;if(distance>2)rub(Math.min(20,distance*.6),e.clientX,e.clientY);}
  function up(){if(!dragging)return;dragging=false;last=null;target.classList.remove('being-touched');if(scene!=='bathroom')render();}
  target.onpointerdown=down;target.onpointermove=move;target.onpointerup=target.onpointercancel=up;
  target.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();if(scene==='bathroom'){if(bathStep!==1)return;soapSelected=true;}const r=target.getBoundingClientRect();rub(60,r.x+r.width/2,r.y+r.height/2);}};
