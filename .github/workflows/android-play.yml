@@ -1,16 +1,20 @@
 name: Gerar AAB para Play Store
 on:
+  push:
+    branches: [main]
+    paths:
+      - package.json
   workflow_dispatch:
     inputs:
       signed_release:
         description: Assinar com a chave de upload para envio ao Play Console
         type: boolean
-        default: false
+        default: true
       version_code:
         description: Código da versão (maior que todos os já enviados à loja)
         type: string
         required: true
-        default: '23'
+        default: '24'
 permissions:
   contents: read
 jobs:
@@ -19,8 +23,8 @@ jobs:
     timeout-minutes: 20
     env:
       APP_SLUG: petverso
-      VERSION_CODE: ${{ inputs.version_code || '23' }}
-      SIGNED_RELEASE: ${{ inputs.signed_release || false }}
+      VERSION_CODE: ${{ inputs.version_code || '24' }}
+      SIGNED_RELEASE: ${{ github.event_name == 'push' || inputs.signed_release || false }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
