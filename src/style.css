@@ -325,3 +325,30 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
 }
 [data-theme="dark"] .game-card{background:linear-gradient(145deg,#38374f,#2d2d45);border-color:#56516c;box-shadow:0 5px 0 #1e2032}
 [data-theme="dark"] .game-card>span{border-color:#736985;box-shadow:0 3px 0 #202237}
+
+/* Shared visual language across every minigame surface. */
+.arcade-hud,.fruit-merge-hud,.proto-hud,.flight-score,.word-score{
+ border:2px solid #ead8c3;border-radius:15px;background:linear-gradient(145deg,#fffdf7,#fff3e7);box-shadow:0 3px 0 #e2ccb1;color:#665f59
+}
+.arcade-hud,.fruit-merge-hud{padding:9px 12px;margin:5px 0 9px}
+.flight-score,.word-score{padding:8px 11px;margin:6px 0 9px}
+.arcade-tip,.fruit-merge-help,.flight-help,.proto-help,.word-status{
+ color:#70675f!important;background:#fff8eb;border:1px solid #eadbc6;border-radius:13px;padding:6px 9px
+}
+.memory-board,.sequence-board,.hide-board,.puzzle-board,.word-board,.block-board,.match-board{
+ border:3px solid #dcc8b0;border-radius:22px;background:#f8eadb;box-shadow:0 5px 0 #cdb292
+}
+.memory-board,.sequence-board,.hide-board,.puzzle-board{padding:8px}
+.dialog canvas.arcade-canvas,.dialog canvas.fruit-merge-canvas,.flight-field{
+ border:3px solid #dcc8b0;border-radius:22px;box-shadow:0 5px 0 #cdb292
+}
+.memory-board button,.puzzle-board button,.word-board button,.block-board button,.match-board button{
+ border-radius:9px
+}
+.sequence-board button,.hide-board button{border-radius:15px;box-shadow:0 3px 0 #c9ab8e}
+[data-theme="dark"] .arcade-hud,[data-theme="dark"] .fruit-merge-hud,[data-theme="dark"] .proto-hud,[data-theme="dark"] .flight-score,[data-theme="dark"] .word-score{
+ background:linear-gradient(145deg,#3b394f,#302f45);border-color:#615a70;box-shadow:0 3px 0 #1d1f31;color:#efe8dc
+}
+[data-theme="dark"] .arcade-tip,[data-theme="dark"] .fruit-merge-help,[data-theme="dark"] .flight-help,[data-theme="dark"] .proto-help,[data-theme="dark"] .word-status{
+ background:#373548;border-color:#5e586d;color:#e2d9cf!important
+}
