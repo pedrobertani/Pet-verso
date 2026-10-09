@@ -12,22 +12,24 @@ export function createAudio({storage=localStorage,contextFactory=()=>new (window
  function unlock(){if(hidden||!setup())return;const first=!unlocked;unlocked=true;ctx.resume()?.catch(()=>{});if(first){startMusic();startAmbient();}}
  function sound(name='tap'){if(!unlocked||hidden||prefs.muted||!prefs.effects||!ctx)return;const t=ctx.currentTime;
  if(name==='lion-roar'||name==='dino-roar'){
- // Distinct layered, procedural roars (no copyrighted recordings): deep Rex rumble vs. lion's pulsed chest growl.
- const dino=name==='dino-roar',duration=dino?2.15:1.65,base=dino?43:78;
- const buffer=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate),data=buffer.getChannelData(0);let smooth=0;
- for(let i=0;i<data.length;i++){const sec=i/ctx.sampleRate,x=sec/duration; smooth=.91*smooth+.09*(Math.random()*2-1);
- const swell=Math.min(1,sec/(dino?.24:.12))*Math.pow(Math.max(0,1-x),dino?.35:.7);
- const beat=dino?(.77+.23*Math.sin(sec*18)):(.62+.38*Math.pow(Math.sin(sec*27),2));
- const sub=Math.sin(2*Math.PI*(base*(1-.42*x))*sec)*.24;
- data[i]=(smooth*.82+sub)*swell*beat;
+ // Smooth band-limited growl with a low resonant throat; avoid harsh sawtooth stacks.
+ const dino=name==='dino-roar',duration=dino?2.3:1.7;
+ const buffer=ctx.createBuffer(1,Math.ceil(ctx.sampleRate*duration),ctx.sampleRate),data=buffer.getChannelData(0);
+ let filtered=0,phase=0;const rate=ctx.sampleRate;
+ for(let i=0;i<data.length;i++){
+ const sec=i/rate,x=sec/duration,attack=Math.min(1,sec/(dino?.3:.17));
+ const envelope=attack*Math.pow(Math.max(0,1-x),dino?.8:1.3);
+ const pitch=(dino?58:106)*(1-.36*x)+(dino?7:13)*Math.sin(sec*(dino?5:9));
+ phase+=2*Math.PI*pitch/rate;
+ const throat=Math.sin(phase)+.32*Math.sin(phase*2)+.12*Math.sin(phase*3);
+ filtered=.985*filtered+.015*(Math.random()*2-1);
+ const chuff=dino?(.85+.15*Math.sin(sec*17)):(.65+.35*Math.pow(Math.sin(sec*23),2));
+ data[i]=Math.tanh((throat*.46+filtered*.36)*chuff)*envelope*.58;
  }
- const source=ctx.createBufferSource(),low=ctx.createBiquadFilter(),presence=ctx.createBiquadFilter(),gain=ctx.createGain();source.buffer=buffer;
- low.type='lowpass';low.frequency.setValueAtTime(dino?750:1350,t);low.frequency.exponentialRampToValueAtTime(dino?160:330,t+duration);
- presence.type='peaking';presence.frequency.value=dino?260:480;presence.Q.value=.7;presence.gain.value=dino?8:6;
- gain.gain.value=dino?.8:.7;source.connect(low);low.connect(presence);presence.connect(gain);gain.connect(effects);
- sources.add(source);source.onended=()=>{sources.delete(source);source.disconnect();low.disconnect();presence.disconnect();gain.disconnect();};source.start(t);source.stop(t+duration);
- if(dino){tone(96,t,.65,'sawtooth',effects,54);tone(63,t+.38,1.3,'sawtooth',effects,34);tone(48,t+.9,.85,'triangle',effects,27);}
- else{tone(170,t,.28,'sawtooth',effects,103);tone(126,t+.22,.6,'sawtooth',effects,74);tone(108,t+.72,.65,'triangle',effects,61);}
+ const source=ctx.createBufferSource(),low=ctx.createBiquadFilter(),gain=ctx.createGain();source.buffer=buffer;
+ low.type='lowpass';low.frequency.setValueAtTime(dino?620:1050,t);low.frequency.exponentialRampToValueAtTime(dino?240:390,t+duration);
+ gain.gain.value=.62;source.connect(low);low.connect(gain);gain.connect(effects);
+ sources.add(source);source.onended=()=>{sources.delete(source);source.disconnect();low.disconnect();gain.disconnect();};source.start(t);source.stop(t+duration);
  return;
  }
  const patterns={tap:[660],feed:[240,300,220],pet:[660,880],soap:[390,520,650],clean:[500,780],sleep:[520,390,260],wake:[390,520,780],win:[523,659,784,1047],buy:[784,1047],match:[659,880],wrong:[220,170],jump:[300],adopt:[523,659,784,1047]};
