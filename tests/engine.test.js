@@ -145,6 +145,7 @@ test('cada cocô diminui 15 de higiene, além da sujeira acumulada',()=>{
  const second=tick(p,1000+90*60000);
  assert.equal(second.waste,2);
  // Ao longo de 90min, dois cocôs custam 30 pontos, além do desgaste e sujeira.
- assert.ok(Math.abs(second.stats.hygiene-53.2)<1e-9,second.stats.hygiene);
+ // O tick longo divide o tempo em blocos de até 1h: 100-15-30-1,6 = 53,4.
+ assert.ok(Math.abs(second.stats.hygiene-53.4)<1e-9,second.stats.hygiene);
  assert.equal(care(second,'bath').stats.hygiene,100,'banho continua gratuito e restaura toda higiene');
 });
