@@ -303,4 +303,4 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
 .dialog canvas.fruit-merge-canvas{display:block;width:100%;height:auto;max-height:calc(100dvh - 205px);aspect-ratio:9/13;border:3px solid #e4c7bf;border-radius:20px;touch-action:none;background:#fff5e8}
 @media(max-width:430px){.fruit-merge-dialog{padding:10px}.fruit-merge-dialog h2{font-size:22px}.fruit-merge-hud{font-size:12px}.fruit-merge-hud strong{font-size:16px}.dialog canvas.fruit-merge-canvas{max-height:calc(100dvh - 190px)}}
 
-.world.night .landscape .sky-moon-icon{width:40px;height:40px;filter:drop-shadow(0 0 7px #fff0a8);transform:translate(-3px,-1px)}
+.world.night .landscape .sky-moon-icon{width:47px;height:47px;filter:drop-shadow(0 0 5px #fff7cb) drop-shadow(0 0 11px #ffe58a);transform:translate(-5px,-3px)}
