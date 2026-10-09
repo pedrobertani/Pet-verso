@@ -18,11 +18,12 @@ test('estegossauro realmente aponta para a esquerda durante os três pulos de vo
    draw:()=>petDrawing({...species,growthLevel:2,walking:true},'happy'),
    sound:()=>{},reducedMotion:false
   });
-  const turning=face.getAnimations().find(a=>a.effect?.getKeyframes().some(k=>k.transform==='scaleX(-1)'));
+  const svg=face.querySelector('svg');
+  const turning=svg.getAnimations().find(a=>a.effect?.getKeyframes().some(k=>k.transform==='scaleX(-1)'));
   const moving=target.getAnimations().find(a=>a.effect?.getKeyframes().some(k=>k.translate==='25px -18px'));
   if(turning)turning.currentTime=2100;
-  const matrix=getComputedStyle(face).transform;
-  const flipped=matrix.startsWith('matrix(-1,')||matrix.startsWith('matrix3d(-1,');
+  const matrix=getComputedStyle(svg).transform;
+  const flipped=/matrix\(-1(?:[,. ]|$)/.test(matrix)||matrix.startsWith('matrix3d(-1,');
   const paused=target.style.animationPlayState==='paused';
   stop();
   const restored=face.style.getPropertyValue('transform')==='none'&&face.style.getPropertyPriority('transform')==='important';
