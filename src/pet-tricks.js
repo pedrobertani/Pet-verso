@@ -40,6 +40,8 @@ export function animateTrick(target,id,{draw,sound=()=>{},reducedMotion=false,on
  // Use the original species drawing for tricks that need a true body or trunk anchor.
  const needsCanonicalArt=id==='selva-2'||id==='dinos-3';
  if(typeof draw==='function'&&(needsCanonicalArt||!face.querySelector('svg')))face.innerHTML=draw();
+ const previousWalkState=target.style.animationPlayState;
+ target.style.animationPlayState='paused';
  target.classList.add('performing-trick');
  const svg=face.querySelector('svg'),animations=[],effects=[];let disposed=false;
  const part=(selector,frames,duration=2400,origin='50% 50%',options={})=>{for(const el of selector==='root'?[svg]:svg.querySelectorAll(selector)){el.style.transformBox='fill-box';el.style.transformOrigin=origin;animations.push(el.animate(frames,{duration:reducedMotion?800:duration,easing:'ease-in-out',fill:'none',...options}));}};
@@ -109,6 +111,6 @@ export function animateTrick(target,id,{draw,sound=()=>{},reducedMotion=false,on
  case 'spin':part('root',motion(['rotate(0deg)','rotate(360deg)']),1600);break;
  case 'flame':effect('<svg viewBox="0 0 120 60"><path d="M4 30Q45 10 51 17L76 3 69 21 109 13 94 30 116 42 71 40 82 57 44 44Q26 38 4 30Z" fill="#ff9364"/><path d="M7 30Q42 22 69 26l-8 6 14 7Q40 39 7 30" fill="#ffe391"/></svg>','trick-flame');part('.pet-head',motion(['rotate(0)','rotate(-5deg)','rotate(0)']),2400);sound('jump');break;
  }
- function finish(){if(disposed)return;disposed=true;clearTimeout(timer);animations.forEach(a=>a.cancel());effects.forEach(e=>e.remove());if(needsCanonicalArt&&face.isConnected)face.innerHTML=originalMarkup;target.classList.remove('performing-trick');onEnd();}
+ function finish(){if(disposed)return;disposed=true;clearTimeout(timer);animations.forEach(a=>a.cancel());effects.forEach(e=>e.remove());if(needsCanonicalArt&&face.isConnected)face.innerHTML=originalMarkup;target.style.animationPlayState=previousWalkState;target.classList.remove('performing-trick');onEnd();}
  const timer=setTimeout(finish,reducedMotion?850:duration);return finish;
 }
