@@ -304,3 +304,24 @@ body.modal-open{overflow:hidden;overscroll-behavior:none}.overlay{overscroll-beh
 @media(max-width:430px){.fruit-merge-dialog{padding:10px}.fruit-merge-dialog h2{font-size:22px}.fruit-merge-hud{font-size:12px}.fruit-merge-hud strong{font-size:16px}.dialog canvas.fruit-merge-canvas{max-height:calc(100dvh - 190px)}}
 
 .world.night .landscape .sky-moon-icon{width:47px;height:47px;filter:drop-shadow(0 0 5px #fff7cb) drop-shadow(0 0 11px #ffe58a);transform:translate(-5px,-3px)}
+
+/* Unified pastel game cards and scene frames. */
+.game-grid{align-items:stretch}
+.game-card{min-height:174px;align-items:center;text-align:center;padding:20px 14px 16px;border:3px solid #ead8c3;border-radius:22px;background:linear-gradient(145deg,#fffdf7,#fff2e4);box-shadow:0 5px 0 #dfc7a9;transition:transform .16s ease,box-shadow .16s ease}
+.game-card>span{display:grid;place-items:center;width:66px;height:66px;margin:0 0 12px;padding:0;border:2px solid #fff8e9;border-radius:20px;box-shadow:0 3px 0 #ddc8ae}
+.game-card>span .icon{width:43px;height:43px}
+.game-card strong{display:flex;align-items:center;justify-content:center;min-height:2.35em;line-height:1.08;text-align:center}
+.game-card small{display:block;margin-top:auto;padding-top:8px;color:#7c7668}
+.game-card:nth-child(3n+1)>span{background:#ffe7a9;color:#9259bd}
+.game-card:nth-child(3n+2)>span{background:#ccefeb;color:#248a9a}
+.game-card:nth-child(3n)>span{background:#f8d9e5;color:#b85f88}
+.game-card:active{transform:translateY(3px);box-shadow:0 2px 0 #dfc7a9}
+.playground.world,.garden.world{width:100%;max-width:100%;height:440px;min-height:440px;aspect-ratio:auto}
+@media(max-width:600px){
+ .game-card{min-height:164px;padding:17px 10px 14px}
+ .game-card>span{width:60px;height:60px;border-radius:18px}
+ .game-card>span .icon{width:39px;height:39px}
+ .playground.world,.garden.world{height:410px;min-height:410px;aspect-ratio:auto}
+}
+[data-theme="dark"] .game-card{background:linear-gradient(145deg,#38374f,#2d2d45);border-color:#56516c;box-shadow:0 5px 0 #1e2032}
+[data-theme="dark"] .game-card>span{border-color:#736985;box-shadow:0 3px 0 #202237}
