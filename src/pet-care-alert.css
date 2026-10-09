@@ -12,6 +12,11 @@
  --care-thought-shadow:#282238;
  --care-thought-ink:#fff2f9;
 }
+/* Anchor each thought to its own pet card, never to the outer dialog. */
+.pet-switch-dialog .pet-switch-option[data-switch-born]{
+ position:relative!important;
+ isolation:isolate;
+}
 .pet-switch-dialog .pet-switch-option>.pet-care-thought{
  position:absolute!important;
  z-index:4;
