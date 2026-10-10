@@ -30,8 +30,7 @@ export const tricks={
  'sombrios-frankie':['short-circuit','Curto-circuito'],'sombrios-6':['bandage-whirl','Redemoinho de faixas'],
  'sombrios-0':['vanish','Desaparecer'],'sombrios-1':['spin','Girar no ar'],'sombrios-dragon':['flame','Cuspir uma pequena chama']
 };
-export const halloweenSkillPreview=p=>['sombrios-frankie','sombrios-6'].includes(p?.species);
-export function trickState(p,now=Date.now()){return {locked:!halloweenSkillPreview(p)&&p.stats.intelligence<50,blocked:!!(p.sleeping||p.dead),remaining:Math.max(0,Math.ceil(((p.skills?.trickUntil||0)-now)/1000))};}
+export function trickState(p,now=Date.now()){return {locked:p.stats.intelligence<50,blocked:!!(p.sleeping||p.dead),remaining:Math.max(0,Math.ceil(((p.skills?.trickUntil||0)-now)/1000))};}
 export function startTrick(p,now=Date.now()){const state=trickState(p,now);if(state.locked||state.blocked||state.remaining||!tricks[p.species])return false;p.skills={...p.skills,trickUntil:now+TRICK_COOLDOWN};return true;}
 // Animate existing anatomy, preserving the growth wrappers around each part.
 export function animateTrick(target,id,{draw,sound=()=>{},reducedMotion=false,onEnd=()=>{}}={}){
