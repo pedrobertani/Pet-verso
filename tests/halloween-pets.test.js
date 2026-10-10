@@ -31,11 +31,13 @@ for(const [id,trick,toy] of pets){
  test(`Halloween ${id}: níveis 50 e 75`,()=>{
   assert.equal(tricks[id][0],trick);assert.equal(parkActions[id],toy);
   const pet=fresh(id,id),now=10000;
-  assert.equal(startTrick(pet,now),false);
+  assert.equal(startTrick(pet,now),true,'prévia libera truque sem inteligência');
+  pet.skills.trickUntil=0;
   pet.stats.intelligence=TRICK_INTELLIGENCE;
   assert.equal(startTrick(pet,now),true);
   assert.equal(startTrick(pet,now),false,'cooldown 50');
-  assert.equal(startParkAction(pet,now),false);
+  assert.equal(startParkAction(pet,now),true,'prévia libera brinquedo sem inteligência');
+  pet.skills.parkUntil=0;
   pet.stats.intelligence=PARK_INTELLIGENCE;
   assert.equal(startParkAction(pet,now),true);
   assert.equal(startParkAction(pet,now),false,'cooldown 75');
