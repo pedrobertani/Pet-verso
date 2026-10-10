@@ -87,6 +87,14 @@ shop.push(...[
 {id:'bench-painted',name:'Banco laqueado',price:250,slot:'garden-bench',room:'garden',paint:'full'},
 {id:'lamp-painted',name:'Abajur laqueado',price:180,slot:'lamp',room:'bedroom',paint:'full'}]);
 shop.push(...parkToys);
+shop.push(...[
+{id:'halloween-pumpkin-table',name:'Mesa de abóbora',icon:'🎃',price:220,slot:'table',room:'living',theme:'halloween'},
+{id:'halloween-candles',name:'Velas encantadas',icon:'🕯️',price:260,slot:'lamp',room:'bedroom',theme:'halloween'},
+{id:'halloween-rug',name:'Tapete de teia',icon:'🕸️',price:150,slot:'rug',room:'living',theme:'halloween'},
+{id:'halloween-bed',name:'Caminha de abóbora',icon:'🎃',price:320,slot:'bed',room:'bedroom',theme:'halloween'},
+{id:'halloween-shelf',name:'Estante assombrada',icon:'👻',price:300,slot:'shelf',room:'living',theme:'halloween'}
+]);
+
 export function buy(p,id,color){const item=shop.find(x=>x.id===id);const n=structuredClone(p);if(n.dead)return n;n.inventory??=[];n.equipped??={};if(!item||(item.species&&item.species!==n.species)||color!==undefined&&!validItemColor(color))return n;if(n.inventory.includes(id)){n.equipped[item.slot]=id;if(color){n.itemColors??={};n.itemColors[id]=color;}return n;}if(n.coins<item.price)return n;n.coins-=item.price;n.inventory.push(id);n.equipped[item.slot]=id;if(color){n.itemColors??={};n.itemColors[id]=color;}return n;}
 
 export const REVIVE_PRICE=300;
