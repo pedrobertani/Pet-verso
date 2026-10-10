@@ -9,7 +9,7 @@ export const environments = [
  {id:'tropical',name:'Jardim tropical',pets:['exoticos-1','exoticos-7'],description:'Camaleão e tartaruga'},
  {id:'ice',name:'Refúgio de gelo',pets:['selva-polar','exoticos-penguin'],description:'Urso polar e pinguim'},
  {id:'prehistoric',name:'Vale dos dinossauros',pets:['dinos-0','dinos-1','dinos-2','dinos-3','dinos-pterosaur'],description:'Todos os dinossauros'},
- {id:'haunted',name:'Castelinho encantado',pets:['sombrios-0','sombrios-1'],description:'Fantasminha e morcego'},
+ {id:'haunted',name:'Castelinho encantado',pets:['sombrios-0','sombrios-1','sombrios-frankie','sombrios-6'],description:'Fantasminha e morcego'},
  {id:'volcanic',name:'Vale do dragão',pets:['sombrios-dragon'],description:'Dragãozinho'},
  {id:'aquarium',name:'Aquário do axolote',pets:['exoticos-0'],description:'Axolote'}
 ];
