@@ -8,7 +8,8 @@ export const parkActions={
  'sombrios-frankie':'lightning-generator','sombrios-6':'sarcophagus','sombrios-0':'hoop','sombrios-1':'hoop','sombrios-dragon':'dragon-hoop','selva-owl':'hoop','dinos-pterosaur':'hoop','exoticos-frog':'lily-pool'
 };
 export const supportedParkActions=Object.keys(parkActions);
-export function parkActionState(p,now=Date.now()){return {locked:p.stats.intelligence<PARK_INTELLIGENCE,blocked:!!(p.sleeping||p.dead),remaining:Math.max(0,Math.ceil(((p.skills?.parkUntil||0)-now)/1000))};}
+export const halloweenParkPreview=p=>['sombrios-frankie','sombrios-6'].includes(p?.species);
+export function parkActionState(p,now=Date.now()){return {locked:!halloweenParkPreview(p)&&p.stats.intelligence<PARK_INTELLIGENCE,blocked:!!(p.sleeping||p.dead),remaining:Math.max(0,Math.ceil(((p.skills?.parkUntil||0)-now)/1000))};}
 export function startParkAction(p,now=Date.now()){const s=parkActionState(p,now);if(s.locked||s.blocked||s.remaining||!supportedParkActions.includes(p.species))return false;p.skills={...p.skills,parkUntil:now+PARK_COOLDOWN};return true;}
 export function animateParkAction(world,target,id,{level=2,reducedMotion=false,onEnd=()=>{}}={}){
  if(!supportedParkActions.includes(id))return ()=>{};
