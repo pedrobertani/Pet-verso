@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {fresh} from '../src/engine.js';
-import {normalizeCollection,activePet,saveActive,switchActive,adoptionPrice,addPet,removePet,needyPets,MAX_PETS} from '../src/pet-collection.js';
+import {normalizeCollection,activePet,saveActive,switchActive,adoptionPrice,addPet,removePet,needyPets,MAX_PETS,EXTRA_PET_PRICE} from '../src/pet-collection.js';
 
 test('migra o save antigo sem perder progresso, itens ou moedas',()=>{
  const old=fresh('pets-0','Lua',1000);old.coins=432;old.stats.intelligence=37;old.inventory=['bed-cloud'];
@@ -10,12 +10,13 @@ test('migra o save antigo sem perder progresso, itens ou moedas',()=>{
  assert.equal(activePet(collection).stats.intelligence,37);assert.deepEqual(activePet(collection).inventory,['bed-cloud']);
 });
 
-test('segundo pet é gratuito e terceiro custa cinco mil moedas',()=>{
- let collection=normalizeCollection(fresh('pets-0','Lua',1000),1000);collection.wallet=5000;collection.pets[0].coins=5000;
+test('segundo pet é gratuito e terceiro custa 2000 moedas',()=>{
+ assert.equal(EXTRA_PET_PRICE,2000);
+ let collection=normalizeCollection(fresh('pets-0','Lua',1000),1000);collection.wallet=2000;collection.pets[0].coins=2000;
  assert.equal(adoptionPrice(collection),0);
- let result=addPet(collection,fresh('dinos-0','Rex',2000));assert.equal(result.ok,true);assert.equal(result.collection.wallet,5000);
- assert.equal(adoptionPrice(result.collection),5000);
- result=addPet(result.collection,fresh('selva-0','Léo',3000));assert.equal(result.ok,true);assert.equal(result.collection.wallet,0);
+ let result=addPet(collection,fresh('dinos-0','Rex',2000));assert.equal(result.ok,true);assert.equal(result.collection.wallet,2000);
+ assert.equal(adoptionPrice(result.collection),2000);
+ result=addPet(result.collection,fresh('selva-0','Léo',3000));assert.equal(result.ok,true);assert.equal(result.price,2000);assert.equal(result.collection.wallet,0);
  assert.ok(result.collection.pets.every(p=>p.coins===0));
 });
 
@@ -43,7 +44,7 @@ test('coleção aceita no máximo três pets e remoção preserva a carteira',()
  assert.equal(collection.pets.length,MAX_PETS);
  const blocked=addPet(collection,fresh('pets-1','Bolt',4000));assert.equal(blocked.ok,false);assert.equal(blocked.reason,'limit');
  const removed=removePet(collection,3000);assert.equal(removed.ok,true);assert.equal(removed.collection.pets.length,2);
- assert.equal(removed.collection.wallet,5000);assert.ok(removed.collection.pets.every(p=>p.coins===5000));
+ assert.equal(removed.collection.wallet,8000);assert.ok(removed.collection.pets.every(p=>p.coins===8000));
  assert.equal(removePet(normalizeCollection(fresh('pets-0','Único',5000),5000),5000).ok,false);
 });
 
@@ -51,9 +52,28 @@ test('coleção aceita no máximo três pets e remoção preserva a carteira',()
 test('terceira vaga é comprada uma vez e reutilizada sem nova cobrança',()=>{
  let collection=normalizeCollection(fresh('pets-0','Lua',1000),1000);collection.wallet=10000;collection.pets[0].coins=10000;
  collection=addPet(collection,fresh('dinos-0','Rex',2000)).collection;
- const third=addPet(collection,fresh('selva-0','Léo',3000));assert.equal(third.price,5000);collection=third.collection;
- assert.equal(collection.unlockedSlots,3);assert.equal(collection.wallet,5000);
+ const third=addPet(collection,fresh('selva-0','Léo',3000));assert.equal(third.price,2000);collection=third.collection;
+ assert.equal(collection.unlockedSlots,3);assert.equal(collection.wallet,8000);
  collection=removePet(collection,3000).collection;assert.equal(adoptionPrice(collection),0);
  const replacement=addPet(collection,fresh('pets-1','Bolt',4000));assert.equal(replacement.ok,true);assert.equal(replacement.price,0);
- assert.equal(replacement.collection.wallet,5000);assert.equal(replacement.collection.unlockedSlots,3);
+ assert.equal(replacement.collection.wallet,8000);assert.equal(replacement.collection.unlockedSlots,3);
+});
+
+test('a terceira vaga exige 2000 moedas, rejeita saldo insuficiente e cobra uma única vez',()=>{
+ let collection=normalizeCollection(fresh('pets-0','Lua',1000),1000);
+ collection.wallet=1999;collection.pets[0].coins=1999;
+ collection=addPet(collection,fresh('dinos-0','Rex',2000)).collection;
+ const blocked=addPet(collection,fresh('selva-0','Léo',3000));
+ assert.equal(blocked.ok,false);assert.equal(blocked.reason,'coins');
+ assert.equal(blocked.price,2000);
+ assert.equal(blocked.collection.wallet,1999);
+ assert.equal(blocked.collection.pets.length,2);
+ collection.wallet=2001;for(const p of collection.pets)p.coins=2001;
+ const unlocked=addPet(collection,fresh('selva-0','Léo',3000));
+ assert.equal(unlocked.ok,true);assert.equal(unlocked.collection.wallet,1);
+ assert.equal(unlocked.collection.unlockedSlots,3);
+ const available=removePet(unlocked.collection,3000).collection;
+ assert.equal(adoptionPrice(available),0);
+ const again=addPet(available,fresh('pets-1','Bolt',4000));
+ assert.equal(again.price,0);assert.equal(again.collection.wallet,1);
 });
