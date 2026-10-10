@@ -112,9 +112,28 @@ export function blocksGame(area,api){
   function makeTray(){const d=prototypeDifficulty('blocks',level),pool=blockShapes.filter((_,i)=>i<5||Math.random()<d.largeChance);return Array.from({length:3},(_,id)=>({id,shape:pick(pool),color:1+Math.floor(Math.random()*d.colors)}));}
   const lineGoal=()=>Math.min(6,2+Math.floor((level-1)/4));
   function clearLines(){let lines=0;for(let r=0;r<size;r++)if(board[r].every(Boolean)){board[r].fill(0);lines++;}for(let c=0;c<size;c++)if(board.every(row=>row[c])){board.forEach(row=>row[c]=0);lines++;}return lines;}
-  function anchor(shape,row,col){const width=Math.max(...shape.map(p=>p[0]))+1,height=Math.max(...shape.map(p=>p[1]))+1;return [clamp(row,0,size-height),clamp(col,0,size-width)];}
-  function preview(row,col){area.querySelectorAll('[data-cell]').forEach(cell=>cell.classList.remove('drop-preview','drop-invalid'));if(!selected)return;const [r,c]=anchor(selected.shape,row,col),ok=canPlace(board,selected.shape,r,c);selected.shape.forEach(([x,y])=>area.querySelector(`[data-cell="${r+y},${c+x}"]`)?.classList.add(ok?'drop-preview':'drop-invalid'));}
-  function place(row,col){if(!selected||stopped)return;const [r,c]=anchor(selected.shape,row,col);if(!canPlace(board,selected.shape,r,c)){api.sound('wrong');preview(row,col);return;}selected.shape.forEach(([x,y])=>board[r+y][c+x]=selected.color);score+=selected.shape.length;tray=tray.filter(piece=>piece.id!==selected.id);selected=null;const lines=clearLines();if(lines){linesDone+=lines;score+=lines*(5+Math.min(level,10));api.sound('match');}else api.sound('tap');api.onScore(score);if(linesDone>=lineGoal()){score+=10+level*2;api.onScore(score);level++;setTimeout(next,550);return;}if(!tray.length)tray=makeTray();if(!tray.some(piece=>available(piece.shape))){stopped=true;setTimeout(()=>api.onEnd(score),400);return;}draw();}
+  // O ponto escolhido é o início da peça; nunca deslocar silenciosamente.
+  function validAnchor(shape,row,col){
+    return shape.every(([x,y])=>row+y>=0&&row+y<size&&col+x>=0&&col+x<size);
+  }
+  function clearPreview(){area.querySelectorAll('[data-cell]').forEach(cell=>cell.classList.remove('drop-preview','drop-invalid'));}
+  function preview(row,col){
+    clearPreview();
+    if(!selected)return;
+    const ok=validAnchor(selected.shape,row,col)&&canPlace(board,selected.shape,row,col);
+    selected.shape.forEach(([x,y])=>area.querySelector(`[data-cell="${row+y},${col+x}"]`)?.classList.add(ok?'drop-preview':'drop-invalid'));
+  }
+  function place(row,col){
+    if(!selected||stopped)return;
+    if(!validAnchor(selected.shape,row,col)||!canPlace(board,selected.shape,row,col)){api.sound('wrong');preview(row,col);return;}
+    selected.shape.forEach(([x,y])=>board[row+y][col+x]=selected.color);
+    score+=selected.shape.length;tray=tray.filter(piece=>piece.id!==selected.id);selected=null;
+    const lines=clearLines();if(lines){linesDone+=lines;score+=lines*(5+Math.min(level,10));api.sound('match');}else api.sound('tap');
+    api.onScore(score);if(linesDone>=lineGoal()){score+=10+level*2;api.onScore(score);level++;setTimeout(next,550);return;}
+    if(!tray.length)tray=makeTray();
+    if(!tray.some(piece=>available(piece.shape))){stopped=true;setTimeout(()=>api.onEnd(score),400);return;}
+    draw();
+  }
   function next(){const d=prototypeDifficulty('blocks',level);linesDone=0;board=empty();seed(d.seeded,d.colors);tray=makeTray();draw();}
   function draw(){
     area.innerHTML=`${gameHeader(score,level,`Linhas ${linesDone}/${lineGoal()}`)}<div class="block-board" style="--block-size:${size}">${board.flatMap((row,r)=>row.map((value,c)=>`<button data-cell="${r},${c}" class="block-color-${value}" aria-label="Linha ${r+1}, coluna ${c+1}"></button>`)).join('')}</div><p class="proto-help">Arraste a peça para o tabuleiro ou toque na peça e na célula onde ela deve começar.</p><div class="block-tray">${tray.map(piece=>{const width=Math.max(...piece.shape.map(p=>p[0]))+1,height=Math.max(...piece.shape.map(p=>p[1]))+1;return `<button data-piece="${piece.id}" class="${selected?.id===piece.id?'selected':''}"><i class="piece-preview" style="--pw:${width};--ph:${height}">${piece.shape.map(([x,y])=>`<span class="block-color-${piece.color}" style="--x:${x};--y:${y}"></span>`).join('')}</i></button>`;}).join('')}</div>`;
@@ -122,15 +141,40 @@ export function blocksGame(area,api){
       let start=null,moved=false,suppressClick=false,lastCell='';
       const choose=()=>{selected=tray.find(piece=>piece.id===+button.dataset.piece);area.querySelectorAll('[data-piece]').forEach(x=>x.classList.toggle('selected',x===button));api.sound('tap');};
       const resetDrag=()=>{button.classList.remove('piece-dragging');button.style.removeProperty('--piece-x');button.style.removeProperty('--piece-y');};
-      button.onclick=()=>{if(suppressClick){suppressClick=false;return;}choose();};
-      button.onpointerdown=event=>{choose();start=[event.clientX,event.clientY];moved=false;lastCell='';button.setPointerCapture?.(event.pointerId);};
-      button.onpointermove=event=>{
-        if(!selected||!start)return;const dx=event.clientX-start[0],dy=event.clientY-start[1];if(Math.hypot(dx,dy)>6)moved=true;if(!moved)return;
-        event.preventDefault();button.classList.add('piece-dragging');button.style.setProperty('--piece-x',`${dx}px`);button.style.setProperty('--piece-y',`${dy}px`);
-        const cell=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-cell]');if(cell&&area.contains(cell)&&cell.dataset.cell!==lastCell){lastCell=cell.dataset.cell;const [row,col]=lastCell.split(',').map(Number);preview(row,col);}
+      // O offset entre o dedo e o primeiro bloco é preservado durante o arraste.
+      const cellAt=(event)=>{
+        const boardElement=area.querySelector('.block-board');
+        if(!boardElement||!start)return null;
+        const cells=boardElement.querySelectorAll('[data-cell]');
+        const first=cells[0];if(!first)return null;
+        const rect=first.getBoundingClientRect(),stepX=cells[1].getBoundingClientRect().left-rect.left,stepY=cells[size].getBoundingClientRect().top-rect.top;
+        if(stepX<=0||stepY<=0)return null;
+        const x=event.clientX-start.offsetX,y=event.clientY-start.offsetY;
+        const col=Math.round((x-rect.left)/stepX),row=Math.round((y-rect.top)/stepY);
+        // Fora do tabuleiro não existe encaixe automático.
+        if(x<rect.left-stepX/2||y<rect.top-stepY/2||col>=size||row>=size||col<0||row<0)return null;
+        return [row,col];
       };
-      button.onpointerup=event=>{const cell=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-cell]');resetDrag();start=null;if(moved)suppressClick=true;if(cell&&area.contains(cell)){event.preventDefault();const [row,col]=cell.dataset.cell.split(',').map(Number);place(row,col);}};
-      button.onpointercancel=()=>{resetDrag();start=null;moved=false;};
+      button.onclick=()=>{if(suppressClick){suppressClick=false;return;}choose();};
+      button.onpointerdown=event=>{
+        choose();const previewElement=button.querySelector('.piece-preview'),previewRect=previewElement.getBoundingClientRect();
+        const previewCell=previewElement.querySelector('span')?.getBoundingClientRect();
+        const cellWidth=previewCell?.width||previewRect.width,cellHeight=previewCell?.height||previewRect.height;
+        start={x:event.clientX,y:event.clientY,offsetX:event.clientX-previewRect.left-cellWidth/2,offsetY:event.clientY-previewRect.top-cellHeight/2};
+        moved=false;lastCell='';button.setPointerCapture?.(event.pointerId);
+      };
+      button.onpointermove=event=>{
+        if(!selected||!start)return;const dx=event.clientX-start.x,dy=event.clientY-start.y;
+        if(Math.hypot(dx,dy)>6)moved=true;if(!moved)return;
+        event.preventDefault();button.classList.add('piece-dragging');button.style.setProperty('--piece-x',`${dx}px`);button.style.setProperty('--piece-y',`${dy}px`);
+        const cell=cellAt(event),key=cell?.join(',')||'';
+        if(key!==lastCell){lastCell=key;if(cell)preview(...cell);else clearPreview();}
+      };
+      button.onpointerup=event=>{
+        const cell=moved?cellAt(event):null;resetDrag();start=null;
+        if(moved){suppressClick=true;if(cell){event.preventDefault();place(...cell);}else clearPreview();}
+      };
+      button.onpointercancel=()=>{resetDrag();start=null;moved=false;clearPreview();};
     });
     area.querySelectorAll('[data-cell]').forEach(button=>{
       button.onpointerenter=()=>{if(selected){const [row,col]=button.dataset.cell.split(',').map(Number);preview(row,col);}};
