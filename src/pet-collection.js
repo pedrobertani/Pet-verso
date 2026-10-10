@@ -1,7 +1,7 @@
 import {tick,valid} from './engine.js';
 
 export const MULTI_PET_REVISION=2;
-export const EXTRA_PET_PRICE=5000;
+export const EXTRA_PET_PRICE=2000;
 export const MAX_PETS=3;
 export const FREE_PET_SLOTS=2;
 
