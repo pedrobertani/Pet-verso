@@ -5,7 +5,7 @@ import {thoughtNeeds} from '../src/pet-thoughts.js';import {colorfulIcon} from '
 test('cada espécie tem exatamente um tipo alimentar, inclusive saves antigos',()=>{
  const ids=Object.values(dietGroups).flat();assert.equal(new Set(ids).size,ids.length);
  for(const s of species){assert.ok(ids.includes(s.id),s.id);assert.ok(diets[s.diet]);assert.ok(colorfulIcon(foodIcon(s.id)));}
- assert.equal(activeSpecies.length,25);
+ assert.equal(activeSpecies.length,27);
 });
 test('pensamento de fome usa a mesma comida da espécie',()=>{
  for(const id of ['selva-0','pets-2','pets-1']){const p=fresh(id,'Pet');p.stats.food=30;assert.equal(thoughtNeeds(p,'living')[0].icon,foodIcon(id));}
