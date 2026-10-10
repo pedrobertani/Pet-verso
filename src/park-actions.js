@@ -56,6 +56,13 @@ export function animateParkAction(world,target,id,{level=2,reducedMotion=false,o
  case 'lightning-generator':{
  const at=point(85,148);travel(at,.74);returnTurn(.76);
  toyPart('.toy-lightning',[{opacity:.1,filter:'drop-shadow(0 0 0px #ffe786)'},{opacity:1,filter:'drop-shadow(0 0 10px #ffe786)'},{opacity:.1}],{delay:reducedMotion?150:1500,duration:reducedMotion?600:800,iterations:reducedMotion?2:4});
+ // Brief x-ray flash over Frankie's body: cute cartoon bones, not a full replacement sprite.
+ const skeleton=document.createElement('div');skeleton.className='park-action-effect frankie-xray';
+ Object.assign(skeleton.style,{position:'absolute',left:`${p.left-w.left}px`,top:`${p.top-w.top}px`,width:`${p.width}px`,height:`${p.height}px`,pointerEvents:'none',zIndex:'24',opacity:'0',display:'grid',placeItems:'center',filter:'drop-shadow(0 0 7px #d8faff)'});
+ skeleton.innerHTML=`<svg viewBox="0 0 100 130" width="100%" height="100%" aria-hidden="true"><g fill="none" stroke="#ecffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><circle cx="50" cy="31" r="22" fill="#a3e7ff" fill-opacity=".25"/><circle cx="42" cy="29" r="3" fill="#ecffff"/><circle cx="58" cy="29" r="3" fill="#ecffff"/><path d="M45 41Q50 46 55 41M50 53V104M30 66Q50 78 70 66M32 77Q50 89 68 77M37 89Q50 97 63 89M50 58L26 84M50 58L74 84M50 103L35 120M50 103L65 120"/></g></svg>`;
+ world.append(skeleton);effects.push(skeleton);
+ animate(skeleton,[{offset:0,opacity:0},{offset:.25,opacity:0},{offset:.28,opacity:.95},{offset:.32,opacity:0},{offset:.39,opacity:0},{offset:.42,opacity:1},{offset:.46,opacity:0},{offset:.54,opacity:0},{offset:.57,opacity:.85},{offset:.61,opacity:0},{offset:1,opacity:0}]);
+ animate(face,[{offset:0,transform:'perspective(480px) rotateY(0deg) scaleX(1)'},{offset:.16,transform:'perspective(480px) rotateY(-17deg) scaleX(1.04)'},{offset:.29,transform:'perspective(480px) rotateY(-25deg) scaleX(1.09)'},{offset:.52,transform:'perspective(480px) rotateY(-19deg) scaleX(1.06)'},{offset:.75,transform:'perspective(480px) rotateY(-12deg) scaleX(1.03)'},{offset:1,transform:'perspective(480px) rotateY(0deg) scaleX(1)'}]);
  part('.pet-head',[{rotate:'-5deg'},{rotate:'5deg'},{rotate:'-5deg'}],{delay:reducedMotion?150:1500,duration:reducedMotion?400:320,iterations:reducedMotion?2:8});break;}
  case 'sand-tsunami':{
  // Three distinct acts: sand rises from Mumi's hand, crests across camera, settles into sparkling dust.
