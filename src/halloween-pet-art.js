@@ -1,6 +1,6 @@
 // Halloween pets: separate anatomy groups for growth and directional movement.
 const g=(c,s)=>`<g class="${c}">${s}</g>`;
-const eyes=(m)=>['sleep','sleepy'].includes(m)?'<path d="M70 95q10 9 20 0M110 95q10 9 20 0" fill="none" stroke="#354255" stroke-width="3" stroke-linecap="round"/>':'<g class="eyes"><ellipse cx="80" cy="94" rx="8" ry="10" fill="#354255"/><ellipse cx="120" cy="94" rx="8" ry="10" fill="#354255"/><circle cx="82" cy="90" r="3" fill="white"/><circle cx="122" cy="90" r="3" fill="white"/></g>';
+const eyes=(m)=>['sleep','sleepy'].includes(m)?'<g class="eyes"><path d="M70 95q10 9 20 0M110 95q10 9 20 0" fill="none" stroke="#354255" stroke-width="3" stroke-linecap="round"/></g>':'<g class="eyes"><ellipse cx="80" cy="94" rx="8" ry="10" fill="#354255"/><ellipse cx="120" cy="94" rx="8" ry="10" fill="#354255"/><circle cx="82" cy="90" r="3" fill="white"/><circle cx="122" cy="90" r="3" fill="white"/></g>';
 const mouth=(m)=>['sleep','sleepy','sad','sick'].includes(m)?'<path class="mouth closed" d="M91 119q9 5 18 0" fill="none" stroke="#64536a" stroke-width="3"/>':'<path class="mouth closed" d="M89 117q11 15 22 0" fill="none" stroke="#64536a" stroke-width="3"/>';
 export function halloweenPet(s,m){
  const age=s.growthLevel??2,baby=age===0,young=age===1,headY=baby?101:young?97:92,headRx=baby?43:young?42:40,headRy=baby?42:young?39:37;
