@@ -65,8 +65,14 @@ export function animateParkAction(world,target,id,{level=2,reducedMotion=false,o
  animate(face,[{offset:0,transform:'perspective(480px) rotateY(0deg) scaleX(1)'},{offset:.16,transform:'perspective(480px) rotateY(-17deg) scaleX(1.04)'},{offset:.29,transform:'perspective(480px) rotateY(-25deg) scaleX(1.09)'},{offset:.52,transform:'perspective(480px) rotateY(-19deg) scaleX(1.06)'},{offset:.75,transform:'perspective(480px) rotateY(-12deg) scaleX(1.03)'},{offset:1,transform:'perspective(480px) rotateY(0deg) scaleX(1)'}]);
  part('.pet-head',[{rotate:'-5deg'},{rotate:'5deg'},{rotate:'-5deg'}],{delay:reducedMotion?150:1500,duration:reducedMotion?400:320,iterations:reducedMotion?2:8});break;}
  case 'sand-tsunami':{
- // Three distinct acts: sand rises from Mumi's hand, crests across camera, settles into sparkling dust.
- animate(target,[move(0,zero),move(.13,zero),move(.78,zero),move(1,zero)]);
+ // Mumi approaches the altar, touches its glowing rune, then summons the sand wave.
+ const altar=point(110,104),nearAltar={x:altar.x,y:altar.y+12};
+ animate(target,[move(0,zero),move(.14,nearAltar),move(.28,nearAltar),move(.39,zero),move(.78,zero),move(1,zero)]);
+ const rune=document.createElement('div');rune.className='park-action-effect mumi-altar-rune';
+ Object.assign(rune.style,{position:'absolute',left:`${b.left-w.left}px`,top:`${b.top-w.top}px`,width:`${b.width}px`,height:`${b.height}px`,pointerEvents:'none',zIndex:'19',opacity:'0'});
+ rune.innerHTML=`<svg viewBox="0 0 220 180" width="100%" height="100%" aria-hidden="true"><g fill="none" stroke="#fff4b8" stroke-linecap="round" stroke-linejoin="round"><path d="M110 69l12 19-12 15-12-15Z" stroke-width="5"/><path d="M76 111h68M84 135h52" stroke-width="4"/><circle cx="110" cy="88" r="28" stroke-width="3" stroke-dasharray="5 7"/></g><g fill="#fff3bd"><path d="M58 85l4-9 4 9 9 4-9 4-4 9-4-9-9-4ZM159 97l3-7 3 7 7 3-7 3-3 7-3-7-7-3Z"/></g></svg>`;
+ world.append(rune);effects.push(rune);
+ animate(rune,[{offset:0,opacity:0,filter:'drop-shadow(0 0 0px #ffe3a0)'},{offset:.15,opacity:0},{offset:.23,opacity:1,filter:'drop-shadow(0 0 12px #ffe3a0)'},{offset:.32,opacity:.85},{offset:.42,opacity:0},{offset:1,opacity:0}]);
  animate(face,[{offset:0,transform:'scaleX(1) rotateY(0deg)'},{offset:.13,transform:'scaleX(.83) rotateY(32deg)'},{offset:.75,transform:'scaleX(.83) rotateY(32deg)'},{offset:1,transform:'scaleX(1) rotateY(0deg)'}]);
  part('.pet-arm, .arm, .pet-arm-left, .pet-arm-right',[{offset:0,rotate:'0deg'},{offset:.14,rotate:'-70deg'},{offset:.73,rotate:'-70deg'},{offset:1,rotate:'0deg'}]);
  const wave=document.createElement('div');
