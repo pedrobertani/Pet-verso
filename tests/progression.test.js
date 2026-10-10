@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {fresh,reward,buy,valid} from '../src/engine.js';
 test('partidas longas acumulam pontos acima de 100 e preservam o maior recorde',()=>{
  let p=fresh('pets-0','Mimi');p=reward(p,650,false,'runner');
- assert.equal(p.totalPoints,650);assert.equal(p.records.runner,650);assert.equal(p.lastEarning,10,'partida excelente respeita teto de 10 moedas');
+ assert.equal(p.totalPoints,650);assert.equal(p.records.runner,650);assert.equal(p.lastEarning,15,'pontuação extraordinária no runner rende até 15 moedas');
  p=reward(p,180,false,'runner');assert.equal(p.totalPoints,830);assert.equal(p.records.runner,650);
  p=reward(p,240,false,'food');assert.equal(p.records.food,240);assert.equal(p.totalPoints,1070);assert.equal(valid(p),true);
 });
