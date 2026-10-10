@@ -23,7 +23,7 @@ test('pilha de frutas acima da linha termina mesmo se estiver tremendo e pulando
  assert.ok(danger>=FRUIT_OVERFLOW_SECONDS,'velocidade não pode impedir fim do jogo');
 });
 test('altura e idade, não velocidade, determinam a linha e o alerta diminui quando desobstrui',()=>{
- const stalled={y:FRUIT_LIMIT_Y+17,r:18,age:5,vy:0,dead:false};
+ const stalled={y:FRUIT_LIMIT_Y+18,r:18,age:5,vy:0,dead:false};
  const overflowing={...stalled,y:FRUIT_LIMIT_Y+17-1};
  assert.equal(fruitOverflowDanger([stalled],0,.1),0,'um pixel abaixo da linha não é derrota');
  assert.equal(fruitOverflowDanger([overflowing],0,.1),.1,'um pixel acima da linha ativa alerta');
