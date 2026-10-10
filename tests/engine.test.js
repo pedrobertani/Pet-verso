@@ -1,4 +1,4 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';import {species,activeSpecies,fresh,valid,tick,care,canFeedByHunger,reward,randomSpecies} from '../src/engine.js';
+import {test} from 'node:test';import assert from 'node:assert/strict';import {species,activeSpecies,fresh,valid,tick,care,canFeedByHunger,reward,randomSpecies,visibleWasteSlots} from '../src/engine.js';
 test('catálogo cobre todas as famílias com identidades únicas',()=>{assert.equal(species.length,51);assert.equal(new Set(species.map(s=>s.id)).size,species.length);assert.equal(new Set(species.map(s=>s.family)).size,5);});
 test('sorteio alcança todas as espécies',()=>{activeSpecies.forEach((s,i)=>assert.equal(randomSpecies(()=>(i+.5)/activeSpecies.length),s.id));});
 test('sono recupera energia offline sem multiplicar tempo ao reabrir',()=>{let p=fresh('pets-0','Lua',1000);p.stats.energy=10;p.sleeping=true;const n=tick(p,3601000);assert.equal(n.stats.energy,60);assert.equal(n.sleeping,true);assert.deepEqual(tick(n,3601000),n);assert.equal(n.stats.intelligence,0);});
@@ -204,4 +204,34 @@ test('reviver custa 300 exatamente e preserva o troco',async()=>{
  assert.equal(p.coins,400);
  assert.equal(n.stats.food,80);
  assert.equal(n.stats.energy,80);
+});
+
+
+test('recolhe exatamente o cocô escolhido sem trocar a posição dos demais',()=>{
+ const p=fresh('pets-0','Pipoca',1000);
+ p.waste=3;p.floorDirt=3;
+ assert.deepEqual(visibleWasteSlots(p),[0,1,2],'save antigo sem IDs ainda exibe as posições');
+ const after=care(p,'pickup',1);
+ assert.equal(after.waste,2);assert.equal(after.floorDirt,2);
+ assert.deepEqual(visibleWasteSlots(after),[0,2],'cocôs das posições 0 e 2 permanecem');
+ assert.deepEqual(visibleWasteSlots(after,'floorDirt'),[0,2],'mancha da posição 1 desaparece');
+ assert.equal(after.coins,p.coins+1);
+ const saved=JSON.parse(JSON.stringify(after));
+ assert.deepEqual(visibleWasteSlots(saved),[0,2],'posições persistem no salvamento');
+ assert.deepEqual(care(saved,'pickup',1),saved,'não recolhe duas vezes o mesmo cocô');
+ const next=care(saved,'pickup',2);
+ assert.deepEqual(visibleWasteSlots(next),[0]);
+ assert.equal(next.coins,p.coins+2);
+ const newPoop=tick(saved,1000+.75*3600000);
+ assert.deepEqual(visibleWasteSlots(newPoop),[0,2,1],'novo cocô ocupa uma vaga livre sem mover os demais');
+ assert.deepEqual(visibleWasteSlots(newPoop,'floorDirt'),[0,2,1]);
+});
+
+test('limpeza geral e reviver não guardam posições antigas de cocô',()=>{
+ const p=fresh('pets-0','Pipoca',1000);p.waste=2;p.floorDirt=2;
+ const picked=care(p,'pickup',0),clean=care(picked,'clean');
+ assert.deepEqual(visibleWasteSlots(clean),[]);
+ assert.deepEqual(visibleWasteSlots(clean,'floorDirt'),[]);
+ assert.deepEqual(clean.wasteSlotIds,[]);
+ assert.deepEqual(clean.dirtSlotIds,[]);
 });

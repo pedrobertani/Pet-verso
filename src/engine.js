@@ -20,9 +20,21 @@ for(const s of species)s.diet=dietForSpecies(s.id);
 export const palettes={'pets-mouse':[{id:'white',name:'Branco',color:'#f0f2f6',detail:'#d6dce5'},{id:'gray',name:'Cinza',color:'#9eabba',detail:'#7b8da4'}],'pets-0':[{id:'orange',name:'Laranja',color:'#f4b173',detail:'#bf753d'},{id:'gray',name:'Cinza',color:'#a7b4c5',detail:'#5d7088'},{id:'black',name:'Preto',color:'#586171',detail:'#333d50'}],'pets-1':[{id:'caramel',name:'Caramelo',color:'#d2a079',detail:'#895438'},{id:'brown',name:'Marrom',color:'#9e7056',detail:'#60412e'},{id:'blackwhite',name:'Preto e branco',color:'#eef2f5',detail:'#364354'}]};
 export const activeSpecies=species.filter(s=>['dinos-pterosaur','exoticos-frog','selva-owl','pets-0','pets-1','exoticos-0','exoticos-1','selva-0','selva-4','dinos-0','dinos-1','sombrios-0','sombrios-1','pets-2','exoticos-7','selva-2','dinos-2','dinos-3','selva-brown','selva-polar','pets-mouse','selva-capybara','selva-fox','exoticos-penguin','sombrios-dragon','sombrios-frankie','sombrios-6'].includes(s.id));
 export const attrs={food:'Saciedade',joy:'Felicidade',energy:'Energia',hygiene:'Higiene',health:'Saúde',intelligence:'Inteligência'};
-export const fresh=(id,name,now=Date.now())=>({revision:1,species:id,name:name.trim().slice(0,24)||species.find(s=>s.id===id)?.name||'Meu pet',born:now,last:now,sleeping:false,coins:40,stats:{food:85,joy:80,energy:90,hygiene:90,health:100,intelligence:0},xp:0,growth:{version:1,level:0,baths:0,meals:0,games:0},personality:['Curioso','Brincalhão','Tranquilo'][Math.floor(Math.random()*3)],games:0,ill:false,illnessHours:0,neglectHours:0,dead:false,deadAt:null,inventory:[],equipped:{},waste:0,wasteClock:0,floorDirt:0,lastEarning:0,totalPoints:0,records:{}});
+export const fresh=(id,name,now=Date.now())=>({revision:1,species:id,name:name.trim().slice(0,24)||species.find(s=>s.id===id)?.name||'Meu pet',born:now,last:now,sleeping:false,coins:40,stats:{food:85,joy:80,energy:90,hygiene:90,health:100,intelligence:0},xp:0,growth:{version:1,level:0,baths:0,meals:0,games:0},personality:['Curioso','Brincalhão','Tranquilo'][Math.floor(Math.random()*3)],games:0,ill:false,illnessHours:0,neglectHours:0,dead:false,deadAt:null,inventory:[],equipped:{},waste:0,wasteClock:0,floorDirt:0,wasteSlotIds:[],dirtSlotIds:[],lastEarning:0,totalPoints:0,records:{}});
 const clamp=x=>Math.max(0,Math.min(100,x));
 export function valid(p){return p?.revision===1&&species.some(s=>s.id===p.species)&&typeof p.name==='string'&&p.name.length>0&&p.name.length<=24&&typeof p.sleeping==='boolean'&&Number.isFinite(p.last)&&Number.isFinite(p.born)&&p.born<=p.last&&Number.isFinite(p.coins)&&p.coins>=0&&Number.isFinite(p.xp)&&p.xp>=0&&Number.isFinite(p.games)&&p.games>=0&&['Curioso','Brincalhão','Tranquilo'].includes(p.personality)&&Object.keys(attrs).every(k=>Number.isFinite(p.stats?.[k])&&p.stats[k]>=0&&p.stats[k]<=100);}
+// Position IDs stay stable when a player picks up a specific poop.
+// Saves made before slot IDs existed are reconstructed from the old counts.
+export function visibleWasteSlots(p,kind='waste'){
+ const dirt=kind==='floorDirt',count=Math.min(5,Math.max(0,Math.trunc(Number(p?.[dirt?'floorDirt':'waste'])||0)));
+ const stored=p?.[dirt?'dirtSlotIds':'wasteSlotIds'];
+ const slots=[];
+ if(Array.isArray(stored))for(const id of stored){
+  if(Number.isInteger(id)&&id>=0&&id<5&&!slots.includes(id)&&slots.length<count)slots.push(id);
+ }
+ for(let id=0;id<5&&slots.length<count;id++)if(!slots.includes(id))slots.push(id);
+ return slots;
+}
 export function tick(p,now=Date.now()){
  const n=structuredClone(p);let remaining=Math.max(0,(now-n.last)/3600000),cursor=n.last;
  n.ill??=false;n.illnessHours??=0;n.neglectHours??=0;n.dead??=false;n.waste??=0;n.wasteClock??=0;n.floorDirt??=n.waste;
@@ -49,13 +61,26 @@ export function tick(p,now=Date.now()){
    else {n.illnessHours+=h;if(n.neglectHours>=120){n.dead=true;n.deadAt=cursor;n.sleeping=false;}}
   }
  }
+ n.wasteSlotIds=visibleWasteSlots(n);n.dirtSlotIds=visibleWasteSlots(n,'floorDirt');
  n.last=Math.max(now,n.last);return advanceGrowth(n);
 }
 // Ração é permitida em qualquer valor abaixo do máximo, mesmo com fome zero.
 export const canFeedByHunger=p=>Number.isFinite(p?.stats?.food)&&p.stats.food<100;
-export function care(p,action){const n=structuredClone(p);if(n.dead)return n;const s=n.stats;
+export function care(p,action,slotId){const n=structuredClone(p);if(n.dead)return n;const s=n.stats;
  if(action==='sleep'){n.sleeping=!n.sleeping;return n;}
- if(action==='clean'){n.coins+=n.waste??0;n.waste=0;n.floorDirt=0;return n;}if(action==='pickup'){if((n.waste??0)>0){n.waste--;n.floorDirt=Math.max(0,(n.floorDirt??0)-1);n.coins++;}return n;}
+ if(action==='clean'){n.coins+=n.waste??0;n.waste=0;n.floorDirt=0;n.wasteSlotIds=[];n.dirtSlotIds=[];return n;}
+ if(action==='pickup'){
+  const slots=visibleWasteSlots(n),chosen=slotId;
+  // A stale or duplicate click must not award another coin.
+  const slot=chosen===undefined?slots.at(-1):chosen;
+  if(!slots.includes(slot))return n;
+  const dirtSlots=visibleWasteSlots(n,'floorDirt');
+  n.waste=slots.length-1;n.wasteSlotIds=slots.filter(id=>id!==slot);
+  if(dirtSlots.length){const dirtyIndex=dirtSlots.indexOf(slot);if(dirtyIndex>=0)dirtSlots.splice(dirtyIndex,1);else dirtSlots.pop();}
+  n.floorDirt=dirtSlots.length;n.dirtSlotIds=dirtSlots;
+  n.coins++;
+  return n;
+ }
  if(n.sleeping)return n;
  if(action==='feed'&&n.coins>=5&&canFeedByHunger(n)){n.coins-=5;s.food=clamp(s.food+30);s.joy=clamp(s.joy+3);n.xp+=2;countGrowthCare(n,'meals');}
  if(action==='bath'){const needed=s.hygiene<=75;s.hygiene=100;s.joy=clamp(s.joy+4);if(needed){n.xp+=2;countGrowthCare(n,'baths');}}
@@ -99,4 +124,4 @@ shop.push(...[
 export function buy(p,id,color){const item=shop.find(x=>x.id===id);const n=structuredClone(p);if(n.dead)return n;n.inventory??=[];n.equipped??={};if(!item||(item.species&&item.species!==n.species)||color!==undefined&&!validItemColor(color))return n;if(n.inventory.includes(id)){n.equipped[item.slot]=id;if(color){n.itemColors??={};n.itemColors[id]=color;}return n;}if(n.coins<item.price)return n;n.coins-=item.price;n.inventory.push(id);n.equipped[item.slot]=id;if(color){n.itemColors??={};n.itemColors[id]=color;}return n;}
 
 export const REVIVE_PRICE=300;
-export function revive(p,now=Date.now()){const n=structuredClone(p);if(!n.dead||n.coins<REVIVE_PRICE)return n;n.coins-=REVIVE_PRICE;n.dead=false;n.deadAt=null;n.ill=false;n.illnessHours=0;n.neglectHours=0;n.sleeping=false;n.waste=0;n.floorDirt=0;n.wasteClock=0;n.last=now;for(const k of ['food','joy','energy','hygiene','health'])n.stats[k]=80;return n;}
+export function revive(p,now=Date.now()){const n=structuredClone(p);if(!n.dead||n.coins<REVIVE_PRICE)return n;n.coins-=REVIVE_PRICE;n.dead=false;n.deadAt=null;n.ill=false;n.illnessHours=0;n.neglectHours=0;n.sleeping=false;n.waste=0;n.floorDirt=0;n.wasteSlotIds=[];n.dirtSlotIds=[];n.wasteClock=0;n.last=now;for(const k of ['food','joy','energy','hygiene','health'])n.stats[k]=80;return n;}
