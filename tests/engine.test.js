@@ -20,13 +20,14 @@ test('partidas sem pontos rendem zero moedas e as demais respeitam metas do jogo
   blocks:[75,200],match3:[350,1000]
  };
  for(const [game,[good,excellent]] of Object.entries(gameThresholds)){
+  const legendary=excellent*2;
   const p=fresh('pets-0','Lua'),score=(points)=>reward(p,points,true,game);
   for(const value of [0,-50,NaN]){
    const n=score(value);
    assert.equal(n.coins,p.coins,game+' não deve render sem pontos');
    assert.equal(n.lastEarning,0);
   }
-  for(const [points,expected] of [[1,5],[good-1,5],[good,8],[excellent-1,8],[excellent,10],[1000000,10]]){
+  for(const [points,expected] of [[1,5],[good-1,5],[good,8],[excellent-1,8],[excellent,10],[legendary-1,10],[legendary,15],[1000000,15]]){
    const n=score(points);
    assert.equal(n.coins-p.coins,expected,game+' com '+points+' pontos');
    assert.equal(n.lastEarning,expected);
