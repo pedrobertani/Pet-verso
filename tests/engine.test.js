@@ -1,5 +1,5 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';import {species,activeSpecies,fresh,valid,tick,care,canFeedByHunger,reward,randomSpecies} from '../src/engine.js';
-test('catálogo cobre todas as famílias com identidades únicas',()=>{assert.equal(species.length,50);assert.equal(new Set(species.map(s=>s.id)).size,50);assert.equal(new Set(species.map(s=>s.family)).size,5);});
+import {test} from 'node:test';import assert from 'node:assert/strict';import {species,activeSpecies,fresh,valid,tick,care,canFeedByHunger,reward,randomSpecies,visibleWasteSlots} from '../src/engine.js';
+test('catálogo cobre todas as famílias com identidades únicas',()=>{assert.equal(species.length,51);assert.equal(new Set(species.map(s=>s.id)).size,species.length);assert.equal(new Set(species.map(s=>s.family)).size,5);});
 test('sorteio alcança todas as espécies',()=>{activeSpecies.forEach((s,i)=>assert.equal(randomSpecies(()=>(i+.5)/activeSpecies.length),s.id));});
 test('sono recupera energia offline sem multiplicar tempo ao reabrir',()=>{let p=fresh('pets-0','Lua',1000);p.stats.energy=10;p.sleeping=true;const n=tick(p,3601000);assert.equal(n.stats.energy,60);assert.equal(n.sleeping,true);assert.deepEqual(tick(n,3601000),n);assert.equal(n.stats.intelligence,0);});
 test('retrocesso do relógio não concede energia nem progresso',()=>{const p=fresh('pets-0','Lua',1000);assert.deepEqual(tick(p,0),p);});
@@ -7,27 +7,33 @@ test('dormindo não pode gastar com cuidados, mas pode receber prêmio de jogo',
 test('cuidados respeitam saldo e inteligência é duradoura',()=>{const p=fresh('pets-0','Lua');p.coins=0;assert.deepEqual(care(p,'feed'),p);const n=reward(p,80,true);assert.ok(n.coins>0&&n.stats.intelligence>0);assert.equal(tick(n,n.last+86400000).stats.intelligence,n.stats.intelligence);assert.ok(valid(n));});
 test('save corrompido não entra no jogo',()=>{assert.equal(valid({revision:1}),false);const p=fresh('pets-0','Lua');p.stats.health=NaN;assert.equal(valid(p),false);});
 import {buy,shop} from '../src/engine.js';
+import {GAME_COIN_TARGETS,GAME_BONUS_20_TARGETS,MAX_GAME_COINS} from '../src/game-economy.js';
 test('loja não compra sem saldo nem cobra novamente ao equipar',()=>{const p=fresh('pets-0','Lua');assert.equal(buy(p,shop[0].id).coins,p.coins);p.coins=500;const n=buy(p,shop[0].id);assert.equal(n.coins,320);assert.equal(n.equipped.bed,shop[0].id);assert.equal(buy(n,shop[0].id).coins,320);assert.equal(n.inventory.length,1);});
 test('negligência offline causa doença e cinco dias sem cuidado causam morte',()=>{const p=fresh('pets-0','Lua',1000);const ill=tick(p,1000+48*3600000);assert.equal(ill.ill,true);assert.equal(ill.dead,false);const dead=tick(p,1000+8*86400000);assert.equal(dead.dead,true);assert.ok(dead.deadAt);assert.deepEqual(care(dead,'medicine'),dead);const farm=reward(dead,100,true);assert.ok(farm.coins>dead.coins);assert.deepEqual(farm.stats,dead.stats);assert.equal(farm.dead,true);assert.equal(tick(dead,dead.last+86400000).dead,true);});
 test('cuidados suficientes interrompem doença antes da morte',()=>{let p=fresh('pets-0','Lua',1000);p.ill=true;p.illnessHours=60;p.stats.health=40;p.coins=100;p=care(p,'medicine');p=care(p,'medicine');const n=tick(p,1000+15*60000);assert.equal(n.ill,false);assert.equal(n.dead,false);assert.equal(n.illnessHours,0);});
-test('seleção tem 25 espécies com saves antigos válidos',()=>{assert.equal(activeSpecies.length,25);assert.equal(new Set(activeSpecies.map(s=>s.id)).size,25);assert.equal(valid(fresh('pets-3','Hamster antigo')),true);});
+test('seleção tem 25 espécies com saves antigos válidos',()=>{assert.equal(activeSpecies.length,27);assert.equal(new Set(activeSpecies.map(s=>s.id)).size,activeSpecies.length);assert.equal(valid(fresh('pets-3','Hamster antigo')),true);});
 test('necessidades acumulam offline e limpeza não custa moedas nem dá banho',()=>{let p=fresh('pets-0','Lua',1000);p=tick(p,1000+1.75*3600000);assert.equal(p.waste,2);const clean=care(p,'clean');assert.equal(clean.waste,0);assert.equal(clean.coins,p.coins+p.waste);assert.equal(clean.stats.hygiene,p.stats.hygiene);});
-test('partidas sem pontos rendem zero moedas e as demais respeitam metas do jogo',()=>{
- const gameThresholds={
-  memory:[100,240],sequence:[60,160],food:[50,140],
-  fruitmerge:[45,150],runner:[25,75],puzzle:[90,220],
-  hide:[60,140],flight:[25,65],words:[60,160],
-  blocks:[75,200],match3:[350,1000]
- };
- for(const [game,[good,excellent]] of Object.entries(gameThresholds)){
-  const legendary=excellent*2;
-  const p=fresh('pets-0','Lua'),score=(points)=>reward(p,points,true,game);
-  for(const value of [0,-50,NaN]){
-   const n=score(value);
-   assert.equal(n.coins,p.coins,game+' não deve render sem pontos');
-   assert.equal(n.lastEarning,0);
+test('partidas sem pontos não rendem moedas e faixas calibradas premiam 5, 8, 10, 15 e 20',()=>{
+ assert.equal(MAX_GAME_COINS,20,'teto extraordinário esperado');
+ for(const [game,targets] of Object.entries(GAME_COIN_TARGETS)){
+  const p=fresh('pets-0','Lua'),score=points=>reward(p,points,true,game);
+  for(const points of [0,-50,NaN]){
+   const n=score(points);
+   assert.equal(n.coins,p.coins,game+' sem pontos');
+   assert.equal(n.lastEarning,0,game+' não registra prêmio');
   }
-  for(const [points,expected] of [[1,5],[good-1,5],[good,8],[excellent-1,8],[excellent,10],[legendary-1,10],[legendary,15],[1000000,15]]){
+  if(game==='puzzle'){
+   for(const [boards,expected] of [[0,0],[1,10],[2,10],[3,15],[5,15],[6,20],[12,20]]){
+    const n=reward(p,boards*90,true,game,boards);
+    assert.equal(n.coins-p.coins,expected,game+' com '+boards+' tabuleiros');
+    assert.equal(n.lastEarning,expected);
+   }
+   continue;
+  }
+  const {good,excellent,legendary}=targets,bonus=GAME_BONUS_20_TARGETS[game];
+  const cases=[[1,5],[good-1,5],[good,8],[excellent-1,8],[excellent,10],[legendary-1,10],[legendary,15],[bonus-1,15],[bonus,20],[1000000,20]];
+  assert.ok(good<excellent&&excellent<legendary&&legendary<bonus,'metas crescentes: '+game);
+  for(const [points,expected] of cases){
    const n=score(points);
    assert.equal(n.coins-p.coins,expected,game+' com '+points+' pontos');
    assert.equal(n.lastEarning,expected);
@@ -49,12 +55,12 @@ test('inteligência aumenta 1, 3 ou 5 pontos conforme o desempenho',()=>{
  const p=fresh('pets-0','Lua');
  assert.equal(reward(p,0,true,'blocks').stats.intelligence-p.stats.intelligence,0);
  assert.equal(reward(p,10,true,'blocks').stats.intelligence-p.stats.intelligence,1);
- assert.equal(reward(p,75,true,'blocks').stats.intelligence-p.stats.intelligence,3);
- assert.equal(reward(p,200,true,'blocks').stats.intelligence-p.stats.intelligence,5);
+ assert.equal(reward(p,220,true,'blocks').stats.intelligence-p.stats.intelligence,3);
+ assert.equal(reward(p,660,true,'blocks').stats.intelligence-p.stats.intelligence,5);
  assert.equal(reward(p,10000,true,'blocks').stats.intelligence-p.stats.intelligence,5);
  assert.equal(reward(p,10000,false,'blocks').stats.intelligence-p.stats.intelligence,0);
  p.stats.health=30;
- assert.equal(reward(p,200,true,'blocks').stats.intelligence-p.stats.intelligence,2);
+ assert.equal(reward(p,660,true,'blocks').stats.intelligence-p.stats.intelligence,2);
 });
 
 
@@ -198,4 +204,34 @@ test('reviver custa 300 exatamente e preserva o troco',async()=>{
  assert.equal(p.coins,400);
  assert.equal(n.stats.food,80);
  assert.equal(n.stats.energy,80);
+});
+
+
+test('recolhe exatamente o cocô escolhido sem trocar a posição dos demais',()=>{
+ const p=fresh('pets-0','Pipoca',1000);
+ p.waste=3;p.floorDirt=3;
+ assert.deepEqual(visibleWasteSlots(p),[0,1,2],'save antigo sem IDs ainda exibe as posições');
+ const after=care(p,'pickup',1);
+ assert.equal(after.waste,2);assert.equal(after.floorDirt,2);
+ assert.deepEqual(visibleWasteSlots(after),[0,2],'cocôs das posições 0 e 2 permanecem');
+ assert.deepEqual(visibleWasteSlots(after,'floorDirt'),[0,2],'mancha da posição 1 desaparece');
+ assert.equal(after.coins,p.coins+1);
+ const saved=JSON.parse(JSON.stringify(after));
+ assert.deepEqual(visibleWasteSlots(saved),[0,2],'posições persistem no salvamento');
+ assert.deepEqual(care(saved,'pickup',1),saved,'não recolhe duas vezes o mesmo cocô');
+ const next=care(saved,'pickup',2);
+ assert.deepEqual(visibleWasteSlots(next),[0]);
+ assert.equal(next.coins,p.coins+2);
+ const newPoop=tick(saved,1000+.75*3600000);
+ assert.deepEqual(visibleWasteSlots(newPoop),[0,2,1],'novo cocô ocupa uma vaga livre sem mover os demais');
+ assert.deepEqual(visibleWasteSlots(newPoop,'floorDirt'),[0,2,1]);
+});
+
+test('limpeza geral e reviver não guardam posições antigas de cocô',()=>{
+ const p=fresh('pets-0','Pipoca',1000);p.waste=2;p.floorDirt=2;
+ const picked=care(p,'pickup',0),clean=care(picked,'clean');
+ assert.deepEqual(visibleWasteSlots(clean),[]);
+ assert.deepEqual(visibleWasteSlots(clean,'floorDirt'),[]);
+ assert.deepEqual(clean.wasteSlotIds,[]);
+ assert.deepEqual(clean.dirtSlotIds,[]);
 });
