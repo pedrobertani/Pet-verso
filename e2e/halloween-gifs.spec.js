@@ -3,7 +3,7 @@ import {mkdirSync} from 'node:fs';
 import {join} from 'node:path';
 
 const pets=[['sombrios-frankie','frankie'],['sombrios-6','mumi']];
-// Recapture Mumi bandage tornado and restored sarcophagus after review.
+// Recapture approved Mumi tornado and new horizontal 3D sarcophagus toy.
 const clips=['trick','park'];
 mkdirSync('halloween-videos',{recursive:true});
 
