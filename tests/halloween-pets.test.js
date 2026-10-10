@@ -7,7 +7,7 @@ import {toyFor,toyArt,toyLayout} from '../src/park-toys.js';
 import {tricks,startTrick,TRICK_INTELLIGENCE} from '../src/pet-tricks.js';
 import {parkActions,startParkAction,PARK_INTELLIGENCE} from '../src/park-actions.js';
 
-const pets=[['sombrios-frankie','short-circuit','lightning-generator'],['sombrios-6','bandage-whirl','sarcophagus']];
+const pets=[['sombrios-frankie','short-circuit','lightning-generator'],['sombrios-6','bandage-whirl','sand-tsunami']];
 for(const [id,trick,toy] of pets){
  test(`Halloween ${id}: adoção, arte e fases`,()=>{
   const species=activeSpecies.find(s=>s.id===id);
@@ -22,7 +22,7 @@ for(const [id,trick,toy] of pets){
   }
  });
  test(`Halloween ${id}: quintal e brinquedo`,()=>{
-  assert.equal(environmentFor(id).id,'haunted');
+  assert.equal(environmentFor(id).id,id==='sombrios-6'?'enchanted-desert':'haunted');
   const item=toyFor(id);assert.ok(item);assert.equal(item.type,toy);assert.equal(item.price,0);
   assert.ok(shop.some(i=>i.id===item.id));
   assert.match(toyArt(id),/<svg/);
