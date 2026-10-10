@@ -65,3 +65,30 @@ for(const [id,name] of pets)for(const clip of clips){
   expect(ff.status,ff.stderr).toBe(0);
  });
 }
+
+for(const [id,name] of pets){
+ test(`${name} - print do brinquedo novo`,async({page})=>{
+  await page.goto('/');
+  await page.setViewportSize({width:740,height:600});
+  const info=await page.evaluate(async id=>{
+   const {toyFor,toyArt}=await import('/src/park-toys.js');
+   const {environmentFor,environmentArt}=await import('/src/park-environments.js');
+   const toy=toyFor(id);
+   if(!toy)throw Error('Brinquedo não encontrado: '+id);
+   const stage=document.createElement('div');
+   stage.id='halloween-object-preview';
+   Object.assign(stage.style,{position:'fixed',left:'40px',top:'35px',width:'650px',height:'490px',zIndex:'2147483647',background:'linear-gradient(#eee4fa,#d8f4ed)',border:'5px solid #b3dbe0',borderRadius:'24px',overflow:'hidden'});
+   const title=document.createElement('h2');title.textContent=toy.name;
+   Object.assign(title.style,{position:'absolute',top:'10px',left:'20px',font:'bold 28px sans-serif',color:'#49325e'});
+   stage.append(title);
+   const holder=document.createElement('div');
+   holder.innerHTML=toyArt(id);
+   Object.assign(holder.style,{position:'absolute',left:'155px',top:'85px',width:'340px',height:'300px'});
+   stage.append(holder);
+   document.body.append(stage);
+   return {name:toy.name,type:toy.type,hasSvg:!!holder.querySelector('svg')};
+  },id);
+  expect(info.hasSvg).toBe(true);
+  await page.locator('#halloween-object-preview').screenshot({path:join('halloween-videos',`${name}-objeto.png`)});
+ });
+}
