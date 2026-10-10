@@ -58,16 +58,23 @@ export function animateParkAction(world,target,id,{level=2,reducedMotion=false,o
  toyPart('.toy-lightning',[{opacity:.1,filter:'drop-shadow(0 0 0px #ffe786)'},{opacity:1,filter:'drop-shadow(0 0 10px #ffe786)'},{opacity:.1}],{delay:reducedMotion?150:1500,duration:reducedMotion?600:800,iterations:reducedMotion?2:4});
  part('.pet-head',[{rotate:'-5deg'},{rotate:'5deg'},{rotate:'-5deg'}],{delay:reducedMotion?150:1500,duration:reducedMotion?400:320,iterations:reducedMotion?2:8});break;}
  case 'sand-tsunami':{
- // Mumi faces sideways, lifts an arm, then summons a wave that crosses the whole playground.
- animate(target,[move(0,zero),move(.16,zero),move(.82,zero),move(1,zero)]);
- animate(face,[{offset:0,transform:'scaleX(1) scaleY(1)'},{offset:.18,transform:'scaleX(.7) scaleY(1)'},{offset:.75,transform:'scaleX(.7) scaleY(1)'},{offset:1,transform:'scaleX(1) scaleY(1)'}]);
- part('.pet-arm, .arm, .pet-arm-left, .pet-arm-right',[{offset:0,rotate:'0deg'},{offset:.2,rotate:'-65deg'},{offset:.72,rotate:'-65deg'},{offset:1,rotate:'0deg'}],{transformOrigin:'50% 0%'});
+ // Three distinct acts: sand rises from Mumi's hand, crests across camera, settles into sparkling dust.
+ animate(target,[move(0,zero),move(.13,zero),move(.78,zero),move(1,zero)]);
+ animate(face,[{offset:0,transform:'scaleX(1) rotateY(0deg)'},{offset:.13,transform:'scaleX(.83) rotateY(32deg)'},{offset:.75,transform:'scaleX(.83) rotateY(32deg)'},{offset:1,transform:'scaleX(1) rotateY(0deg)'}]);
+ part('.pet-arm, .arm, .pet-arm-left, .pet-arm-right',[{offset:0,rotate:'0deg'},{offset:.14,rotate:'-70deg'},{offset:.73,rotate:'-70deg'},{offset:1,rotate:'0deg'}]);
  const wave=document.createElement('div');
  wave.className='park-action-effect park-sand-tsunami';
- Object.assign(wave.style,{position:'absolute',left:'0',top:'0',width:'100%',height:'100%',pointerEvents:'none',zIndex:'20',transformOrigin:'left bottom'});
- wave.innerHTML=`<svg viewBox="0 0 600 340" preserveAspectRatio="none" style="width:100%;height:100%"><defs><linearGradient id="mumi-sand-wave" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff0bd"/><stop offset=".45" stop-color="#e9bb75"/><stop offset="1" stop-color="#bf8656"/></linearGradient></defs><path d="M-120 340V246Q-45 205 15 180Q65 140 100 89Q119 53 157 62Q194 73 191 117Q191 150 164 175Q220 151 255 181Q282 205 325 228L660 275V340Z" fill="url(#mumi-sand-wave)" stroke="#ffe6ad" stroke-width="9"/><path d="M-60 286Q78 220 134 104Q157 87 168 114M150 183Q225 177 268 216" fill="none" stroke="#fff0c4" stroke-width="11" opacity=".85"/><g fill="#f8d89a">${Array.from({length:35},(_,i)=>`<circle cx="${(i*79)%600}" cy="${110+(i*43)%220}" r="${2+i%5}" opacity=".65"/>`).join('')}</g></svg>`;
+ Object.assign(wave.style,{position:'absolute',left:'0',top:'0',width:'100%',height:'100%',pointerEvents:'none',zIndex:'20',transformOrigin:'16% 96%'});
+ const grains=Array.from({length:62},(_,i)=>`<circle cx="${(i*71)%600}" cy="${80+(i*43)%260}" r="${1+i%4}" fill="${i%3?'#ffe4aa':'#b77c4c'}" opacity=".65"/>`).join('');
+ wave.innerHTML=`<svg viewBox="0 0 600 340" preserveAspectRatio="none" style="width:100%;height:100%"><defs><linearGradient id="mumi-sand-wave" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff5c9"/><stop offset=".38" stop-color="#efc17a"/><stop offset="1" stop-color="#b87947"/></linearGradient></defs><path d="M-85 340Q-40 290 5 268Q46 244 65 200Q79 162 101 121Q121 76 155 77Q195 78 205 115Q218 152 189 187Q166 211 133 217Q202 194 251 228Q302 265 377 280Q478 293 655 320L655 365H-85Z" fill="url(#mumi-sand-wave)" stroke="#ffe5a7" stroke-width="8" stroke-linejoin="round"/><path d="M-30 310Q65 260 103 142Q124 100 152 101Q182 103 179 132Q171 165 147 182M152 220Q225 212 291 262" stroke="#fff2ca" stroke-width="11" fill="none" opacity=".9" stroke-linecap="round"/><path d="M-30 331Q76 295 132 239T270 275" stroke="#b47d4e" stroke-width="9" opacity=".45" fill="none"/>${grains}</svg>`;
  world.append(wave);effects.push(wave);
- animate(wave,[{offset:0,opacity:0,transform:'translateX(-110%) scale(.35)'},{offset:.17,opacity:0,transform:'translateX(-95%) scale(.55)'},{offset:.3,opacity:1,transform:'translateX(-65%) scale(.85)'},{offset:.51,opacity:1,transform:'translateX(10%) scale(1.18)'},{offset:.72,opacity:1,transform:'translateX(75%) scale(1.22)'},{offset:.88,opacity:.3,transform:'translateX(115%) scale(1.15)'},{offset:1,opacity:0,transform:'translateX(130%) scale(1.15)'}]);
+ // Rising locally, sweeping over the entire viewport, then receding instead of popping out.
+ animate(wave,[{offset:0,opacity:0,transform:'translate(-34%,38%) scale(.04,.02)'},{offset:.13,opacity:.9,transform:'translate(-30%,26%) scale(.17,.25)'},{offset:.25,opacity:1,transform:'translate(-22%,12%) scale(.45,.7)'},{offset:.39,opacity:1,transform:'translate(-9%,0%) scale(.94,1.08)'},{offset:.55,opacity:1,transform:'translate(14%,-8%) scale(1.45,1.7)'},{offset:.7,opacity:.95,transform:'translate(45%,-4%) scale(1.65,1.5)'},{offset:.84,opacity:.45,transform:'translate(94%,16%) scale(1.2,.7)'},{offset:1,opacity:0,transform:'translate(130%,45%) scale(.55,.15)'}]);
+ const dust=document.createElement('div');dust.className='park-action-effect park-sand-dust';
+ Object.assign(dust.style,{position:'absolute',inset:'0',zIndex:'21',pointerEvents:'none'});
+ dust.innerHTML=`<svg viewBox="0 0 600 340" preserveAspectRatio="none" style="width:100%;height:100%"><g fill="#f9d59a">${Array.from({length:85},(_,i)=>`<circle cx="${(i*113)%600}" cy="${65+(i*53)%270}" r="${1+i%4}" opacity="${.3+(i%5)*.12}"/>`).join('')}</g></svg>`;
+ world.append(dust);effects.push(dust);
+ animate(dust,[{offset:0,opacity:0,translate:'-20px 25px'},{offset:.65,opacity:0,translate:'0 0'},{offset:.78,opacity:.9,translate:'10px -12px'},{offset:1,opacity:0,translate:'80px -65px'}]);
  break;}
  case 'fetch':{
  const mouth=target.querySelector('.mouth')?.getBoundingClientRect(),offset={x:mouth?mouth.left+mouth.width/2-w.left-origin.x:p.width*.2,y:mouth?mouth.top+mouth.height/2-w.top-origin.y:-p.height*.35};
