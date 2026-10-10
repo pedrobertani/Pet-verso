@@ -5,7 +5,7 @@ export const parkActions={
  'exoticos-0':'swim','exoticos-1':'branch','exoticos-7':'bridge',
  'selva-0':'bat-ball','selva-2':'waterwheel','selva-4':'bamboo','selva-brown':'log','selva-polar':'ice-pool','selva-capybara':'shower-pool','selva-fox':'den','exoticos-penguin':'slide',
  'dinos-0':'bite-ball','dinos-1':'push-ball','dinos-2':'leaves','dinos-3':'logs',
- 'sombrios-0':'hoop','sombrios-1':'hoop','sombrios-dragon':'dragon-hoop','selva-owl':'hoop','dinos-pterosaur':'hoop','exoticos-frog':'lily-pool'
+ 'sombrios-frankie':'lightning-generator','sombrios-6':'sarcophagus','sombrios-0':'hoop','sombrios-1':'hoop','sombrios-dragon':'dragon-hoop','selva-owl':'hoop','dinos-pterosaur':'hoop','exoticos-frog':'lily-pool'
 };
 export const supportedParkActions=Object.keys(parkActions);
 export function parkActionState(p,now=Date.now()){return {locked:p.stats.intelligence<PARK_INTELLIGENCE,blocked:!!(p.sleeping||p.dead),remaining:Math.max(0,Math.ceil(((p.skills?.parkUntil||0)-now)/1000))};}
@@ -53,6 +53,13 @@ export function animateParkAction(world,target,id,{level=2,reducedMotion=false,o
  part('.leg-0',[{rotate:'-7deg'},{rotate:'7deg'},{rotate:'-7deg'}],{duration:reducedMotion?200:560,iterations:reducedMotion?3:11});
  part('.leg-1',[{rotate:'7deg'},{rotate:'-7deg'},{rotate:'7deg'}],{duration:reducedMotion?200:560,iterations:reducedMotion?3:11});
  switch(kind){
+ case 'lightning-generator':{
+ const at=point(85,148);travel(at,.74);returnTurn(.76);
+ toyPart('.toy-lightning',[{opacity:.1,filter:'drop-shadow(0 0 0px #ffe786)'},{opacity:1,filter:'drop-shadow(0 0 10px #ffe786)'},{opacity:.1}],{delay:reducedMotion?150:1500,duration:reducedMotion?600:800,iterations:reducedMotion?2:4});
+ part('.pet-head',[{rotate:'-5deg'},{rotate:'5deg'},{rotate:'-5deg'}],{delay:reducedMotion?150:1500,duration:reducedMotion?400:320,iterations:reducedMotion?2:8});break;}
+ case 'sarcophagus':{
+ const at=point(110,141);animate(target,[move(0,zero),move(.23,at),move(.38,at,.1,.7),move(.63,at,0,.7),move(.77,at,1,.8),move(1,zero)]);returnTurn(.8);
+ toyPart('.toy-sarcophagus-lid',[{offset:0,opacity:.4},{offset:.32,opacity:.9},{offset:.65,opacity:1},{offset:.8,opacity:.4},{offset:1,opacity:.4}]);break;}
  case 'fetch':{
  const mouth=target.querySelector('.mouth')?.getBoundingClientRect(),offset={x:mouth?mouth.left+mouth.width/2-w.left-origin.x:p.width*.2,y:mouth?mouth.top+mouth.height/2-w.top-origin.y:-p.height*.35};
  const landing=point(-30,147),catchAt={x:landing.x-offset.x,y:point(-30,163).y};
