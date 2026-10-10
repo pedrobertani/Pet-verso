@@ -1,7 +1,7 @@
 // Directional anatomy shared by previews and the game.
 import {petDrawing} from './pets.js';
 import {dogTurnPreview} from './dog-turn-preview.js';
-const bipeds=new Set(['selva-4','selva-brown','selva-polar','exoticos-penguin','dinos-0','exoticos-frog']);
+const bipeds=new Set(['selva-4','selva-brown','selva-polar','exoticos-penguin','dinos-0','exoticos-frog','sombrios-frankie','sombrios-6']);
 export function landTurnPreview(s,angle=0,mode='happy'){
  if(s.id==='pets-1')return dogTurnPreview(s,angle,mode);
  const side=Math.cos(angle),depth=Math.sin(angle),amount=Math.abs(side),sign=side<0?-1:1;
