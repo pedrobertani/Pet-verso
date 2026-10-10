@@ -17,8 +17,12 @@ export const GAME_COIN_TARGETS=Object.freeze({
 const DEFAULT_TARGETS=Object.freeze({good:60,excellent:160,legendary:320});
 export const MAX_GAME_COINS=15;
 
+// Petisco (match-3): fases ilimitadas, recompensa única por partida.
+export const MATCH3_COIN_TIERS=Object.freeze([[100000,50],[50000,40],[25000,30],[15000,25],[10000,20],[6000,15],[3000,10],[1000,5]]);
+
 export function gameCoinReward(gameId,score){
  if(!Number.isFinite(score)||score<=0)return 0;
+ if(gameId==='match3')return MATCH3_COIN_TIERS.find(([minimum])=>score>=minimum)?.[1]??5;
  const {good,excellent,legendary}=GAME_COIN_TARGETS[gameId]||DEFAULT_TARGETS;
  if(score>=legendary)return MAX_GAME_COINS;
  if(score>=excellent)return 10;
