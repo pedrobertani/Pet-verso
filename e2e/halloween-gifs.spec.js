@@ -3,7 +3,7 @@ import {mkdirSync} from 'node:fs';
 import {join} from 'node:path';
 
 const pets=[['sombrios-frankie','frankie'],['sombrios-6','mumi']];
-// Fresh screenshots for revised Halloween special effects and shaded toys.
+// Recapture Mumi bandage tornado and restored sarcophagus after review.
 const clips=['trick','park'];
 mkdirSync('halloween-videos',{recursive:true});
 
