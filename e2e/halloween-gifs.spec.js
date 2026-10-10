@@ -109,6 +109,11 @@ test('prints dos cinco itens Halloween da loja',async({page})=>{
   const item=page.locator(`[data-buy="${id}"]`);
   await expect(item).toBeVisible();
   await item.scrollIntoViewIfNeeded();
-  await item.screenshot({path:join('halloween-videos',`shopping-${id}.png`)});
+  await item.click();
+  // Capture the complete shop preview / selection UI, never the action button alone.
+  await page.screenshot({path:join('halloween-videos',`shopping-${id}.png`),fullPage:true});
+  const close=page.locator('[data-close-item], #cancel-item, .modal-close, [aria-label="Fechar"]').first();
+  if(await close.isVisible().catch(()=>false))await close.click();
+  else await page.keyboard.press('Escape');
  }
 });
