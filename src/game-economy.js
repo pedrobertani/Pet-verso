@@ -1,7 +1,7 @@
 // Metas calibradas com placares de 1 minuto medidos em outubro de 2026.
 // Jogos com maior risco de derrota usam horizonte de cerca de 3 minutos;
-// os demais, cerca de 5 minutos. Puzzle mantém metas antigas por falta de medição.
-// Teto universal: 15 moedas, reservado para uma pontuação extraordinária.
+// os demais, cerca de 5 minutos. Puzzle usa tabuleiros concluídos.
+// Teto universal: 20 moedas para conquistas excepcionais.
 export const GAME_COIN_TARGETS=Object.freeze({
  memory:Object.freeze({good:120,excellent:180,legendary:300}),   // Pares por rodada
  sequence:Object.freeze({good:160,excellent:320,legendary:480}),  // 20 pontos por sequência
@@ -18,7 +18,7 @@ export const GAME_COIN_TARGETS=Object.freeze({
 const DEFAULT_TARGETS=Object.freeze({good:60,excellent:160,legendary:320});
 export const MAX_GAME_COINS=20;
 // Faixa especial: 20 moedas para partidas acima da meta lendária.
-// O quebra-cabeça permanece em 15 até termos dados de uma partida real.
+// Quebra-cabeça usa quantidade de tabuleiros concluídos, não pontos.
 export const GAME_BONUS_20_TARGETS=Object.freeze({
  memory:570,
  sequence:900,
@@ -32,7 +32,13 @@ export const GAME_BONUS_20_TARGETS=Object.freeze({
  match3:15000
 });
 
-export function gameCoinReward(gameId,score){
+export function gameCoinReward(gameId,score,completedBoards=0){
+ if(gameId==='puzzle'){
+  if(completedBoards>=6)return 20;
+  if(completedBoards>=3)return 15;
+  if(completedBoards>=1)return 10;
+  return 0;
+ }
  if(!Number.isFinite(score)||score<=0)return 0;
  const bonusTarget=GAME_BONUS_20_TARGETS[gameId];
  if(bonusTarget&&score>=bonusTarget)return MAX_GAME_COINS;
