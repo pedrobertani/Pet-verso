@@ -94,6 +94,34 @@ for(const [id,name] of pets){
  });
 }
 
+
+test('mumi - print do parquinho inteiro com deserto encantado',async({page})=>{
+ await page.goto('/');
+ await page.setViewportSize({width:900,height:700});
+ const result=await page.evaluate(async()=>{
+  const {activeSpecies,fresh}=await import('/src/engine.js');
+  const {petDrawing}=await import('/src/pets.js');
+  const {playgroundScene}=await import('/src/playground-scene.js');
+  const species=activeSpecies.find(s=>s.id==='sombrios-6');
+  const pet=fresh(species.id,species.name);
+  pet.stats.intelligence=75;
+  const holder=document.createElement('div');
+  holder.id='mumi-full-playground';
+  Object.assign(holder.style,{position:'fixed',left:'20px',top:'20px',width:'860px',height:'640px',zIndex:'2147483647',overflow:'hidden'});
+  holder.innerHTML=playgroundScene({species,pet,drawing:petDrawing});
+  document.body.append(holder);
+  const world=holder.querySelector('.playground');
+  Object.assign(world.style,{position:'relative',display:'block',width:'100%',height:'100%',minHeight:'0',overflow:'hidden'});
+  const background=world.querySelector('.park-background');
+  Object.assign(background.style,{position:'absolute',inset:'0',width:'100%',height:'100%'});
+  const svg=background.querySelector('svg');
+  Object.assign(svg.style,{display:'block',width:'100%',height:'100%'});
+  return {environment:svg.getAttribute('aria-label'),pyramid:svg.innerHTML.includes('desert-pyramid'),pet:!!world.querySelector('.park-pet'),toy:!!world.querySelector('.park-object svg')};
+ });
+ expect(result).toEqual({environment:'Deserto encantado',pyramid:true,pet:true,toy:true});
+ await page.locator('#mumi-full-playground').screenshot({path:join('halloween-videos','mumi-parquinho-inteiro.png')});
+});
+
 const halloweenShopIds=['halloween-pumpkin-table','halloween-candles','halloween-rug','halloween-bed','halloween-shelf'];
 test('prints dos cinco itens Halloween da loja',async({page})=>{
  await page.goto('/');
