@@ -5,6 +5,9 @@ on:
     paths:
       - '.github/workflows/halloween-gifs.yml'
       - 'e2e/halloween-gifs.spec.js'
+      - 'src/park-actions.js'
+      - 'src/park-toys.js'
+      - 'src/park-environments.js'
   workflow_dispatch:
 permissions:
   contents: read
