@@ -120,12 +120,24 @@ export function animateTrick(target,id,{draw,sound=()=>{},reducedMotion=false,on
  part('.pet-head',motion(['rotate(-3deg)','rotate(3deg)','rotate(-3deg)','rotate(0deg)']),330,'50% 75%',{iterations:7});
  part('root',[{filter:'drop-shadow(0 0 0px #ffed9c)'},{filter:'drop-shadow(0 0 11px #ffe17b)'},{filter:'none'}],2600);break;}
  case 'bandage-whirl':{
+ // The mummy dissolves into a bandage-and-dust cyclone; the pet itself never spins.
+ duration=4400;
  const fx=document.createElement('div');fx.className='trick-effect trick-mumi-tornado';
- Object.assign(fx.style,{position:'absolute',inset:'0',pointerEvents:'none',zIndex:'5'});
- fx.innerHTML='<svg viewBox="0 0 200 200" style="width:100%;height:100%;overflow:visible"><defs><linearGradient id="mumi-wind" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#fff3cf"/><stop offset=".5" stop-color="#cbb39a"/><stop offset="1" stop-color="#fff4db"/></linearGradient></defs><g fill="none" stroke="url(#mumi-wind)" stroke-linecap="round"><path d="M38 158Q100 184 163 157T60 131Q14 117 81 102T151 78Q170 62 76 61T91 39" stroke-width="11"/><path d="M51 169Q111 192 170 163M46 124Q116 144 161 111M57 88Q107 101 151 74" stroke="#e2c6a0" stroke-width="5"/></g><g fill="#d6bb98" opacity=".85"><circle cx="39" cy="167" r="5"/><circle cx="163" cy="176" r="6"/><circle cx="62" cy="182" r="4"/><circle cx="146" cy="148" r="3"/></g></svg>';
+ Object.assign(fx.style,{position:'absolute',inset:'-22% -35%',pointerEvents:'none',zIndex:'5',overflow:'visible'});
+ const ribbons=Array.from({length:12},(_,i)=>{
+  const y=179-i*12,rx=12+i*6.4,ry=3+i*.55;
+  const color=i%3===0?'#fff4d7':i%3===1?'#d7bc98':'#f0dfc3';
+  return `<g class="mumi-band mumi-band-${i}"><ellipse cx="110" cy="${y}" rx="${rx}" ry="${ry}" fill="none" stroke="#79614d" stroke-opacity=".3" stroke-width="12"/><path d="M${110-rx} ${y}a${rx} ${ry} 0 1 0 ${rx*2} 0" fill="none" stroke="${color}" stroke-width="${8+i*.18}" stroke-linecap="round"/><path d="M${110+rx} ${y}a${rx} ${ry} 0 1 0 -${rx*2} 0" fill="none" stroke="${color}" stroke-width="${7+i*.18}" stroke-linecap="round" stroke-opacity=".65"/></g>`;
+ }).join('');
+ const dust=Array.from({length:28},(_,i)=>{const x=35+(i*37)%155,y=80+(i*29)%110,r=1.5+i%4;return `<circle cx="${x}" cy="${y}" r="${r}" fill="${i%2?'#cfb394':'#ebd8b6'}" opacity=".65"/>`;}).join('');
+ fx.innerHTML=`<svg viewBox="0 0 220 220" style="width:100%;height:100%;overflow:visible"><defs><radialGradient id="mumi-dust-cloud"><stop stop-color="#c5a887" stop-opacity=".42"/><stop offset="1" stop-color="#c5a887" stop-opacity="0"/></radialGradient></defs><ellipse cx="110" cy="158" rx="91" ry="65" fill="url(#mumi-dust-cloud)"/><g class="mumi-dust">${dust}</g><g class="mumi-ribbons">${ribbons}</g></svg>`;
  face.append(fx);effects.push(fx);
- animations.push(fx.animate([{opacity:0,transform:'translateY(18px) scale(.55) rotate(-15deg)'},{opacity:1,transform:'translateY(-8px) scale(1.1) rotate(10deg)'},{opacity:1,transform:'translateY(-17px) scale(1.15) rotate(-8deg)'},{opacity:0,transform:'translateY(-38px) scale(.7) rotate(25deg)'}],{duration:reducedMotion?800:2600,fill:'both'}));
- part('.pet-head',motion(['rotate(0deg)','rotate(-4deg)','rotate(4deg)','rotate(0deg)']),900);break;}
+ // Fade the actual anatomy away completely, then reveal it after the tornado dissipates.
+ animations.push(svg.animate([{offset:0,opacity:1,filter:'blur(0px)'},{offset:.18,opacity:0,filter:'blur(5px)'},{offset:.78,opacity:0,filter:'blur(5px)'},{offset:1,opacity:1,filter:'blur(0px)'}],{duration:reducedMotion?1100:duration,fill:'both'}));
+ animations.push(fx.animate([{offset:0,opacity:0,transform:'translate(0px,18px) scale(.25)'},{offset:.2,opacity:1,transform:'translate(-8px,0px) scale(.95)'},{offset:.4,opacity:1,transform:'translate(15px,-10px) scale(1.12)'},{offset:.6,opacity:1,transform:'translate(-17px,-4px) scale(1.04)'},{offset:.76,opacity:1,transform:'translate(10px,-10px) scale(1)'},{offset:1,opacity:0,transform:'translate(0px,24px) scale(.18)'}],{duration:reducedMotion?1100:duration,fill:'both'}));
+ fx.querySelectorAll('.mumi-band').forEach((band,i)=>animations.push(band.animate([{transform:'translateX(0px) scaleX(1)'},{transform:`translateX(${i%2?12:-12}px) scaleX(.45)`},{transform:'translateX(0px) scaleX(1)'}],{duration:reducedMotion?900:430+i*30,iterations:reducedMotion?1:10,direction:'alternate',easing:'ease-in-out'})));
+ animations.push(fx.querySelector('.mumi-dust').animate([{transform:'rotate(0deg)'},{transform:'rotate(360deg)'}],{duration:reducedMotion?1100:1900,iterations:reducedMotion?1:3,easing:'linear'}));
+ break;}
  case 'flame':effect('<svg viewBox="0 0 120 60"><path d="M4 30Q45 10 51 17L76 3 69 21 109 13 94 30 116 42 71 40 82 57 44 44Q26 38 4 30Z" fill="#ff9364"/><path d="M7 30Q42 22 69 26l-8 6 14 7Q40 39 7 30" fill="#ffe391"/></svg>','trick-flame');part('.pet-head',motion(['rotate(0)','rotate(-5deg)','rotate(0)']),2400);sound('jump');break;
  }
  function finish(){if(disposed)return;disposed=true;clearTimeout(timer);animations.forEach(a=>a.cancel());effects.forEach(e=>e.remove());if(needsCanonicalArt&&face.isConnected)face.innerHTML=originalMarkup;target.style.animationPlayState=previousWalkState;target.classList.remove('performing-trick');onEnd();}
