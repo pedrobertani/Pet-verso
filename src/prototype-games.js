@@ -53,6 +53,44 @@ export function findMatches(board){
   return hits;
 }
 
+// Only adjacent swaps that really create 3+ matching treats are playable.
+// This check never changes the caller's board.
+export function findAvailableMatch3Swap(board){
+ const rows=board?.length||0,cols=board?.[0]?.length||0;
+ if(rows<3||cols<3)return null;
+ for(let r=0;r<rows;r++)for(let col=0;col<cols;col++)for(const [dr,dc] of [[0,1],[1,0]]){
+  const nr=r+dr,nc=col+dc;
+  if(nr>=rows||nc>=cols||!board[r][col]||!board[nr][nc]||board[r][col]===board[nr][nc])continue;
+  [board[r][col],board[nr][nc]]=[board[nr][nc],board[r][col]];
+  const matches=findMatches(board).size>0;
+  [board[r][col],board[nr][nc]]=[board[nr][nc],board[r][col]];
+  if(matches)return {from:[r,col],to:[nr,nc]};
+ }
+ return null;
+}
+
+// Used on the first board AND after cascades. A player can never be
+// stranded with no available combination. Reshuffling costs no moves.
+export function reshuffleMatch3Board(board){
+ const size=board.length,flat=board.flat().filter(Boolean);
+ if(size<3||board.some(row=>row.length!==size)||flat.length!==size*size)return board;
+ for(let attempt=0;attempt<120;attempt++){
+  const pieces=shuffle(flat);
+  const next=Array.from({length:size},(_,r)=>pieces.slice(r*size,(r+1)*size));
+  if(!findMatches(next).size&&findAvailableMatch3Swap(next))return next;
+ }
+ // Deterministic fallback: a B a in the first row, with 'a' below B.
+ // This also guarantees that a rare unlucky shuffle cannot loop forever.
+ const values=[...new Set(flat)];
+ if(values.length<3)return board;
+ const next=Array.from({length:size},(_,r)=>Array.from({length:size},(_,col)=>values[(r+col)%values.length]));
+ next[0][0]=values[0];next[0][1]=values[1];next[0][2]=values[0];next[1][1]=values[0];
+ if(findMatches(next).size||!findAvailableMatch3Swap(next)){
+  throw new Error('Não foi possível gerar um tabuleiro jogável.');
+ }
+ return next;
+}
+
 export function canPlace(board,shape,row,col){
   return shape.every(([x,y])=>row+y>=0&&col+x>=0&&row+y<board.length&&col+x<board[0].length&&!board[row+y][col+x]);
 }
