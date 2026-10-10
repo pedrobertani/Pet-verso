@@ -53,6 +53,44 @@ export function findMatches(board){
   return hits;
 }
 
+// Only adjacent swaps that really create 3+ matching treats are playable.
+// This check never changes the caller's board.
+export function findAvailableMatch3Swap(board){
+ const rows=board?.length||0,cols=board?.[0]?.length||0;
+ if(rows<3||cols<3)return null;
+ for(let r=0;r<rows;r++)for(let col=0;col<cols;col++)for(const [dr,dc] of [[0,1],[1,0]]){
+  const nr=r+dr,nc=col+dc;
+  if(nr>=rows||nc>=cols||!board[r][col]||!board[nr][nc]||board[r][col]===board[nr][nc])continue;
+  [board[r][col],board[nr][nc]]=[board[nr][nc],board[r][col]];
+  const matches=findMatches(board).size>0;
+  [board[r][col],board[nr][nc]]=[board[nr][nc],board[r][col]];
+  if(matches)return {from:[r,col],to:[nr,nc]};
+ }
+ return null;
+}
+
+// Used on the first board AND after cascades. A player can never be
+// stranded with no available combination. Reshuffling costs no moves.
+export function reshuffleMatch3Board(board){
+ const size=board.length,flat=board.flat().filter(Boolean);
+ if(size<3||board.some(row=>row.length!==size)||flat.length!==size*size)return board;
+ for(let attempt=0;attempt<120;attempt++){
+  const pieces=shuffle(flat);
+  const next=Array.from({length:size},(_,r)=>pieces.slice(r*size,(r+1)*size));
+  if(!findMatches(next).size&&findAvailableMatch3Swap(next))return next;
+ }
+ // Deterministic fallback: a B a in the first row, with 'a' below B.
+ // This also guarantees that a rare unlucky shuffle cannot loop forever.
+ const values=[...new Set(flat)];
+ if(values.length<3)return board;
+ const next=Array.from({length:size},(_,r)=>Array.from({length:size},(_,col)=>values[(r+col)%values.length]));
+ next[0][0]=values[0];next[0][1]=values[1];next[0][2]=values[0];next[1][1]=values[0];
+ if(findMatches(next).size||!findAvailableMatch3Swap(next)){
+  throw new Error('Não foi possível gerar um tabuleiro jogável.');
+ }
+ return next;
+}
+
 export function canPlace(board,shape,row,col){
   return shape.every(([x,y])=>row+y>=0&&col+x>=0&&row+y<board.length&&col+x<board[0].length&&!board[row+y][col+x]);
 }
@@ -104,7 +142,7 @@ export function blocksGame(area,api){
 
 const treats=treatIds;
 export function match3Game(area,api){
-  let level=1,score=0,levelStart=0,target=0,moves=0,board=[],selected=null,locked=false,stopped=false;
+  let level=1,score=0,levelStart=0,target=0,moves=0,board=[],selected=null,locked=false,stopped=false,shuffleMessage='';
   function makeBoard(size,kinds){
     const values=treats.slice(0,kinds),result=Array.from({length:size},()=>Array(size));
     for(let r=0;r<size;r++)for(let c=0;c<size;c++){const allowed=values.filter(value=>!(c>1&&result[r][c-1]===value&&result[r][c-2]===value)&&!(r>1&&result[r-1][c]===value&&result[r-2][c]===value));result[r][c]=pick(allowed);}
@@ -114,11 +152,16 @@ export function match3Game(area,api){
   async function resolve(){
     let chain=0,hits=findMatches(board);
     while(hits.size&&!stopped){chain++;hits.forEach(key=>{const [r,c]=key.split(',').map(Number);board[r][c]=null;});score+=hits.size*10*chain;api.onScore(score);api.sound('match');draw(hits);await wait(260);collapse();draw();await wait(220);hits=findMatches(board);}
+    if(stopped)return;
+    if(score-levelStart<target&&moves>0&&!findAvailableMatch3Swap(board)){
+      board=reshuffleMatch3Board(board);
+      shuffleMessage='Sem combinações! Embaralhei os petiscos, sem gastar jogadas.';
+    }
     locked=false;
     if(score-levelStart>=target){score+=Math.max(0,moves)*5+levelReward(level,25);api.onScore(score);level++;setTimeout(round,550);}
     else if(moves<=0){stopped=true;api.onEnd(score);}else draw();
   }
-  function round(){const d=prototypeDifficulty('match3',level);board=makeBoard(d.size,d.kinds);moves=d.moves;target=d.target;levelStart=score;selected=null;locked=false;draw();}
+  function round(){if(stopped)return;const d=prototypeDifficulty('match3',level);const initial=makeBoard(d.size,d.kinds);board=findAvailableMatch3Swap(initial)?initial:reshuffleMatch3Board(initial);moves=d.moves;target=d.target;levelStart=score;selected=null;locked=false;shuffleMessage='';draw();}
   async function attempt(from,current){
     if(locked||stopped)return false;const [r,c]=from,[r2,c2]=current;if(Math.abs(r-r2)+Math.abs(c-c2)!==1)return false;
     locked=true;[board[r][c],board[r2][c2]]=[board[r2][c2],board[r][c]];draw();
@@ -126,45 +169,83 @@ export function match3Game(area,api){
     area.querySelector(`[data-gem="${r2},${c2}"]`)?.classList.add('swap-to');
     await wait(170);const hits=findMatches(board);
     if(!hits.size){[board[r][c],board[r2][c2]]=[board[r2][c2],board[r][c]];api.sound('wrong');selected=null;draw();area.querySelector(`[data-gem="${r},${c}"]`)?.classList.add('swap-reject');locked=false;return false;}
-    selected=null;moves--;draw();await resolve();return true;
+    selected=null;shuffleMessage='';moves--;draw();await resolve();return true;
   }
   function draw(clearing=new Set()){
     const progress=clamp((score-levelStart)/target*100,0,100),size=board.length;
-    area.innerHTML=`${gameHeader(score,level,`${moves} jogadas`)}<div class="match-progress"><span style="width:${progress}%"></span></div><p class="proto-help">Meta: ${target} pontos nesta fase</p><div class="match-board" style="--match-size:${size}">${board.flatMap((row,r)=>row.map((value,c)=>`<button data-gem="${r},${c}" class="${selected?.[0]===r&&selected?.[1]===c?'selected':''} ${clearing.has(`${r},${c}`)?'clearing':''}" aria-label="Petisco ${value||''}"><span class="treat-art treat-${Math.max(0,treats.indexOf(value))}">${value?treatSvgs[value]:''}</span></button>`)).join('')}</div>`;
-    let dragStart=null,startPoint=null,dragMoved=false,ignoreClick=false;
-    const currentOf=element=>element?.closest?.('[data-gem]')?.dataset.gem?.split(',').map(Number);
+    area.innerHTML=`${gameHeader(score,level,`${moves} jogadas`)}<div class="match-progress"><span style="width:${progress}%"></span></div><p class="proto-help">Meta: ${target} pontos nesta fase</p><div class="match-board" style="--match-size:${size}">${board.flatMap((row,r)=>row.map((value,c)=>`<button data-gem="${r},${c}" class="${selected?.[0]===r&&selected?.[1]===c?'selected':''} ${clearing.has(`${r},${c}`)?'clearing':''}" aria-label="Petisco ${value||''}"><span class="treat-art treat-${Math.max(0,treats.indexOf(value))}">${value?treatSvgs[value]:''}</span></button>`)).join('')}</div><p class="match-status" role="status" aria-live="polite">${shuffleMessage}</p>`;
+    // Capture input on the board, not on a petisco that may move or rerender.
+    // A swipe always means ONE adjacent move in its dominant direction.
+    const grid=area.querySelector('.match-board');
+    const positionOf=element=>element?.closest?.('[data-gem]')?.dataset.gem?.split(',').map(Number);
     const same=(a,b)=>a&&b&&a[0]===b[0]&&a[1]===b[1];
-    area.querySelectorAll('[data-gem]').forEach(button=>{
-      button.onpointerdown=event=>{if(locked||stopped)return;dragStart=currentOf(button);startPoint=[event.clientX,event.clientY];dragMoved=false;button.setPointerCapture?.(event.pointerId);};
-      button.onclick=async()=>{
-        if(ignoreClick){ignoreClick=false;return;}
-        if(locked||stopped)return;
-        const current=currentOf(button);
-        if(!selected){selected=current;api.sound('tap');draw();return;}
-        if(same(selected,current)){selected=null;draw();return;}
-        if(Math.abs(selected[0]-current[0])+Math.abs(selected[1]-current[1])===1){await attempt(selected,current);return;}
-        selected=current;api.sound('tap');draw();
-      };
-    });
-    area.onpointermove=event=>{
-      if(!dragStart||!startPoint)return;
-      if(Math.hypot(event.clientX-startPoint[0],event.clientY-startPoint[1])>8)dragMoved=true;
-      if(!dragMoved)return;
+    const adjacent=(from,dx,dy)=>{
+      const horizontal=Math.abs(dx)>=Math.abs(dy);
+      const row=from[0]+(horizontal?0:Math.sign(dy)),col=from[1]+(horizontal?Math.sign(dx):0);
+      return row>=0&&col>=0&&row<size&&col<size?[row,col]:null;
+    };
+    const clearDrag=()=>{
+      grid.querySelectorAll('[data-gem]').forEach(button=>{
+        button.classList.remove('dragging','drag-target');
+        button.style.removeProperty('--drag-x');
+        button.style.removeProperty('--drag-y');
+      });
+    };
+    const tap=async current=>{
+      if(!current||locked||stopped)return;
+      if(!selected){selected=current;api.sound('tap');draw();return;}
+      if(same(selected,current)){selected=null;draw();return;}
+      if(Math.abs(selected[0]-current[0])+Math.abs(selected[1]-current[1])===1){
+        await attempt(selected,current);return;
+      }
+      selected=current;api.sound('tap');draw();
+    };
+    let active=null;
+    grid.onpointerdown=event=>{
+      if(locked||stopped||(event.pointerType==='mouse'&&event.button!==0))return;
+      const from=positionOf(event.target);
+      if(!from)return;
       event.preventDefault();
-      const target=document.elementFromPoint(event.clientX,event.clientY)?.closest('[data-gem]');
-      area.querySelectorAll('[data-gem]').forEach(x=>x.classList.toggle('drag-target',x===target));const source=area.querySelector(`[data-gem="${dragStart[0]},${dragStart[1]}"]`);if(source){source.style.setProperty('--drag-x',`${event.clientX-startPoint[0]}px`);source.style.setProperty('--drag-y',`${event.clientY-startPoint[1]}px`);source.classList.add('dragging');}
+      active={id:event.pointerId,from,x:event.clientX,y:event.clientY};
+      grid.setPointerCapture?.(event.pointerId);
     };
-    area.onpointerup=async event=>{
-      if(!dragStart)return;
-      const from=dragStart,target=currentOf(document.elementFromPoint(event.clientX,event.clientY));
-      dragStart=null;startPoint=null;
-      area.querySelectorAll('[data-gem]').forEach(x=>x.classList.remove('drag-target'));
-      if(!dragMoved)return;
-      ignoreClick=true;
-      if(target&&!same(target,from))await attempt(from,target);
-      else {selected=null;draw();}
+    grid.onpointermove=event=>{
+      if(!active||active.id!==event.pointerId)return;
+      const dx=event.clientX-active.x,dy=event.clientY-active.y;
+      if(Math.hypot(dx,dy)<=8)return;
+      event.preventDefault();
+      const to=adjacent(active.from,dx,dy);
+      const dragged=grid.querySelector('[data-gem="'+active.from.join(',')+'"]');
+      const hovered=to?grid.querySelector('[data-gem="'+to.join(',')+'"]'):null;
+      grid.querySelectorAll('[data-gem]').forEach(x=>x.classList.toggle('drag-target',x===hovered));
+      if(dragged){
+        const distance=Math.min(Math.hypot(dx,dy),dragged.getBoundingClientRect().width);
+        const length=Math.hypot(dx,dy)||1;
+        dragged.style.setProperty('--drag-x',(dx/length*distance)+'px');
+        dragged.style.setProperty('--drag-y',(dy/length*distance)+'px');
+        dragged.classList.add('dragging');
+      }
     };
-    area.onpointercancel=()=>{dragStart=null;startPoint=null;dragMoved=false;area.querySelectorAll('[data-gem]').forEach(x=>x.classList.remove('drag-target'));};
+    grid.onpointerup=async event=>{
+      if(!active||active.id!==event.pointerId)return;
+      event.preventDefault();
+      const {from,x,y}=active,dx=event.clientX-x,dy=event.clientY-y;
+      active=null;clearDrag();
+      if(Math.hypot(dx,dy)>8){
+        const to=adjacent(from,dx,dy);
+        selected=null;
+        if(to)await attempt(from,to);
+        else draw();
+      }else await tap(from);
+    };
+    grid.onpointercancel=()=>{
+      active=null;clearDrag();
+    };
+    // Keyboard and screen-reader activation of a gem still uses tap-to-swap.
+    grid.onclick=event=>{
+      if(event.detail!==0)return;
+      tap(positionOf(event.target));
+    };
   }
   round();return()=>{stopped=true;};
 }
