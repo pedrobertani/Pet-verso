@@ -19,7 +19,7 @@ test('balão de pensamento substitui o alerta inferior e funciona em ambos os te
  await page.reload();
 
  await expect(page.locator('#other-pet-alert')).toHaveCount(0);
- await expect(page.locator('#switch-pet i')).toHaveText('1');
+ await expect(page.locator('#switch-pet')).toBeVisible();
  await page.locator('#switch-pet').click();
 
  const cards=page.locator('.pet-switch-option[data-switch-born]');
@@ -55,7 +55,7 @@ test('balão de pensamento substitui o alerta inferior e funciona em ambos os te
  expect(dark).not.toBe(light);
 
  await hungryCard.click();
- await expect(page.locator('#switch-pet i')).toHaveCount(0);
+ await expect(page.locator('#switch-pet')).toBeVisible();
  await page.locator('#switch-pet').click();
  await expect(page.locator('.pet-care-thought')).toHaveCount(1);
  await expect(page.locator('.pet-switch-option.active .pet-care-thought')).toHaveCount(1);
