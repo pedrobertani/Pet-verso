@@ -9,7 +9,8 @@ export const environments = [
  {id:'tropical',name:'Jardim tropical',pets:['exoticos-1','exoticos-7'],description:'Camaleão e tartaruga'},
  {id:'ice',name:'Refúgio de gelo',pets:['selva-polar','exoticos-penguin'],description:'Urso polar e pinguim'},
  {id:'prehistoric',name:'Vale dos dinossauros',pets:['dinos-0','dinos-1','dinos-2','dinos-3','dinos-pterosaur'],description:'Todos os dinossauros'},
- {id:'haunted',name:'Castelinho encantado',pets:['sombrios-0','sombrios-1','sombrios-frankie','sombrios-6'],description:'Fantasminha e morcego'},
+ {id:'enchanted-desert',name:'Deserto encantado',pets:['sombrios-6'],description:'Mumi'},
+ {id:'haunted',name:'Castelinho encantado',pets:['sombrios-0','sombrios-1','sombrios-frankie'],description:'Fantasminha e morcego'},
  {id:'volcanic',name:'Vale do dragão',pets:['sombrios-dragon'],description:'Dragãozinho'},
  {id:'aquarium',name:'Aquário do axolote',pets:['exoticos-0'],description:'Axolote'}
 ];
@@ -21,7 +22,7 @@ const bamboo=(x,y)=>`<g stroke-linecap="round"><path d="M${x} ${y}v-120m16 120v-
 const cloud=(x,y)=>`<g fill="#fff" opacity=".75">${ellipse(x,y,32,10,'#fff')}${ellipse(x-10,y-8,15,14,'#fff')}${ellipse(x+10,y-12,18,17,'#fff')}</g>`;
 export function environmentArt(id,{night=false,playground=false,tall=false}={}){
  const e=environments.find(e=>e.id===id)||environments.find(e=>e.id==='home');id=e.id;
- const palettes={wetland:['#b5e9e6','#83bba1','#b9d9aa'],rainforest:['#b4e9df','#6ca78b','#a1ca92'],home:['#a9e6f2','#a5d67b','#c0dd8d'],savanna:['#ffe0a3','#d9c97a','#efd393'],bamboo:['#bae6d8','#91c286','#b9dba0'],forest:['#b9dfec','#84b496','#a9cf9a'],tropical:['#a9e6d8','#78b99b','#a6d4a3'],ice:['#bfe9f5','#c1dbe8','#f0f8fc'],prehistoric:['#b7e1e9','#80b899','#b6d491'],haunted:['#746aab','#696690','#8a7da9'],volcanic:['#f5b4a6','#9b83ad','#c6a3bd'],aquarium:['#a4e6ee','#7bc6d7','#f0d9b1']};
+ const palettes={wetland:['#b5e9e6','#83bba1','#b9d9aa'],rainforest:['#b4e9df','#6ca78b','#a1ca92'],home:['#a9e6f2','#a5d67b','#c0dd8d'],savanna:['#ffe0a3','#d9c97a','#efd393'],bamboo:['#bae6d8','#91c286','#b9dba0'],forest:['#b9dfec','#84b496','#a9cf9a'],tropical:['#a9e6d8','#78b99b','#a6d4a3'],ice:['#bfe9f5','#c1dbe8','#f0f8fc'],prehistoric:['#b7e1e9','#80b899','#b6d491'],'enchanted-desert':['#f9dca6','#e5b87a','#f1ce8c'],haunted:['#746aab','#696690','#8a7da9'],volcanic:['#f5b4a6','#9b83ad','#c6a3bd'],aquarium:['#a4e6ee','#7bc6d7','#f0d9b1']};
  const [sky,hills,floor]=palettes[id];const renderedSky=night&&id!=='aquarium'?'#263758':sky;let back='',front='';
  if(id==='home'){
  back=`<g stroke="#dba470" stroke-width="3"><path d="M28 242V144L94 101l66 43v98Z" fill="#fff0d8"/><path d="M18 146l76-53 76 53" fill="none" stroke="#cc8c73" stroke-width="10" stroke-linejoin="round"/><rect x="75" y="189" width="38" height="53" rx="16" fill="#adcbdd"/><rect x="44" y="153" width="28" height="28" rx="5" fill="#a1deed"/></g>${tree(520,243,.85)}<path d="M0 247H600" stroke="#eac390" stroke-width="7"/>`;
@@ -32,6 +33,10 @@ export function environmentArt(id,{night=false,playground=false,tall=false}={}){
  if(id==='tropical')back=`${tree(66,247,.9)}${tree(530,247,.85)}<path d="M30 250q-20-75 30-34q-4-65 26-24q40-30 30 0l-7 58H30Z M487 247q-8-62 25-32q10-56 30-21q29-19 25 9l-5 44H487Z" fill="#438e76"/>${pond(467,269)}`;
  if(id==='ice')back=`<path d="M5 249l76-105 63 91 74-141 114 155Z" fill="#d6edf6"/><path d="M57 174l24-30 30 39-28-7-12 7M187 137l31-43 41 51-39-13-18 12" fill="#fff"/><path d="M452 249q-17-49 36-55q57 0 61 55Z" fill="#edf8fc" stroke="#b1d6e4" stroke-width="3"/><path d="M480 249v-19q13-25 26 0v19" fill="#93bed3"/><path d="M454 221h83m-52-22v21m24 0v27" stroke="#c7e0ea" stroke-width="3"/>${pond(475,274,'#78bfdb')}`;
  if(id==='prehistoric')back=`<path d="M150 249L260 103l115 146" fill="#98b7ad"/><path d="M233 136l27-33 32 36-27-9Z" fill="#cedbd0"/>${tree(66,244,.96,'pine')}${tree(530,246,1.06,'pine')}<g fill="#7a9b83"><ellipse cx="130" cy="249" rx="35" ry="13"/><ellipse cx="550" cy="260" rx="29" ry="11"/></g>${pond(465,272)}`;
+ if(id==='enchanted-desert'){
+ back=`<defs><linearGradient id="desert-pyramid" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f9db98"/><stop offset="1" stop-color="#c48b58"/></linearGradient></defs><circle cx="485" cy="69" r="39" fill="#ffe9ae" opacity=".8"/><path d="M290 241L414 57 542 241Z" fill="url(#desert-pyramid)" stroke="#b98257" stroke-width="3"/><path d="M414 57L542 241H429Z" fill="#b7865c" opacity=".7"/><path d="M348 240L414 150 479 240Z" fill="#bd875d" opacity=".55"/><path d="M0 250Q104 183 220 245T600 239V303H0Z" fill="#edc385"/><path d="M0 283Q110 252 211 287T600 274V328H0Z" fill="#f6dba4"/><g stroke="#ae8157" stroke-width="4" fill="#e4b97d"><path d="M51 251v-63h41v63Z"/><path d="M43 187h57l-8-13H51Z"/></g><g fill="#d4a66f"><path d="M119 256l25-28 29 28Z"/><path d="M536 264l19-19 22 19Z"/></g>`;
+ front=`<g fill="#d2a06b" opacity=".7"><ellipse cx="94" cy="302" rx="22" ry="5"/><ellipse cx="517" cy="305" rx="27" ry="6"/></g><path d="M45 314q20-12 41 0m425-3q22-10 45 0" stroke="#d6a76d" stroke-width="4" fill="none"/>`;
+ }
  if(id==='haunted'){
  back=`<g fill="#b3a0d6" stroke="#655485" stroke-width="3"><path d="M399 246V167h125v79Z"/><path d="M382 246V137h38v109m86 0V137h38v109"/><path d="M375 139l26-38 26 38m71 0 26-38 26 38" fill="#655485"/><path d="M442 170v-27h35v27"/><path d="M435 246v-32q26-38 52 0v32" fill="#6c6496"/></g><g fill="#ffe3a0"><rect x="393" y="157" width="13" height="23" rx="7"/><rect x="517" y="157" width="13" height="23" rx="7"/></g>${tree(64,246,.8,'pine')}`;
  front=`<g transform="translate(74 266)">${ellipse(0,0,23,17,'#f2b078')}<path d="M-2-13v-9" stroke="#6d926e" stroke-width="6"/><path d="M-12-4l4-5 4 5m10 0 4-5 4 5M-9 5q9 8 18 0" fill="none" stroke="#815970" stroke-width="3"/></g><g transform="translate(554 275)" fill="#efe5d3"><path d="M-13 4v-13a15 15 0 0 1 30 0V4h-5v8H-8V4Z"/><g fill="#827494"><circle cx="-5" cy="-6" r="3"/><circle cx="9" cy="-6" r="3"/></g></g>`;
