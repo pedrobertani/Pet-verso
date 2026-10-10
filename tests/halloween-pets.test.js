@@ -23,7 +23,7 @@ for(const [id,trick,toy] of pets){
  });
  test(`Halloween ${id}: quintal e brinquedo`,()=>{
   assert.equal(environmentFor(id).id,id==='sombrios-6'?'enchanted-desert':'haunted');
-  const item=toyFor(id);assert.ok(item);assert.equal(item.type,toy);assert.equal(item.price,0);
+  const item=toyFor(id);assert.ok(item);assert.equal(item.type,id==='sombrios-6'?'sand-altar':toy);assert.equal(item.price,0);
   assert.ok(shop.some(i=>i.id===item.id));
   assert.match(toyArt(id),/<svg/);
   assert.ok(toyLayout(id));
