@@ -49,7 +49,7 @@ for(const [id,name] of pets)for(const clip of clips){
   },{id,clip});
   expect(result).toEqual({unlocked:true,hasPet:true,hasToy:true});
   if(clip==='park'){
-   const effect=page.locator(id==='sombrios-6'?'.mumi-altar-rune':'.frankie-xray');
+   const effect=page.locator(id==='sombrios-6'?'.mumi-altar-rune':'.frankie-sparks');
    await expect(effect).toHaveCount(1);
   }
   const stage=page.locator('#halloween-gif-stage');
