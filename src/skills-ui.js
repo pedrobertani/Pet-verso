@@ -1,7 +1,7 @@
 import {colorfulIcon} from './icons.js';
 const star='<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 5l5.5 12 13 1.5-9.5 9 2.5 13L24 34l-11.5 6.5 2.5-13-9.5-9L18.5 17Z" fill="#ffe28b" stroke="#c49a56" stroke-width="2.5" stroke-linejoin="round"/><path d="M20 15l-3 7-7 1" stroke="#fff9dc" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>';
 export function skillBadge(p,scene,remaining=0){
- const required=scene==='playground'?75:50,locked=!['sombrios-frankie','sombrios-6'].includes(p.species)&&p.stats.intelligence<required;
+ const required=scene==='playground'?75:50,locked=p.stats.intelligence<required;
  return `<button class="skill-badge ${locked?'skill-locked':remaining?'skill-cooldown':''}" aria-disabled="${locked||remaining>0}" aria-label="${locked?`Habilidade bloqueada: ${required} de inteligência`:remaining?`Aguarde ${remaining} segundos`:'Usar habilidade'}" title="Habilidade">${star}${locked?'<span class="skill-lock">🔒</span>':remaining?`<span class="skill-seconds">${remaining}</span>`:''}</button>`;
 }
 export function openSkillProgress(p,scene,{required,label}={}){
