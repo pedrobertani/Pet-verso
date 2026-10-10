@@ -43,7 +43,7 @@ test('energia completa mantém o pet dormindo até o jogador acordá-lo',()=>{co
 test('refeição recupera 30 pontos de saciedade e sono completo leva duas horas',()=>{const p=fresh('pets-0','Lua',1000);p.stats.food=25;const fed=care(p,'feed');assert.equal(fed.stats.food,55);assert.equal(tick(fed,1000+45*60000).stats.food,37);p.sleeping=true;p.stats.energy=35;const rested=tick(p,1000+2*3600000);assert.equal(rested.stats.energy,100);assert.equal(rested.sleeping,true);});
 test('cada cocô recolhido rende uma moeda sem repetir nem premiar manchas',()=>{const p=fresh('pets-0','Lua');p.waste=2;p.floorDirt=2;const first=care(p,'pickup');assert.equal(first.coins,p.coins+1);const second=care(first,'pickup');assert.equal(second.coins,p.coins+2);assert.equal(care(second,'pickup').coins,second.coins);assert.equal(care(second,'clean').coins,second.coins);assert.equal(care(p,'clean').coins,p.coins+2);});
 
-test('cinco dias críticos e renascimento preservam identidade e progresso',async()=>{const {revive}=await import('../src/engine.js');const p=fresh('pets-0','Lua',1000);p.ill=true;p.neglectHours=119;p.stats.food=0;p.stats.energy=0;p.stats.hygiene=0;p.stats.health=0;assert.equal(tick(p,1000+30*60000).dead,false);const dead=tick(p,1000+3600000);assert.equal(dead.dead,true);dead.coins=4999;assert.deepEqual(revive(dead),dead);dead.coins=5000;dead.stats.intelligence=60;const live=revive(dead,9000000);assert.equal(live.coins,0);assert.equal(live.dead,false);assert.equal(live.species,p.species);assert.equal(live.stats.intelligence,60);assert.equal(live.neglectHours,0);assert.equal(live.last,9000000);});
+test('cinco dias críticos e renascimento por 300 moedas preservam identidade e progresso',async()=>{const {revive,REVIVE_PRICE}=await import('../src/engine.js');assert.equal(REVIVE_PRICE,300);const p=fresh('pets-0','Lua',1000);p.ill=true;p.neglectHours=119;p.stats.food=0;p.stats.energy=0;p.stats.hygiene=0;p.stats.health=0;assert.equal(tick(p,1000+30*60000).dead,false);const dead=tick(p,1000+3600000);assert.equal(dead.dead,true);dead.coins=REVIVE_PRICE-1;assert.deepEqual(revive(dead),dead,'com 299 moedas não revive e não cobra');dead.coins=REVIVE_PRICE;dead.stats.intelligence=60;const live=revive(dead,9000000);assert.equal(live.coins,0);assert.equal(live.dead,false);assert.equal(live.species,p.species);assert.equal(live.stats.intelligence,60);assert.equal(live.neglectHours,0);assert.equal(live.last,9000000);assert.deepEqual(revive(live,9000001),live,'reviver só cobra uma vez');});
 
 test('inteligência aumenta 1, 3 ou 5 pontos conforme o desempenho',()=>{
  const p=fresh('pets-0','Lua');
@@ -186,4 +186,16 @@ test('ração só bloqueia em 100 e alimenta de 0 a 99.99 sem cobrança indevida
  ]){
   assert.deepEqual(care(pet,'feed'),pet,'outros bloqueios continuam funcionando');
  }
+});
+
+test('reviver custa 300 exatamente e preserva o troco',async()=>{
+ const {revive,REVIVE_PRICE}=await import('../src/engine.js');
+ const p=fresh('pets-0','Lua',1000);p.dead=true;p.deadAt=1000;p.coins=REVIVE_PRICE+100;
+ const n=revive(p,2000);
+ assert.equal(n.coins,100);
+ assert.equal(n.dead,false);
+ assert.equal(p.dead,true,'o save original não deve ser mutado');
+ assert.equal(p.coins,400);
+ assert.equal(n.stats.food,80);
+ assert.equal(n.stats.energy,80);
 });
