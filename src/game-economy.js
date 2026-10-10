@@ -16,12 +16,28 @@ export const GAME_COIN_TARGETS=Object.freeze({
  match3:Object.freeze({good:2400,excellent:4800,legendary:8000})  // Combinações geram mais pontos
 });
 const DEFAULT_TARGETS=Object.freeze({good:60,excellent:160,legendary:320});
-export const MAX_GAME_COINS=15;
+export const MAX_GAME_COINS=20;
+// Faixa especial: 20 moedas para partidas acima da meta lendária.
+// O quebra-cabeça permanece em 15 até termos dados de uma partida real.
+export const GAME_BONUS_20_TARGETS=Object.freeze({
+ memory:570,
+ sequence:900,
+ food:2025,
+ fruitmerge:3600,
+ runner:510,
+ hide:790,
+ flight:790,
+ words:2625,
+ blocks:2065,
+ match3:15000
+});
 
 export function gameCoinReward(gameId,score){
  if(!Number.isFinite(score)||score<=0)return 0;
+ const bonusTarget=GAME_BONUS_20_TARGETS[gameId];
+ if(bonusTarget&&score>=bonusTarget)return MAX_GAME_COINS;
  const {good,excellent,legendary}=GAME_COIN_TARGETS[gameId]||DEFAULT_TARGETS;
- if(score>=legendary)return MAX_GAME_COINS;
+ if(score>=legendary)return 15;
  if(score>=excellent)return 10;
  if(score>=good)return 8;
  return 5;
