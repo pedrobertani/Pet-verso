@@ -27,6 +27,7 @@ export const tricks={
  'selva-0':['roar','Rugir'],'selva-2':['splash','Jogar água'],'selva-4':['roll','Rolar'],'selva-brown':['roll','Rolar'],'selva-polar':['roll','Rolar'],
  'selva-capybara':['relax','Deitar e relaxar'],'selva-fox':['pounce','Saltinho de caça'],'exoticos-penguin':['flap','Bater nadadeiras'],
  'dinos-0':['roar','Rugir'],'dinos-1':['dash','Correr'],'dinos-2':['dash','Correr'],'dinos-3':['dash','Correr'],
+ 'sombrios-frankie':['short-circuit','Curto-circuito'],'sombrios-6':['bandage-whirl','Redemoinho de faixas'],
  'sombrios-0':['vanish','Desaparecer'],'sombrios-1':['spin','Girar no ar'],'sombrios-dragon':['flame','Cuspir uma pequena chama']
 };
 export function trickState(p,now=Date.now()){return {locked:p.stats.intelligence<50,blocked:!!(p.sleeping||p.dead),remaining:Math.max(0,Math.ceil(((p.skills?.trickUntil||0)-now)/1000))};}
@@ -109,6 +110,8 @@ export function animateTrick(target,id,{draw,sound=()=>{},reducedMotion=false,on
  }break;
  case 'vanish':part('root',[{opacity:1,filter:'drop-shadow(0 0 0 #d5bdff)'},{opacity:0,filter:'drop-shadow(0 0 12px #d5bdff)'},{opacity:0},{opacity:1,filter:'drop-shadow(0 0 8px #d5bdff)'},{opacity:1,filter:'none'}],2800);duration=3000;break;
  case 'spin':part('root',motion(['rotate(0deg)','rotate(360deg)']),1600);break;
+ case 'short-circuit':effect('<svg viewBox="0 0 120 100"><path d="M15 48L43 18 36 49 65 30 53 68 93 40 79 77" stroke="#ffe786" stroke-width="6" fill="none" stroke-linejoin="round"/></svg>','trick-lightning');part('.pet-head',motion(['rotate(-5deg)','rotate(5deg)','rotate(-5deg)']),240,'50% 75%',{iterations:9});part('root',[{filter:'drop-shadow(0 0 0px #e7ceff)'},{filter:'drop-shadow(0 0 12px #e7ceff)'},{filter:'none'}],2600);break;
+ case 'bandage-whirl':effect('<svg viewBox="0 0 120 100"><path d="M18 72Q5 30 61 24T100 58Q88 88 34 76M15 48Q51 6 97 36" stroke="#f4dfb6" stroke-width="9" stroke-linecap="round" fill="none"/><path d="M18 72Q5 30 61 24T100 58" stroke="#c8a477" stroke-width="2" fill="none"/></svg>','trick-bandages');part('root',motion(['rotate(0deg)','rotate(360deg)','rotate(720deg)']),2400);break;
  case 'flame':effect('<svg viewBox="0 0 120 60"><path d="M4 30Q45 10 51 17L76 3 69 21 109 13 94 30 116 42 71 40 82 57 44 44Q26 38 4 30Z" fill="#ff9364"/><path d="M7 30Q42 22 69 26l-8 6 14 7Q40 39 7 30" fill="#ffe391"/></svg>','trick-flame');part('.pet-head',motion(['rotate(0)','rotate(-5deg)','rotate(0)']),2400);sound('jump');break;
  }
  function finish(){if(disposed)return;disposed=true;clearTimeout(timer);animations.forEach(a=>a.cancel());effects.forEach(e=>e.remove());if(needsCanonicalArt&&face.isConnected)face.innerHTML=originalMarkup;target.style.animationPlayState=previousWalkState;target.classList.remove('performing-trick');onEnd();}
