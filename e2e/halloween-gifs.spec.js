@@ -116,7 +116,7 @@ test('mumi - print do parquinho inteiro com deserto encantado',async({page})=>{
   Object.assign(background.style,{position:'absolute',inset:'0',width:'100%',height:'100%'});
   const svg=background.querySelector('svg');
   Object.assign(svg.style,{display:'block',width:'100%',height:'100%'});
-  return {environment:svg.getAttribute('aria-label'),pyramid:svg.innerHTML.includes('desert-pyramid'),pet:!!world.querySelector('.park-pet'),toy:!!world.querySelector('.park-object svg')};
+  return {environment:svg.getAttribute('aria-label'),pyramid:svg.innerHTML.includes('mumi-oasis'),pet:!!world.querySelector('.park-pet'),toy:!!world.querySelector('.park-object svg')};
  });
  expect(result).toEqual({environment:'Deserto encantado',pyramid:true,pet:true,toy:true});
  await page.locator('#mumi-full-playground').screenshot({path:join('halloween-videos','mumi-parquinho-inteiro.png')});
