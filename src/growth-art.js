@@ -24,6 +24,8 @@ export const growthProfiles={
  'dinos-3':{head:[.97,.93],tail:[.82,.8]},
  'sombrios-0':{body:[.84,.7],arm:[.7,.7]},
  'sombrios-1':{wing:[.9,.9],head:[.9,.85]},
+ 'sombrios-frankie':{head:[1.08,1.07],body:[.68,.75],arm:[.72,.78],leg:[.7,.75]},
+ 'sombrios-6':{head:[1.09,1.06],body:[.68,.74],arm:[.72,.78],leg:[.7,.75]},
  'sombrios-dragon':{wing:[.9,.9],tail:[.52,.65],head:[.92,.82]},
 };
 function transformGroup(svg,cls,transform){

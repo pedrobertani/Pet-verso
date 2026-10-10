@@ -1,0 +1,49 @@
+name: Capturar GIFs Halloween
+on:
+  push:
+    branches: [feature/halloween-frankie-mumi]
+    paths:
+      - '.github/workflows/halloween-gifs.yml'
+      - 'e2e/halloween-gifs.spec.js'
+      - 'src/park-actions.js'
+      - 'src/park-toys.js'
+      - 'src/park-environments.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  capturar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Instalar FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Capturar habilidades no Chromium
+        run: npx playwright test e2e/halloween-gifs.spec.js --project=desktop --workers=1
+      - name: Converter capturas reais em GIF
+        if: always()
+        run: |
+          mkdir -p halloween-gifs
+          for file in halloween-videos/*.webm; do
+            [ -f "$file" ] || continue
+            name=$(basename "$file" .webm)
+            ffmpeg -y -i "$file" -vf "fps=12,scale=560:-1:flags=lanczos,palettegen" "/tmp/${name}-palette.png"
+            ffmpeg -y -i "$file" -i "/tmp/${name}-palette.png" -lavfi "fps=12,scale=560:-1:flags=lanczos[x];[x][1:v]paletteuse" "halloween-gifs/${name}.gif"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: halloween-habilidades-gifs
+          path: |
+            halloween-gifs/
+            halloween-videos/
+            test-results/
+          retention-days: 14
+          if-no-files-found: warn

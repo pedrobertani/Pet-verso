@@ -22,4 +22,5 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test
+      # GIF capture uses FFmpeg and runs in its dedicated Halloween workflow.
+      - run: npx playwright test --grep-invert 'GIF real'

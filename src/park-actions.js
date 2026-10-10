@@ -5,7 +5,7 @@ export const parkActions={
  'exoticos-0':'swim','exoticos-1':'branch','exoticos-7':'bridge',
  'selva-0':'bat-ball','selva-2':'waterwheel','selva-4':'bamboo','selva-brown':'log','selva-polar':'ice-pool','selva-capybara':'shower-pool','selva-fox':'den','exoticos-penguin':'slide',
  'dinos-0':'bite-ball','dinos-1':'push-ball','dinos-2':'leaves','dinos-3':'logs',
- 'sombrios-0':'hoop','sombrios-1':'hoop','sombrios-dragon':'dragon-hoop','selva-owl':'hoop','dinos-pterosaur':'hoop','exoticos-frog':'lily-pool'
+ 'sombrios-frankie':'lightning-generator','sombrios-6':'sand-tsunami','sombrios-0':'hoop','sombrios-1':'hoop','sombrios-dragon':'dragon-hoop','selva-owl':'hoop','dinos-pterosaur':'hoop','exoticos-frog':'lily-pool'
 };
 export const supportedParkActions=Object.keys(parkActions);
 export function parkActionState(p,now=Date.now()){return {locked:p.stats.intelligence<PARK_INTELLIGENCE,blocked:!!(p.sleeping||p.dead),remaining:Math.max(0,Math.ceil(((p.skills?.parkUntil||0)-now)/1000))};}
@@ -53,6 +53,42 @@ export function animateParkAction(world,target,id,{level=2,reducedMotion=false,o
  part('.leg-0',[{rotate:'-7deg'},{rotate:'7deg'},{rotate:'-7deg'}],{duration:reducedMotion?200:560,iterations:reducedMotion?3:11});
  part('.leg-1',[{rotate:'7deg'},{rotate:'-7deg'},{rotate:'7deg'}],{duration:reducedMotion?200:560,iterations:reducedMotion?3:11});
  switch(kind){
+ case 'lightning-generator':{
+ const at=point(85,148);travel(at,.74);returnTurn(.76);
+ toyPart('.toy-lightning',[{opacity:.1,filter:'drop-shadow(0 0 0px #ffe786)'},{opacity:1,filter:'drop-shadow(0 0 10px #ffe786)'},{opacity:.1}],{delay:reducedMotion?150:1500,duration:reducedMotion?600:800,iterations:reducedMotion?2:4});
+ // Reuse Frankie's level-50 short-circuit visual language: several small bolts around his body.
+ const sparks=document.createElement('div');sparks.className='park-action-effect frankie-sparks';
+ Object.assign(sparks.style,{position:'absolute',inset:'-8% -15%',pointerEvents:'none',zIndex:'24',opacity:'0',filter:'drop-shadow(0 0 6px #ffe17b)'});
+ sparks.innerHTML=`<svg viewBox="0 0 200 200" width="100%" height="100%" style="overflow:visible" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M48 70L30 55 43 53 25 31" stroke="#fff9d0" stroke-width="5"/><path d="M152 70l18-15-13-2 18-22" stroke="#fff9d0" stroke-width="5"/><path d="M57 42l-5-15 14 5 3-19M143 42l5-15-14 5-3-19" stroke="#ffe05e" stroke-width="4"/><path d="M35 90l-18-7 11-8M165 90l18-7-11-8" stroke="#a6f3ff" stroke-width="4"/><path d="M52 125l-18 9 11 8-17 12M148 125l18 9-11 8 17 12" stroke="#ffe05e" stroke-width="4"/><path d="M70 161l-9 13 13-3-6 16M130 161l9 13-13-3 6 16" stroke="#a6f3ff" stroke-width="4"/></g><g fill="#fff9cc"><circle cx="28" cy="40" r="4"/><circle cx="171" cy="40" r="4"/><circle cx="52" cy="20" r="3"/><circle cx="147" cy="20" r="3"/></g></svg>`;
+ target.append(sparks);effects.push(sparks);
+ animate(sparks,[{offset:0,opacity:0,scale:'.9'},{offset:.25,opacity:0},{offset:.28,opacity:1,scale:'1.05'},{offset:.34,opacity:.25},{offset:.42,opacity:1,scale:'.95'},{offset:.49,opacity:.1},{offset:.57,opacity:1,scale:'1.08'},{offset:.67,opacity:.25},{offset:.75,opacity:0},{offset:1,opacity:0}]);
+ animate(face,[{offset:0,transform:'perspective(480px) rotateY(0deg) scaleX(1)'},{offset:.16,transform:'perspective(480px) rotateY(-17deg) scaleX(1.04)'},{offset:.29,transform:'perspective(480px) rotateY(-25deg) scaleX(1.09)'},{offset:.52,transform:'perspective(480px) rotateY(-19deg) scaleX(1.06)'},{offset:.75,transform:'perspective(480px) rotateY(-12deg) scaleX(1.03)'},{offset:1,transform:'perspective(480px) rotateY(0deg) scaleX(1)'}]);
+ part('.pet-head',[{rotate:'-5deg'},{rotate:'5deg'},{rotate:'-5deg'}],{delay:reducedMotion?150:1500,duration:reducedMotion?400:320,iterations:reducedMotion?2:8});break;}
+ case 'sand-tsunami':{
+ // Mumi approaches the altar, touches its glowing rune, then summons the sand wave.
+ const altar=point(110,104),nearAltar={x:altar.x,y:altar.y+12};
+ animate(target,[move(0,zero),move(.14,nearAltar),move(.28,nearAltar),move(.39,zero),move(.78,zero),move(1,zero)]);
+ const rune=document.createElement('div');rune.className='park-action-effect mumi-altar-rune';
+ Object.assign(rune.style,{position:'absolute',left:`${b.left-w.left}px`,top:`${b.top-w.top}px`,width:`${b.width}px`,height:`${b.height}px`,pointerEvents:'none',zIndex:'19',opacity:'0'});
+ rune.innerHTML=`<svg viewBox="0 0 220 180" width="100%" height="100%" aria-hidden="true"><g fill="none" stroke="#fff4b8" stroke-linecap="round" stroke-linejoin="round"><path d="M110 69l12 19-12 15-12-15Z" stroke-width="5"/><path d="M76 111h68M84 135h52" stroke-width="4"/><circle cx="110" cy="88" r="28" stroke-width="3" stroke-dasharray="5 7"/></g><g fill="#fff3bd"><path d="M58 85l4-9 4 9 9 4-9 4-4 9-4-9-9-4ZM159 97l3-7 3 7 7 3-7 3-3 7-3-7-7-3Z"/></g></svg>`;
+ world.append(rune);effects.push(rune);
+ animate(rune,[{offset:0,opacity:0,filter:'drop-shadow(0 0 0px #ffe3a0)'},{offset:.15,opacity:0},{offset:.23,opacity:1,filter:'drop-shadow(0 0 12px #ffe3a0)'},{offset:.32,opacity:.85},{offset:.42,opacity:0},{offset:1,opacity:0}]);
+ animate(face,[{offset:0,transform:'scaleX(1) rotateY(0deg)'},{offset:.13,transform:'scaleX(.83) rotateY(32deg)'},{offset:.75,transform:'scaleX(.83) rotateY(32deg)'},{offset:1,transform:'scaleX(1) rotateY(0deg)'}]);
+ part('.pet-arm, .arm, .pet-arm-left, .pet-arm-right',[{offset:0,rotate:'0deg'},{offset:.14,rotate:'-70deg'},{offset:.73,rotate:'-70deg'},{offset:1,rotate:'0deg'}]);
+ const wave=document.createElement('div');
+ wave.className='park-action-effect park-sand-tsunami';
+ Object.assign(wave.style,{position:'absolute',left:'0',top:'0',width:'100%',height:'100%',pointerEvents:'none',zIndex:'20',transformOrigin:'16% 96%',maskImage:'linear-gradient(to right, transparent 0%, black 13%, black 100%)',WebkitMaskImage:'linear-gradient(to right, transparent 0%, black 13%, black 100%)'});
+ const grains=Array.from({length:62},(_,i)=>`<circle cx="${(i*71)%600}" cy="${80+(i*43)%260}" r="${1+i%4}" fill="${i%3?'#ffe4aa':'#b77c4c'}" opacity=".65"/>`).join('');
+ wave.innerHTML=`<svg viewBox="0 0 600 340" preserveAspectRatio="none" style="width:100%;height:100%"><defs><linearGradient id="mumi-sand-wave" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff5c9"/><stop offset=".38" stop-color="#efc17a"/><stop offset="1" stop-color="#b87947"/></linearGradient></defs><path d="M-85 365Q-78 365 -69 363Q-57 355 -49 321Q-43 303 -30 303Q-16 304 -10 284Q-5 274 5 268Q46 244 65 200Q79 162 101 121Q121 76 155 77Q195 78 205 115Q218 152 189 187Q166 211 133 217Q202 194 251 228Q302 265 377 280Q478 293 655 320L655 365H-85Z" fill="url(#mumi-sand-wave)" stroke="#ffe5a7" stroke-width="8" stroke-linejoin="round"/><path d="M-45 320Q-14 292 5 268Q65 260 103 142Q124 100 152 101Q182 103 179 132Q171 165 147 182M152 220Q225 212 291 262" stroke="#fff2ca" stroke-width="11" fill="none" opacity=".9" stroke-linecap="round"/><path d="M-30 331Q76 295 132 239T270 275" stroke="#b47d4e" stroke-width="9" opacity=".45" fill="none"/>${grains}</svg>`;
+ world.append(wave);effects.push(wave);
+ // Rising locally, sweeping over the entire viewport, then receding instead of popping out.
+ animate(wave,[{offset:0,opacity:0,transform:'translate(-34%,38%) scale(.04,.02)'},{offset:.13,opacity:.9,transform:'translate(-30%,26%) scale(.17,.25)'},{offset:.25,opacity:1,transform:'translate(-22%,12%) scale(.45,.7)'},{offset:.39,opacity:1,transform:'translate(-9%,0%) scale(.94,1.08)'},{offset:.55,opacity:1,transform:'translate(14%,-8%) scale(1.45,1.7)'},{offset:.7,opacity:.95,transform:'translate(45%,-4%) scale(1.65,1.5)'},{offset:.84,opacity:.45,transform:'translate(94%,16%) scale(1.2,.7)'},{offset:1,opacity:0,transform:'translate(130%,45%) scale(.55,.15)'}]);
+ const dust=document.createElement('div');dust.className='park-action-effect park-sand-dust';
+ Object.assign(dust.style,{position:'absolute',inset:'0',zIndex:'21',pointerEvents:'none'});
+ dust.innerHTML=`<svg viewBox="0 0 600 340" preserveAspectRatio="none" style="width:100%;height:100%"><g fill="#f9d59a">${Array.from({length:85},(_,i)=>`<circle cx="${(i*113)%600}" cy="${65+(i*53)%270}" r="${1+i%4}" opacity="${.3+(i%5)*.12}"/>`).join('')}</g></svg>`;
+ world.append(dust);effects.push(dust);
+ animate(dust,[{offset:0,opacity:0,translate:'-20px 25px'},{offset:.65,opacity:0,translate:'0 0'},{offset:.78,opacity:.9,translate:'10px -12px'},{offset:1,opacity:0,translate:'80px -65px'}]);
+ break;}
  case 'fetch':{
  const mouth=target.querySelector('.mouth')?.getBoundingClientRect(),offset={x:mouth?mouth.left+mouth.width/2-w.left-origin.x:p.width*.2,y:mouth?mouth.top+mouth.height/2-w.top-origin.y:-p.height*.35};
  const landing=point(-30,147),catchAt={x:landing.x-offset.x,y:point(-30,163).y};
