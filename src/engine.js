@@ -89,4 +89,5 @@ shop.push(...[
 shop.push(...parkToys);
 export function buy(p,id,color){const item=shop.find(x=>x.id===id);const n=structuredClone(p);if(n.dead)return n;n.inventory??=[];n.equipped??={};if(!item||(item.species&&item.species!==n.species)||color!==undefined&&!validItemColor(color))return n;if(n.inventory.includes(id)){n.equipped[item.slot]=id;if(color){n.itemColors??={};n.itemColors[id]=color;}return n;}if(n.coins<item.price)return n;n.coins-=item.price;n.inventory.push(id);n.equipped[item.slot]=id;if(color){n.itemColors??={};n.itemColors[id]=color;}return n;}
 
-export function revive(p,now=Date.now()){const n=structuredClone(p);if(!n.dead||n.coins<5000)return n;n.coins-=5000;n.dead=false;n.deadAt=null;n.ill=false;n.illnessHours=0;n.neglectHours=0;n.sleeping=false;n.waste=0;n.floorDirt=0;n.wasteClock=0;n.last=now;for(const k of ['food','joy','energy','hygiene','health'])n.stats[k]=80;return n;}
+export const REVIVE_PRICE=300;
+export function revive(p,now=Date.now()){const n=structuredClone(p);if(!n.dead||n.coins<REVIVE_PRICE)return n;n.coins-=REVIVE_PRICE;n.dead=false;n.deadAt=null;n.ill=false;n.illnessHours=0;n.neglectHours=0;n.sleeping=false;n.waste=0;n.floorDirt=0;n.wasteClock=0;n.last=now;for(const k of ['food','joy','energy','hygiene','health'])n.stats[k]=80;return n;}
