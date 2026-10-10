@@ -5,7 +5,7 @@ export const parkActions={
  'exoticos-0':'swim','exoticos-1':'branch','exoticos-7':'bridge',
  'selva-0':'bat-ball','selva-2':'waterwheel','selva-4':'bamboo','selva-brown':'log','selva-polar':'ice-pool','selva-capybara':'shower-pool','selva-fox':'den','exoticos-penguin':'slide',
  'dinos-0':'bite-ball','dinos-1':'push-ball','dinos-2':'leaves','dinos-3':'logs',
- 'sombrios-frankie':'lightning-generator','sombrios-6':'sarcophagus','sombrios-0':'hoop','sombrios-1':'hoop','sombrios-dragon':'dragon-hoop','selva-owl':'hoop','dinos-pterosaur':'hoop','exoticos-frog':'lily-pool'
+ 'sombrios-frankie':'lightning-generator','sombrios-6':'sand-tsunami','sombrios-0':'hoop','sombrios-1':'hoop','sombrios-dragon':'dragon-hoop','selva-owl':'hoop','dinos-pterosaur':'hoop','exoticos-frog':'lily-pool'
 };
 export const supportedParkActions=Object.keys(parkActions);
 export function parkActionState(p,now=Date.now()){return {locked:p.stats.intelligence<PARK_INTELLIGENCE,blocked:!!(p.sleeping||p.dead),remaining:Math.max(0,Math.ceil(((p.skills?.parkUntil||0)-now)/1000))};}
@@ -57,11 +57,18 @@ export function animateParkAction(world,target,id,{level=2,reducedMotion=false,o
  const at=point(85,148);travel(at,.74);returnTurn(.76);
  toyPart('.toy-lightning',[{opacity:.1,filter:'drop-shadow(0 0 0px #ffe786)'},{opacity:1,filter:'drop-shadow(0 0 10px #ffe786)'},{opacity:.1}],{delay:reducedMotion?150:1500,duration:reducedMotion?600:800,iterations:reducedMotion?2:4});
  part('.pet-head',[{rotate:'-5deg'},{rotate:'5deg'},{rotate:'-5deg'}],{delay:reducedMotion?150:1500,duration:reducedMotion?400:320,iterations:reducedMotion?2:8});break;}
- case 'sarcophagus':{
- const at=point(108,124);
- animate(target,[move(0,zero),move(.18,at),move(.29,at,1,1),move(.42,at,0,.65),move(.64,at,0,.65),move(.78,at,1,.85),move(1,zero)]);returnTurn(.79);
- toyPart('.toy-sarcophagus-lid',[{offset:0,transform:'translate(0px,0px)',opacity:1},{offset:.2,transform:'translate(0px,-16px)',opacity:1},{offset:.35,transform:'translate(15px,-26px)',opacity:1},{offset:.65,transform:'translate(15px,-26px)',opacity:1},{offset:.79,transform:'translate(0px,0px)',opacity:1},{offset:1,transform:'translate(0px,0px)',opacity:1}],{transformOrigin:'50% 50%'});
- toyPart('.toy-sarcophagus-sparks',[{offset:0,opacity:0,transform:'scale(.4)'},{offset:.38,opacity:0,transform:'scale(.4)'},{offset:.48,opacity:1,transform:'scale(1.2)'},{offset:.62,opacity:1,transform:'scale(.8)'},{offset:.77,opacity:0,transform:'scale(1.3)'},{offset:1,opacity:0,transform:'scale(.4)'}]);break;}
+ case 'sand-tsunami':{
+ // Mumi faces sideways, lifts an arm, then summons a wave that crosses the whole playground.
+ animate(target,[move(0,zero),move(.16,zero),move(.82,zero),move(1,zero)]);
+ animate(face,[{offset:0,transform:'scaleX(1) scaleY(1)'},{offset:.18,transform:'scaleX(.7) scaleY(1)'},{offset:.75,transform:'scaleX(.7) scaleY(1)'},{offset:1,transform:'scaleX(1) scaleY(1)'}]);
+ part('.pet-arm, .arm, .pet-arm-left, .pet-arm-right',[{offset:0,rotate:'0deg'},{offset:.2,rotate:'-65deg'},{offset:.72,rotate:'-65deg'},{offset:1,rotate:'0deg'}],{transformOrigin:'50% 0%'});
+ const wave=document.createElement('div');
+ wave.className='park-action-effect park-sand-tsunami';
+ Object.assign(wave.style,{position:'absolute',left:'0',top:'0',width:'100%',height:'100%',pointerEvents:'none',zIndex:'20',transformOrigin:'left bottom'});
+ wave.innerHTML=`<svg viewBox="0 0 600 340" preserveAspectRatio="none" style="width:100%;height:100%"><defs><linearGradient id="mumi-sand-wave" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff0bd"/><stop offset=".45" stop-color="#e9bb75"/><stop offset="1" stop-color="#bf8656"/></linearGradient></defs><path d="M-120 340V246Q-45 205 15 180Q65 140 100 89Q119 53 157 62Q194 73 191 117Q191 150 164 175Q220 151 255 181Q282 205 325 228L660 275V340Z" fill="url(#mumi-sand-wave)" stroke="#ffe6ad" stroke-width="9"/><path d="M-60 286Q78 220 134 104Q157 87 168 114M150 183Q225 177 268 216" fill="none" stroke="#fff0c4" stroke-width="11" opacity=".85"/><g fill="#f8d89a">${Array.from({length:35},(_,i)=>`<circle cx="${(i*79)%600}" cy="${110+(i*43)%220}" r="${2+i%5}" opacity=".65"/>`).join('')}</g></svg>`;
+ world.append(wave);effects.push(wave);
+ animate(wave,[{offset:0,opacity:0,transform:'translateX(-110%) scale(.35)'},{offset:.17,opacity:0,transform:'translateX(-95%) scale(.55)'},{offset:.3,opacity:1,transform:'translateX(-65%) scale(.85)'},{offset:.51,opacity:1,transform:'translateX(10%) scale(1.18)'},{offset:.72,opacity:1,transform:'translateX(75%) scale(1.22)'},{offset:.88,opacity:.3,transform:'translateX(115%) scale(1.15)'},{offset:1,opacity:0,transform:'translateX(130%) scale(1.15)'}]);
+ break;}
  case 'fetch':{
  const mouth=target.querySelector('.mouth')?.getBoundingClientRect(),offset={x:mouth?mouth.left+mouth.width/2-w.left-origin.x:p.width*.2,y:mouth?mouth.top+mouth.height/2-w.top-origin.y:-p.height*.35};
  const landing=point(-30,147),catchAt={x:landing.x-offset.x,y:point(-30,163).y};
