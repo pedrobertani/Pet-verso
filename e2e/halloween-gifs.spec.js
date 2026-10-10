@@ -92,3 +92,22 @@ for(const [id,name] of pets){
   await page.locator('#halloween-object-preview').screenshot({path:join('halloween-videos',`${name}-objeto.png`)});
  });
 }
+
+const halloweenShopIds=['halloween-pumpkin-table','halloween-candles','halloween-rug','halloween-bed','halloween-shelf'];
+test('prints dos cinco itens Halloween da loja',async({page})=>{
+ await page.goto('/');
+ await page.evaluate(async()=>{
+  const {fresh}=await import('/src/engine.js');
+  const pet=fresh('sombrios-frankie','Frankie');
+  pet.coins=5000;
+  localStorage.setItem('petverso-v1',JSON.stringify(pet));
+ });
+ await page.reload();
+ await page.locator('[data-page="shop"]').click();
+ for(const id of halloweenShopIds){
+  const item=page.locator(`[data-buy="${id}"]`);
+  await expect(item).toBeVisible();
+  await item.scrollIntoViewIfNeeded();
+  await item.screenshot({path:join('halloween-videos',`shopping-${id}.png`)});
+ }
+});
