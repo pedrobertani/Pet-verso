@@ -110,8 +110,22 @@ export function animateTrick(target,id,{draw,sound=()=>{},reducedMotion=false,on
  }break;
  case 'vanish':part('root',[{opacity:1,filter:'drop-shadow(0 0 0 #d5bdff)'},{opacity:0,filter:'drop-shadow(0 0 12px #d5bdff)'},{opacity:0},{opacity:1,filter:'drop-shadow(0 0 8px #d5bdff)'},{opacity:1,filter:'none'}],2800);duration=3000;break;
  case 'spin':part('root',motion(['rotate(0deg)','rotate(360deg)']),1600);break;
- case 'short-circuit':effect('<svg viewBox="0 0 120 100"><path d="M15 48L43 18 36 49 65 30 53 68 93 40 79 77" stroke="#ffe786" stroke-width="6" fill="none" stroke-linejoin="round"/></svg>','trick-lightning');part('.pet-head',motion(['rotate(-5deg)','rotate(5deg)','rotate(-5deg)']),240,'50% 75%',{iterations:9});part('root',[{filter:'drop-shadow(0 0 0px #e7ceff)'},{filter:'drop-shadow(0 0 12px #e7ceff)'},{filter:'none'}],2600);break;
- case 'bandage-whirl':effect('<svg viewBox="0 0 120 100"><path d="M18 72Q5 30 61 24T100 58Q88 88 34 76M15 48Q51 6 97 36" stroke="#f4dfb6" stroke-width="9" stroke-linecap="round" fill="none"/><path d="M18 72Q5 30 61 24T100 58" stroke="#c8a477" stroke-width="2" fill="none"/></svg>','trick-bandages');part('root',motion(['rotate(0deg)','rotate(360deg)','rotate(720deg)']),2400);break;
+ case 'short-circuit':{
+ const bolts=svg.querySelectorAll('.pet-bolt,.head-bolt');
+ const fx=document.createElement('div');fx.className='trick-effect trick-frankie-sparks';
+ Object.assign(fx.style,{position:'absolute',inset:'0',pointerEvents:'none',zIndex:'5'});
+ fx.innerHTML='<svg viewBox="0 0 200 200" style="width:100%;height:100%;overflow:visible"><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M48 70L30 55 43 53 25 31" stroke="#fff9d0" stroke-width="5"/><path d="M152 70l18-15-13-2 18-22" stroke="#fff9d0" stroke-width="5"/><path d="M57 42l-5-15 14 5 3-19M143 42l5-15-14 5-3-19" stroke="#ffe05e" stroke-width="4"/><path d="M35 90l-18-7 11-8M165 90l18-7-11-8" stroke="#a6f3ff" stroke-width="4"/></g><g fill="#fff9cc"><circle cx="28" cy="40" r="4"/><circle cx="171" cy="40" r="4"/><circle cx="52" cy="20" r="3"/><circle cx="147" cy="20" r="3"/></g></svg>';
+ face.append(fx);effects.push(fx);
+ animations.push(fx.animate([{opacity:0,transform:'scale(.75)'},{opacity:1,transform:'scale(1.08)'},{opacity:.35,transform:'scale(.93)'},{opacity:1,transform:'scale(1.06)'},{opacity:0,transform:'scale(1.2)'}],{duration:reducedMotion?800:2600,fill:'both'}));
+ part('.pet-head',motion(['rotate(-3deg)','rotate(3deg)','rotate(-3deg)','rotate(0deg)']),330,'50% 75%',{iterations:7});
+ part('root',[{filter:'drop-shadow(0 0 0px #ffed9c)'},{filter:'drop-shadow(0 0 11px #ffe17b)'},{filter:'none'}],2600);break;}
+ case 'bandage-whirl':{
+ const fx=document.createElement('div');fx.className='trick-effect trick-mumi-tornado';
+ Object.assign(fx.style,{position:'absolute',inset:'0',pointerEvents:'none',zIndex:'5'});
+ fx.innerHTML='<svg viewBox="0 0 200 200" style="width:100%;height:100%;overflow:visible"><defs><linearGradient id="mumi-wind" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#fff3cf"/><stop offset=".5" stop-color="#cbb39a"/><stop offset="1" stop-color="#fff4db"/></linearGradient></defs><g fill="none" stroke="url(#mumi-wind)" stroke-linecap="round"><path d="M38 158Q100 184 163 157T60 131Q14 117 81 102T151 78Q170 62 76 61T91 39" stroke-width="11"/><path d="M51 169Q111 192 170 163M46 124Q116 144 161 111M57 88Q107 101 151 74" stroke="#e2c6a0" stroke-width="5"/></g><g fill="#d6bb98" opacity=".85"><circle cx="39" cy="167" r="5"/><circle cx="163" cy="176" r="6"/><circle cx="62" cy="182" r="4"/><circle cx="146" cy="148" r="3"/></g></svg>';
+ face.append(fx);effects.push(fx);
+ animations.push(fx.animate([{opacity:0,transform:'translateY(18px) scale(.55) rotate(-15deg)'},{opacity:1,transform:'translateY(-8px) scale(1.1) rotate(10deg)'},{opacity:1,transform:'translateY(-17px) scale(1.15) rotate(-8deg)'},{opacity:0,transform:'translateY(-38px) scale(.7) rotate(25deg)'}],{duration:reducedMotion?800:2600,fill:'both'}));
+ part('.pet-head',motion(['rotate(0deg)','rotate(-4deg)','rotate(4deg)','rotate(0deg)']),900);break;}
  case 'flame':effect('<svg viewBox="0 0 120 60"><path d="M4 30Q45 10 51 17L76 3 69 21 109 13 94 30 116 42 71 40 82 57 44 44Q26 38 4 30Z" fill="#ff9364"/><path d="M7 30Q42 22 69 26l-8 6 14 7Q40 39 7 30" fill="#ffe391"/></svg>','trick-flame');part('.pet-head',motion(['rotate(0)','rotate(-5deg)','rotate(0)']),2400);sound('jump');break;
  }
  function finish(){if(disposed)return;disposed=true;clearTimeout(timer);animations.forEach(a=>a.cancel());effects.forEach(e=>e.remove());if(needsCanonicalArt&&face.isConnected)face.innerHTML=originalMarkup;target.style.animationPlayState=previousWalkState;target.classList.remove('performing-trick');onEnd();}
