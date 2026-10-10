@@ -27,7 +27,7 @@ async function getPlayableMove(page){
   const board=Array.from({length:size},()=>Array(size));
   for(const button of buttons){
    const [r,c]=button.dataset.gem.split(',').map(Number);
-   board[r][c]=[...button.querySelector('.treat-art').classList].find(x=>x.startsWith('treat-'));
+   board[r][c]=[...button.querySelector('.treat-art').classList].find(x=>/^treat-\d+$/.test(x));
   }
   const move=findAvailableMatch3Swap(board);
   return move;
