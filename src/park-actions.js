@@ -58,8 +58,10 @@ export function animateParkAction(world,target,id,{level=2,reducedMotion=false,o
  toyPart('.toy-lightning',[{opacity:.1,filter:'drop-shadow(0 0 0px #ffe786)'},{opacity:1,filter:'drop-shadow(0 0 10px #ffe786)'},{opacity:.1}],{delay:reducedMotion?150:1500,duration:reducedMotion?600:800,iterations:reducedMotion?2:4});
  part('.pet-head',[{rotate:'-5deg'},{rotate:'5deg'},{rotate:'-5deg'}],{delay:reducedMotion?150:1500,duration:reducedMotion?400:320,iterations:reducedMotion?2:8});break;}
  case 'sarcophagus':{
- const at=point(110,141);animate(target,[move(0,zero),move(.23,at),move(.38,at,.1,.7),move(.63,at,0,.7),move(.77,at,1,.8),move(1,zero)]);returnTurn(.8);
- toyPart('.toy-sarcophagus-lid',[{offset:0,opacity:.4},{offset:.32,opacity:.9},{offset:.65,opacity:1},{offset:.8,opacity:.4},{offset:1,opacity:.4}]);break;}
+ const at=point(108,124);
+ animate(target,[move(0,zero),move(.18,at),move(.29,at,1,1),move(.42,at,0,.65),move(.64,at,0,.65),move(.78,at,1,.85),move(1,zero)]);returnTurn(.79);
+ toyPart('.toy-sarcophagus-lid',[{offset:0,transform:'translate(0px,0px)',opacity:1},{offset:.2,transform:'translate(0px,-16px)',opacity:1},{offset:.35,transform:'translate(15px,-26px)',opacity:1},{offset:.65,transform:'translate(15px,-26px)',opacity:1},{offset:.79,transform:'translate(0px,0px)',opacity:1},{offset:1,transform:'translate(0px,0px)',opacity:1}],{transformOrigin:'50% 50%'});
+ toyPart('.toy-sarcophagus-sparks',[{offset:0,opacity:0,transform:'scale(.4)'},{offset:.38,opacity:0,transform:'scale(.4)'},{offset:.48,opacity:1,transform:'scale(1.2)'},{offset:.62,opacity:1,transform:'scale(.8)'},{offset:.77,opacity:0,transform:'scale(1.3)'},{offset:1,opacity:0,transform:'scale(.4)'}]);break;}
  case 'fetch':{
  const mouth=target.querySelector('.mouth')?.getBoundingClientRect(),offset={x:mouth?mouth.left+mouth.width/2-w.left-origin.x:p.width*.2,y:mouth?mouth.top+mouth.height/2-w.top-origin.y:-p.height*.35};
  const landing=point(-30,147),catchAt={x:landing.x-offset.x,y:point(-30,163).y};
