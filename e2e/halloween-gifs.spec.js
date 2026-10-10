@@ -3,7 +3,7 @@ import {mkdirSync} from 'node:fs';
 import {join} from 'node:path';
 
 const pets=[['sombrios-frankie','frankie'],['sombrios-6','mumi']];
-// Capture approved Mumi tornado and new enchanted desert sand tsunami.
+// Capture approved Mumi tornado and three-act tsunami in the lush enchanted desert oasis.
 const clips=['trick','park'];
 mkdirSync('halloween-videos',{recursive:true});
 
