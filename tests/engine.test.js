@@ -1,4 +1,4 @@
-import {test} from 'node:test';import assert from 'node:assert/strict';import {species,activeSpecies,fresh,valid,tick,care,canFeedByHunger,reward,randomSpecies,visibleWasteSlots} from '../src/engine.js';
+import {test} from 'node:test';import assert from 'node:assert/strict';import {species,activeSpecies,fresh,valid,tick,care,canFeedByHunger,reward,randomSpecies,visibleWasteSlots,MEDICINE_PRICE,ILLNESS_NEGLECT_HOURS} from '../src/engine.js';
 test('catálogo cobre todas as famílias com identidades únicas',()=>{assert.equal(species.length,51);assert.equal(new Set(species.map(s=>s.id)).size,species.length);assert.equal(new Set(species.map(s=>s.family)).size,5);});
 test('sorteio alcança todas as espécies',()=>{activeSpecies.forEach((s,i)=>assert.equal(randomSpecies(()=>(i+.5)/activeSpecies.length),s.id));});
 test('sono recupera energia offline sem multiplicar tempo ao reabrir',()=>{let p=fresh('pets-0','Lua',1000);p.stats.energy=10;p.sleeping=true;const n=tick(p,3601000);assert.equal(n.stats.energy,60);assert.equal(n.sleeping,true);assert.deepEqual(tick(n,3601000),n);assert.equal(n.stats.intelligence,0);});
@@ -131,7 +131,8 @@ test('saciedade cai 24/h e cada refeição repõe 30 pontos por 5 moedas',()=>{
  assert.equal(tick({...fed,sleeping:true},1000+2*3600000).stats.food,49);
  assert.equal(care(fed,'medicine').coins,15,'preço do remédio não foi modificado');
  const patient={...fed,stats:{...fed.stats,health:50}};
- assert.equal(care(patient,'medicine').coins,3,'remédio custa 12 moedas');
+ assert.equal(care(patient,'medicine').coins,5,'remédio custa 10 moedas');
+ assert.equal(care(patient,'medicine').stats.health,100,'uma dose enche toda a saúde');
 });
 
 test('higiene cai 10 por hora acordado e 5 por hora dormindo, antes de produzir cocô',()=>{
@@ -234,4 +235,49 @@ test('limpeza geral e reviver não guardam posições antigas de cocô',()=>{
  assert.deepEqual(visibleWasteSlots(clean,'floorDirt'),[]);
  assert.deepEqual(clean.wasteSlotIds,[]);
  assert.deepEqual(clean.dirtSlotIds,[]);
+});
+
+
+test('remédio custa dez moedas e recupera completamente saúde e doença',()=>{
+ const patient=fresh('pets-0','Doentinho',1000);
+ patient.coins=20;patient.stats.health=24;patient.ill=true;
+ patient.illnessHours=22;patient.neglectHours=27;
+ const treated=care(patient,'medicine');
+ assert.equal(MEDICINE_PRICE,10);
+ assert.equal(treated.coins,10);
+ assert.equal(treated.stats.health,100);
+ assert.equal(treated.ill,false);
+ assert.equal(treated.illnessHours,0);
+ assert.equal(treated.neglectHours,0);
+ assert.equal(care(treated,'medicine').coins,10,'não cobra outra dose em pet saudável');
+ assert.equal(patient.stats.health,24,'estado original permanece inalterado');
+});
+test('remédio cura também pet doente mesmo com saúde acima de 90',()=>{
+ const patient=fresh('pets-0','Doentinho',1000);
+ patient.ill=true;patient.stats.health=96;patient.coins=10;
+ const treated=care(patient,'medicine');
+ assert.equal(treated.coins,0);
+ assert.equal(treated.stats.health,100);
+ assert.equal(treated.ill,false);
+});
+test('sem dez moedas, remédio não trata nem altera o paciente',()=>{
+ const patient=fresh('pets-0','Doentinho',1000);
+ patient.ill=true;patient.stats.health=11;patient.coins=9;
+ assert.deepEqual(care(patient,'medicine'),patient);
+});
+test('doença começa somente após 24 horas de negligência crítica contínua',()=>{
+ assert.equal(ILLNESS_NEGLECT_HOURS,24);
+ const p=fresh('pets-0','Pet',1000);
+ p.stats.food=0;p.stats.hygiene=0;p.stats.health=20;
+ const notYet=tick(p,1000+23*3600000);
+ assert.equal(notYet.ill,false,'saúde crítica não ignora o prazo de tolerância');
+ assert.ok(notYet.neglectHours>=23);
+ const sick=tick(notYet,1000+24*3600000);
+ assert.equal(sick.ill,true);
+ assert.ok(sick.neglectHours>=24);
+ const healthy=fresh('pets-0','Pet',1000);
+ const afterDay=tick(healthy,1000+24*3600000);
+ assert.equal(afterDay.ill,false,'pet novo não fica doente antes de completar negligência crítica');
+ const afterLonger=tick(healthy,1000+48*3600000);
+ assert.equal(afterLonger.ill,true);
 });
