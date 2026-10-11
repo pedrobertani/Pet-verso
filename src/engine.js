@@ -54,7 +54,7 @@ export function tick(p,now=Date.now()){
   const neglected=n.stats.food<=15||n.stats.energy<=10||n.stats.hygiene<=10||n.waste>=4;
   n.neglectHours=neglected?n.neglectHours+h:0;
   n.stats.health=clamp(n.stats.health+h*(neglected?-3:(n.sleeping?2:.5)));
-  if(!n.ill&&(n.neglectHours>=12||n.stats.health<=25)){n.ill=true;n.illnessHours=0;}
+  if(!n.ill&&n.neglectHours>=ILLNESS_NEGLECT_HOURS){n.ill=true;n.illnessHours=0;}
   if(n.ill){
    const recovered=n.stats.health>=70&&n.stats.food>=30&&n.stats.energy>=30&&n.stats.hygiene>=30;
    if(recovered){n.ill=false;n.illnessHours=0;n.neglectHours=0;}
@@ -66,6 +66,8 @@ export function tick(p,now=Date.now()){
 }
 // Ração é permitida em qualquer valor abaixo do máximo, mesmo com fome zero.
 export const canFeedByHunger=p=>Number.isFinite(p?.stats?.food)&&p.stats.food<100;
+export const MEDICINE_PRICE=10;
+export const ILLNESS_NEGLECT_HOURS=24;
 export function care(p,action,slotId){const n=structuredClone(p);if(n.dead)return n;const s=n.stats;
  if(action==='sleep'){n.sleeping=!n.sleeping;return n;}
  if(action==='clean'){n.coins+=n.waste??0;n.waste=0;n.floorDirt=0;n.wasteSlotIds=[];n.dirtSlotIds=[];return n;}
@@ -85,7 +87,13 @@ export function care(p,action,slotId){const n=structuredClone(p);if(n.dead)retur
  if(action==='feed'&&n.coins>=5&&canFeedByHunger(n)){n.coins-=5;s.food=clamp(s.food+30);s.joy=clamp(s.joy+3);n.xp+=2;countGrowthCare(n,'meals');}
  if(action==='bath'){const needed=s.hygiene<=75;s.hygiene=100;s.joy=clamp(s.joy+4);if(needed){n.xp+=2;countGrowthCare(n,'baths');}}
  if(action==='pet'){s.joy=clamp(s.joy+5);n.social={...n.social,affection:n.last};}
- if(action==='medicine'&&n.coins>=12&&s.health<90){n.coins-=12;s.health=clamp(s.health+20);}
+ if(action==='medicine'&&n.coins>=MEDICINE_PRICE&&(s.health<90||n.ill)){
+  n.coins-=MEDICINE_PRICE;
+  s.health=100;
+  n.ill=false;
+  n.illnessHours=0;
+  n.neglectHours=0;
+ }
  return n;
 }
 export function reward(p,score,smart,gameId,completedBoards=0){const n=structuredClone(p);if(!n.dead&&n.stats.energy<10)return n;const points=Math.max(0,Math.min(100,Math.floor(score)));const earnedPoints=Math.max(0,Math.floor(Number.isFinite(score)?score:0));n.totalPoints=(n.totalPoints||0)+earnedPoints;n.records??={};if(gameId)n.records[gameId]=Math.max(n.records[gameId]||0,earnedPoints);n.lastEarning=gameCoinReward(gameId,earnedPoints,completedBoards);n.coins+=n.lastEarning;if(n.dead)return n;n.growth??={version:1,level:growthProgress(n).level,baths:0,meals:0,games:n.games};n.games++;if(earnedPoints>0)n.growth.games++;n.xp+=3+Math.floor(points/20);n.stats.energy=clamp(n.stats.energy-5);n.stats.joy=clamp(n.stats.joy+5+points/20);if(smart&&earnedPoints>0){const intelligenceGain=Math.min(n.stats.health<40?2:5,gameIntelligenceReward(gameId,earnedPoints));n.stats.intelligence=clamp(n.stats.intelligence+intelligenceGain);}return advanceGrowth(n);}
